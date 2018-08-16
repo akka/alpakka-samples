@@ -85,7 +85,8 @@ public class Main {
                                     .runWith(s3Client.multipartUpload(s3Bucket, s3BucketKey, ContentTypes.TEXT_HTML_UTF8), materializer);
                         }
                 )
-                .runForeach(res -> System.out.println(res), materializer);
+                .runForeach(res -> System.out.println(res), materializer)
+                .exceptionally(e -> { e.printStackTrace(); return Done.done(); });
     }
 
 }
