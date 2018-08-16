@@ -56,8 +56,7 @@ public class Main {
     }
 
     void run() throws Exception {
-
-        final MqttConnectionSettings mqttSettings =
+        final MqttConnectionSettings mqttConnectionSettings =
                 MqttConnectionSettings
                         .create(
                                 mqttBroker,
@@ -66,28 +65,27 @@ public class Main {
                         );
 
         @SuppressWarnings("unchecked")
-        MqttSourceSettings sourceSettings =
-                MqttSourceSettings.create(mqttSettings)
+        MqttSourceSettings mqttSourceSettings =
+                MqttSourceSettings.create(mqttConnectionSettings)
                         .withSubscriptions(Pair.create(topic, MqttQoS.atLeastOnce()));
 
         S3Settings s3Settings = S3Settings.create(system);
-        S3Client client = S3Client.create(s3Settings, system, materializer);
+        S3Client s3Client = S3Client.create(s3Settings, system, materializer);
 
-        CompletionStage<Done> streamCompletion =
-                MqttSource
-                        .atMostOnce(sourceSettings, 8)
-                        .map(m -> m.payload().utf8String())
-                        .<DownloadCommand>map(downloadCommandReader::readValue)
-                        .mapAsync(4, info -> {
-                                    String s3BucketKey = createS3BucketKey(info);
-                                    return Source.single(info.url)
-                                            .map(HttpRequest::GET)
-                                            .mapAsync(1, http::singleRequest)
-                                            .flatMapConcat(strictEntity -> strictEntity.entity().getDataBytes())
-                                            .runWith(client.multipartUpload(s3Bucket, s3BucketKey, ContentTypes.TEXT_HTML_UTF8), materializer);
-                                }
-                        )
-                        .runWith(Sink.ignore(), materializer);
+        MqttSource
+                .atMostOnce(mqttSourceSettings, 8)
+                .map(m -> m.payload().utf8String())
+                .<DownloadCommand>map(downloadCommandReader::readValue)
+                .mapAsync(4, info -> {
+                            String s3BucketKey = createS3BucketKey(info);
+                            return Source.single(info.url)
+                                    .map(HttpRequest::GET)
+                                    .mapAsync(1, http::singleRequest)
+                                    .flatMapConcat(httpResponse -> httpResponse.entity().getDataBytes())
+                                    .runWith(s3Client.multipartUpload(s3Bucket, s3BucketKey, ContentTypes.TEXT_HTML_UTF8), materializer);
+                        }
+                )
+                .runWith(Sink.ignore(), materializer);
     }
 
 }
