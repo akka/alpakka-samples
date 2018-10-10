@@ -1,0 +1,16 @@
+language: scala
+jdk: oraclejdk8
+
+jobs:
+  include:
+    - script: cd alpakka-sample-mqtt-http-to-s3-java && sbt compile
+    - script: cd alpakka-sample-sqs-java && sbt compile
+
+before_cache:
+  - find $HOME/.ivy2 -name "ivydata-*.properties" -print -delete
+  - find $HOME/.sbt  -name "*.lock"               -print -delete
+
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot
