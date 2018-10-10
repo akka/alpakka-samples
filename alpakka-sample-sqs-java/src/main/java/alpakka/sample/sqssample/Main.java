@@ -26,16 +26,12 @@ import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.util.concurrent.CompletionStage;
 
 public class Main {
-
-    final static Logger log = LoggerFactory.getLogger(Main.class);
 
     final static ObjectMapper mapper = new ObjectMapper();
     final static ObjectReader fromSqsReader = mapper.readerFor(MessageFromSqs.class);
@@ -46,7 +42,7 @@ public class Main {
     final ActorSystem system;
     final Materializer materializer;
     final ActorRef enrichingActor;
-    final LoggingAdapter logAsMain;
+    final LoggingAdapter log;
 
     public static void main(String[] args) throws Exception {
         Main me = new Main();
@@ -55,7 +51,7 @@ public class Main {
 
     public Main() {
         system = ActorSystem.create();
-        logAsMain = Logging.getLogger(system, this);
+        log = Logging.getLogger(system, this);
         materializer = ActorMaterializer.create(system);
         enrichingActor = system.actorOf(Props.create(EnrichActor.class, EnrichActor::new));
     }
@@ -79,7 +75,7 @@ public class Main {
 
         // create running stream
         CompletionStage<Done> streamCompletion = SqsSource.create(sourceQueueUrl, settings, sqsClient)
-                .log("read from SQS", logAsMain)
+                .log("read from SQS", log)
                 .mapAsync(8, (Message msg) -> {
                     return enrichAndPublish(sqsClient, msg)
                             // upon completion ignore the result and pass on the original message
@@ -114,7 +110,7 @@ public class Main {
                             });
                 })
                 .map(amsg -> new SendMessageRequest(publishUrl, enrichedMessageWriter.writeValueAsString(amsg)))
-                .log("sending to publish queue", logAsMain)
+                .log("sending to publish queue", log)
                 .via(publishFlow)
                 .runWith(Sink.head(), materializer);
     }
