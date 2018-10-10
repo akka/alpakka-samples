@@ -6,6 +6,8 @@ import akka.actor.*;
 
 import static akka.pattern.PatternsCS.ask;
 
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
 import akka.stream.alpakka.sqs.*;
@@ -44,6 +46,7 @@ public class Main {
     final ActorSystem system;
     final Materializer materializer;
     final ActorRef enrichingActor;
+    final LoggingAdapter logAsMain;
 
     public static void main(String[] args) throws Exception {
         Main me = new Main();
@@ -52,6 +55,7 @@ public class Main {
 
     public Main() {
         system = ActorSystem.create();
+        logAsMain = Logging.getLogger(system, this);
         materializer = ActorMaterializer.create(system);
         enrichingActor = system.actorOf(Props.create(EnrichActor.class, EnrichActor::new));
     }
@@ -75,10 +79,7 @@ public class Main {
 
         // create running stream
         CompletionStage<Done> streamCompletion = SqsSource.create(sourceQueueUrl, settings, sqsClient)
-                .map(msg -> {
-                    log.debug("read from SQS '{}'", msg);
-                    return msg;
-                })
+                .log("read from SQS", logAsMain)
                 .mapAsync(8, (Message msg) -> {
                     return enrichAndPublish(sqsClient, msg)
                             // upon completion ignore the result and pass on the original message
@@ -113,10 +114,7 @@ public class Main {
                             });
                 })
                 .map(amsg -> new SendMessageRequest(publishUrl, enrichedMessageWriter.writeValueAsString(amsg)))
-                .map(req -> {
-                    log.debug("sending '{}' to publish queue", req);
-                    return req;
-                })
+                .log("sending to publish queue", logAsMain)
                 .via(publishFlow)
                 .runWith(Sink.head(), materializer);
     }
