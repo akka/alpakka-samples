@@ -5,4 +5,4 @@
 Running this requires:
 - Amazon SQS (this sample uses ElasticMQ, provided via docker-compose)
 
-Messages to MQTT can be published by `PublishDataToMqtt`.
+Messages to SQS can be published by `PublishToSqs`.
