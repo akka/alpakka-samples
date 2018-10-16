@@ -96,7 +96,7 @@ public class Main {
         final Flow<SendMessageRequest, SqsPublishResult, NotUsed> publishFlow = SqsPublishFlow.create(publishUrl, publishSettings, sqsClient);
         return Source.<Message>single(sqsMsg)
                 .map(Main::transform)
-                .mapAsync(16, (MessageFromSqs msg) -> {
+                .mapAsync(1, (MessageFromSqs msg) -> {
                     return ask(enrichingActor, msg.id, Duration.ofSeconds(2))
                             .thenApply(response -> {
                                 log.debug("ask received '{}'", response);
