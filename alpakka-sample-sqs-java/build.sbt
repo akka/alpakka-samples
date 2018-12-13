@@ -1,7 +1,7 @@
 organization := "com.lightbend.alpakka.samples"
 name := "alpakka-samples-sqs-java"
 
-val akkaVersion = "2.5.17"
+val akkaVersion = "2.5.19"
 val akkaHttpVersion = "10.1.5"
 val alpakkaVersion = "1.0-M1"
 val jacksonVersion = "2.9.7"
@@ -14,3 +14,7 @@ libraryDependencies ++= Seq(
 )
 
 licenses := Seq(("CC0", url("http://creativecommons.org/publicdomain/zero/1.0")))
+
+javacOptions ++= Seq(
+  "-Xlint:deprecation"
+)
