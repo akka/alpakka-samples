@@ -11,7 +11,7 @@ import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
 import akka.stream.alpakka.mqtt.MqttConnectionSettings;
 import akka.stream.alpakka.mqtt.MqttQoS;
-import akka.stream.alpakka.mqtt.MqttSourceSettings;
+import akka.stream.alpakka.mqtt.MqttSubscriptions;
 import akka.stream.alpakka.mqtt.javadsl.MqttSource;
 import akka.stream.alpakka.s3.S3Settings;
 import akka.stream.alpakka.s3.javadsl.S3Client;
@@ -65,15 +65,14 @@ public class Main {
                         );
 
         @SuppressWarnings("unchecked")
-        MqttSourceSettings mqttSourceSettings =
-                MqttSourceSettings.create(mqttConnectionSettings)
-                        .withSubscriptions(Pair.create(topic, MqttQoS.atLeastOnce()));
+        MqttSubscriptions mqttSubscriptions =
+                MqttSubscriptions.create(topic, MqttQoS.atLeastOnce());
 
         S3Settings s3Settings = S3Settings.create(system);
         S3Client s3Client = S3Client.create(s3Settings, system, materializer);
 
         MqttSource
-                .atMostOnce(mqttSourceSettings, 8)
+                .atMostOnce(mqttConnectionSettings, mqttSubscriptions, 8)
                 .map(m -> m.payload().utf8String())
                 .<DownloadCommand>map(downloadCommandReader::readValue)
                 .mapAsync(4, info -> {
