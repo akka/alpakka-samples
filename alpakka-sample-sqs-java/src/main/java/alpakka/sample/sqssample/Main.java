@@ -4,7 +4,7 @@ import akka.Done;
 import akka.NotUsed;
 import akka.actor.*;
 
-import static akka.pattern.PatternsCS.ask;
+import static akka.pattern.Patterns.ask;
 
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
