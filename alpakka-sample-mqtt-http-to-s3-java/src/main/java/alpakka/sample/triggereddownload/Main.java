@@ -11,10 +11,9 @@ import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
 import akka.stream.alpakka.mqtt.MqttConnectionSettings;
 import akka.stream.alpakka.mqtt.MqttQoS;
-import akka.stream.alpakka.mqtt.MqttSourceSettings;
+import akka.stream.alpakka.mqtt.MqttSubscriptions;
 import akka.stream.alpakka.mqtt.javadsl.MqttSource;
-import akka.stream.alpakka.s3.S3Settings;
-import akka.stream.alpakka.s3.javadsl.S3Client;
+import akka.stream.alpakka.s3.javadsl.S3;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,7 +23,6 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.CompletionStage;
 
 public class Main {
 
@@ -65,15 +63,11 @@ public class Main {
                         );
 
         @SuppressWarnings("unchecked")
-        MqttSourceSettings mqttSourceSettings =
-                MqttSourceSettings.create(mqttConnectionSettings)
-                        .withSubscriptions(Pair.create(topic, MqttQoS.atLeastOnce()));
-
-        S3Settings s3Settings = S3Settings.create(system);
-        S3Client s3Client = S3Client.create(s3Settings, system, materializer);
+        MqttSubscriptions mqttSubscriptions =
+                MqttSubscriptions.create(topic, MqttQoS.atLeastOnce());
 
         MqttSource
-                .atMostOnce(mqttSourceSettings, 8)
+                .atMostOnce(mqttConnectionSettings, mqttSubscriptions, 8)
                 .map(m -> m.payload().utf8String())
                 .<DownloadCommand>map(downloadCommandReader::readValue)
                 .mapAsync(4, info -> {
@@ -82,7 +76,8 @@ public class Main {
                                     .map(HttpRequest::GET)
                                     .mapAsync(1, http::singleRequest)
                                     .flatMapConcat(httpResponse -> httpResponse.entity().getDataBytes())
-                                    .runWith(s3Client.multipartUpload(s3Bucket, s3BucketKey, ContentTypes.TEXT_HTML_UTF8), materializer);
+                                    .runWith(S3.multipartUpload(s3Bucket, s3BucketKey, ContentTypes.TEXT_HTML_UTF8), materializer)
+                                    .runWith(Sink.ignore(), materializer);
                         }
                 )
                 .runForeach(res -> System.out.println(res), materializer)
