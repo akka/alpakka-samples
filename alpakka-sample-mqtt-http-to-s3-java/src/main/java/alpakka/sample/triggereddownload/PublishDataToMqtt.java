@@ -2,6 +2,8 @@ package alpakka.sample.triggereddownload;
 
 import akka.Done;
 import akka.actor.ActorSystem;
+import akka.event.Logging;
+import akka.event.LoggingAdapter;
 import akka.http.javadsl.Http;
 import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
@@ -42,7 +44,7 @@ public class PublishDataToMqtt {
 
 
     void run() throws Exception {
-
+        LoggingAdapter logging = Logging.getLogger(system, this);
 
         final MqttConnectionSettings connectionSettings =
                 MqttConnectionSettings.create(
@@ -53,6 +55,8 @@ public class PublishDataToMqtt {
         DownloadCommand command = new DownloadCommand(Instant.now(), "https://developer.lightbend.com/docs/alpakka/current/s3.html");
         MqttMessage message = MqttMessage.create("downloads/trigger", ByteString.fromString(downloadCommandWriter.writeValueAsString(command)));
 
-        Source.tick(Duration.ofSeconds(5), Duration.ofSeconds(30), message).runWith(mqttSink, materializer);
+        Source.tick(Duration.ofSeconds(5), Duration.ofSeconds(30), message)
+                .log("sending", logging)
+                .runWith(mqttSink, materializer);
     }
 }
