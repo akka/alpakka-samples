@@ -8,16 +8,15 @@ import akka.stream.alpakka.sqs.SqsPublishSettings;
 import akka.stream.alpakka.sqs.javadsl.SqsPublishFlow;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.services.sqs.AmazonSQSAsync;
-import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
-import com.amazonaws.services.sqs.model.SendMessageRequest;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 
+import java.net.URI;
 import java.util.concurrent.CompletionStage;
 
 public class PublishToSqs {
@@ -41,24 +40,22 @@ public class PublishToSqs {
     void run() throws Exception {
         // create SQS client
         String sqsEndpoint = "this-uses-ElasticMQ";
-        AWSCredentialsProvider credentialsProvider =
-                new AWSStaticCredentialsProvider(new BasicAWSCredentials("x", "x"));
-        AmazonSQSAsync sqsClient =
-                AmazonSQSAsyncClientBuilder.standard()
-                        .withCredentials(credentialsProvider)
-                        .withEndpointConfiguration(
-                                new AwsClientBuilder.EndpointConfiguration(sqsEndpoint, "eu-central-1"))
+        SqsAsyncClient sqsClient =
+                SqsAsyncClient.builder()
+                        .credentialsProvider(
+                                StaticCredentialsProvider.create(AwsBasicCredentials.create("x", "x")))
+                        .endpointOverride(URI.create(sqsEndpoint))
+                        .region(Region.EU_CENTRAL_1)
                         .build();
-        system.registerOnTermination(() -> sqsClient.shutdown());
+        system.registerOnTermination(() -> sqsClient.close());
 
         publishMessageToSourceTopic(sqsClient, "{\"id\":423,\"name\":\"Alpakka\"}")
                 .thenAccept(done -> system.terminate());
     }
 
-    private CompletionStage<Done> publishMessageToSourceTopic(AmazonSQSAsync sqsClient, String msgJson) {
-        return
-        Source.single(msgJson)
-                .map(s -> new SendMessageRequest(sourceQueueUrl, s))
+    private CompletionStage<Done> publishMessageToSourceTopic(SqsAsyncClient sqsClient, String msgJson) {
+        return Source.single(msgJson)
+                .map(s -> SendMessageRequest.builder().messageBody(s).build())
                 .via(SqsPublishFlow.create(sourceQueueUrl, SqsPublishSettings.create(), sqsClient))
                 .runWith(Sink.foreach(System.out::println), materializer);
     }

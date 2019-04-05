@@ -2,10 +2,9 @@ package alpakka.sample.sqssample;
 
 import akka.Done;
 import akka.NotUsed;
-import akka.actor.*;
-
-import static akka.pattern.Patterns.ask;
-
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.Props;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.stream.ActorMaterializer;
@@ -14,22 +13,26 @@ import akka.stream.alpakka.sqs.*;
 import akka.stream.alpakka.sqs.javadsl.SqsAckSink;
 import akka.stream.alpakka.sqs.javadsl.SqsPublishFlow;
 import akka.stream.alpakka.sqs.javadsl.SqsSource;
-import akka.stream.javadsl.*;
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.services.sqs.AmazonSQSAsync;
-import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
-import com.amazonaws.services.sqs.model.Message;
-import com.amazonaws.services.sqs.model.SendMessageRequest;
+import akka.stream.javadsl.Flow;
+import akka.stream.javadsl.Sink;
+import akka.stream.javadsl.Source;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.sqs.SqsAsyncClient;
+import software.amazon.awssdk.services.sqs.model.Message;
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
+import software.amazon.awssdk.services.sqs.model.SendMessageResponse;
 
 import java.io.IOException;
+import java.net.URI;
 import java.time.Duration;
 import java.util.concurrent.CompletionStage;
+
+import static akka.pattern.Patterns.ask;
 
 public class Main {
 
@@ -59,15 +62,14 @@ public class Main {
     void run() throws Exception {
         // create SQS client
         String sqsEndpoint = "this-uses-ElasticMQ";
-        AWSCredentialsProvider credentialsProvider =
-                new AWSStaticCredentialsProvider(new BasicAWSCredentials("x", "x"));
-        AmazonSQSAsync sqsClient =
-                AmazonSQSAsyncClientBuilder.standard()
-                        .withCredentials(credentialsProvider)
-                        .withEndpointConfiguration(
-                                new AwsClientBuilder.EndpointConfiguration(sqsEndpoint, "eu-central-1"))
+        SqsAsyncClient sqsClient =
+                SqsAsyncClient.builder()
+                        .credentialsProvider(
+                                StaticCredentialsProvider.create(AwsBasicCredentials.create("x", "x")))
+                        .endpointOverride(URI.create(sqsEndpoint))
+                        .region(Region.EU_CENTRAL_1)
                         .build();
-        system.registerOnTermination(() -> sqsClient.shutdown());
+        system.registerOnTermination(() -> sqsClient.close());
 
         // configure SQS
         SqsSourceSettings settings = SqsSourceSettings.create().withCloseOnEmptyReceive(true);
@@ -91,9 +93,9 @@ public class Main {
         streamCompletion.thenAccept(done -> system.terminate());
     }
 
-    CompletionStage<SqsPublishResult> enrichAndPublish(AmazonSQSAsync sqsClient, Message sqsMsg) {
+    CompletionStage<SqsPublishResult<SendMessageResponse>> enrichAndPublish(SqsAsyncClient sqsClient, Message sqsMsg) {
         SqsPublishSettings publishSettings = SqsPublishSettings.create();
-        final Flow<SendMessageRequest, SqsPublishResult, NotUsed> publishFlow = SqsPublishFlow.create(publishUrl, publishSettings, sqsClient);
+        final Flow<SendMessageRequest, SqsPublishResult<SendMessageResponse>, NotUsed> publishFlow = SqsPublishFlow.create(publishUrl, publishSettings, sqsClient);
         return Source.<Message>single(sqsMsg)
                 .map(Main::transform)
                 .mapAsync(1, (MessageFromSqs msg) -> {
@@ -109,14 +111,14 @@ public class Main {
                                 }
                             });
                 })
-                .map(amsg -> new SendMessageRequest(publishUrl, enrichedMessageWriter.writeValueAsString(amsg)))
+                .map(amsg -> SendMessageRequest.builder().messageBody(enrichedMessageWriter.writeValueAsString(amsg)).build())
                 .log("sending to publish queue", log)
                 .via(publishFlow)
                 .runWith(Sink.head(), materializer);
     }
 
     private static MessageFromSqs transform(Message message) throws IOException {
-        return fromSqsReader.readValue(message.getBody());
+        return fromSqsReader.readValue(message.body());
     }
 
 }
