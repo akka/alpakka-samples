@@ -76,8 +76,7 @@ public class Main {
                                     .map(HttpRequest::GET)
                                     .mapAsync(1, http::singleRequest)
                                     .flatMapConcat(httpResponse -> httpResponse.entity().getDataBytes())
-                                    .runWith(S3.multipartUpload(s3Bucket, s3BucketKey, ContentTypes.TEXT_HTML_UTF8), materializer)
-                                    .runWith(Sink.ignore(), materializer);
+                                    .runWith(S3.multipartUpload(s3Bucket, s3BucketKey, ContentTypes.TEXT_HTML_UTF8), materializer);
                         }
                 )
                 .runForeach(res -> System.out.println(res), materializer)
