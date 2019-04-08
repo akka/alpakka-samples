@@ -1,9 +1,8 @@
 package alpakka.sample.sqssample;
 
+import akka.actor.AbstractActor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import akka.actor.AbstractActor;
 
 class EnrichActor extends AbstractActor {
 

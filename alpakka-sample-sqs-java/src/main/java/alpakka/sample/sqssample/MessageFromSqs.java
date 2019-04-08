@@ -3,8 +3,6 @@ package alpakka.sample.sqssample;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.time.Instant;
-
 final class MessageFromSqs {
     public final int id;
     public final String name;
