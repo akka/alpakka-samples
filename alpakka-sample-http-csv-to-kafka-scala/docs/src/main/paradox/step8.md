@@ -1,6 +1,6 @@
-@@include[readme](/step_008_completed/README.md)
+@@include[readme](/step_008_scheduled_download/README.md)
 
 ### Code 
 Scala
-: @@snip [snip](/step_008_completed/src/main/scala/samples/Main.scala) { }
+: @@snip [snip](/step_008_scheduled_download/src/main/scala/samples/Main.scala) { }
 

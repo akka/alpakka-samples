@@ -2,47 +2,46 @@
 lazy val alpakka_sample_master = (project in file("."))
   .aggregate(
     common,
-    step_001_HTTP_request,
-    step_002_Extract_HTTP_entity,
-    step_003_Parse_CSV,
-    step_004_Producing_JSON,
-    step_005_Cleanse_lines,
-    step_006_Coordinated_shutdown,
-    step_007_Almost_complete,
-    step_008_Completed
+    step_001_http_request,
+    step_002_extract_http_entity,
+    step_003_parse_csv,
+    step_004_producing_json,
+    step_005_cleanse_lines,
+    step_006_coordinated_shutdown,
+    step_007_produce_to_kafka,
+    step_008_scheduled_download
  ).settings(CommonSettings.commonSettings: _*)
 
 lazy val common = project.settings(CommonSettings.commonSettings: _*)
 
-lazy val step_001_HTTP_request = project
+lazy val step_001_http_request = project
   .settings(CommonSettings.commonSettings: _*)
   .dependsOn(common % "test->test;compile->compile")
 
-lazy val step_002_Extract_HTTP_entity = project
+lazy val step_002_extract_http_entity = project
   .settings(CommonSettings.commonSettings: _*)
   .dependsOn(common % "test->test;compile->compile")
 
-lazy val step_003_Parse_CSV = project
+lazy val step_003_parse_csv = project
   .settings(CommonSettings.commonSettings: _*)
   .dependsOn(common % "test->test;compile->compile")
 
-lazy val step_004_Producing_JSON = project
+lazy val step_004_producing_json = project
   .settings(CommonSettings.commonSettings: _*)
   .dependsOn(common % "test->test;compile->compile")
 
-lazy val step_005_Cleanse_lines = project
+lazy val step_005_cleanse_lines = project
   .settings(CommonSettings.commonSettings: _*)
   .dependsOn(common % "test->test;compile->compile")
 
-lazy val step_006_Coordinated_shutdown = project
+lazy val step_006_coordinated_shutdown = project
   .settings(CommonSettings.commonSettings: _*)
   .dependsOn(common % "test->test;compile->compile")
 
-lazy val step_007_Almost_complete = project
+lazy val step_007_produce_to_kafka = project
   .settings(CommonSettings.commonSettings: _*)
   .dependsOn(common % "test->test;compile->compile")
 
-lazy val step_008_Completed = project
+lazy val step_008_scheduled_download = project
   .settings(CommonSettings.commonSettings: _*)
   .dependsOn(common % "test->test;compile->compile")
-       

@@ -1,3 +1,5 @@
 # Step 6: Adding Coordinated Shutdown
 
-- Run the code
+### Description
+
+To make sure Akka HTTP is shut down in a proper way it is added to Akka's @extref:[Coordinated shutdown](akka-docs:actors.html#coordinated-shutdown).
