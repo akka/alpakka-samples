@@ -5,6 +5,7 @@ jobs:
   include:
     - script: cd alpakka-sample-mqtt-http-to-s3-java && sbt compile
     - script: cd alpakka-sample-sqs-java && sbt compile
+    - script: cd alpakka-sample-http-csv-to-kafka-scala && sbt "; compile ; docs/paradox"
 
 before_cache:
   - find $HOME/.ivy2 -name "ivydata-*.properties" -print -delete
