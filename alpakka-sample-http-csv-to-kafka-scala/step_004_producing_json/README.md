@@ -2,6 +2,6 @@
 
 ### Description
 
-The helper method `toJson` turns the maps into JSON by using [Spray JSON](https://github.com/spray/spray-json). 
+The helper method `toJson` turns the maps into JSON by using @scala[[Spray JSON](https://github.com/spray/spray-json)]@java[Jackson].
 
-The JSON structure is converted to `String`s via `compactPrint`.
+@scala[The JSON structure is converted to `String`s via `compactPrint`.]

@@ -47,7 +47,7 @@ object Main
       .mapAsync(1)(Http().singleRequest(_)) //: HttpResponse
       .flatMapConcat(extractEntityData) //: ByteString
       .via(CsvParsing.lineScanner()) //: List[ByteString]
-      .via(CsvToMap.toMapAsStrings()) //: Map[String, ByteString]
+      .via(CsvToMap.toMapAsStrings()) //: Map[String, String]
       .map(toJson) //: JsValue
       .map(_.compactPrint) //: String (JSON formatted)
       .runWith(Sink.foreach(println))

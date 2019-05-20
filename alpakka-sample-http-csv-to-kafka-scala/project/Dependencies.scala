@@ -13,6 +13,8 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-stream-kafka" % AlpakkaKafkaVersion,
     "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion,
     "com.typesafe.akka" %% "akka-http-spray-json" % AkkaHttpVersion,
+    "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.9.9",
+    "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.9.9",
 
     "org.testcontainers" % "kafka" % "1.11.1",
     
