@@ -2,10 +2,11 @@
 <html class="no-js" lang="en">
 
 <head>
-<title>Alpakka step-by-step example</title>
+<title>Alpakka Samples</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content="Alpakka Samples"/>
+<link rel="canonical" href="https://akka.io/alpakka-samples/index.html"/>
 <script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
 <script type="text/javascript" src="lib/foundation/dist/js/foundation.min.js"></script>
 <link rel="stylesheet" type="text/css" href="lib/normalize.css/normalize.css"/>
@@ -86,26 +87,17 @@ document.getElementsByTagName('head')[0].appendChild(s);
 <div id="overlay" class="overlay-nav" data-toggler="nav-open">
 <header class="nav-header">
 <div class="nav-header-title">
-<h1><a href="index.html">Alpakka step-by-step example</a></h1>
+<h1><a href="index.html">Alpakka Samples</a></h1>
 </div>
 <div class="nav-header-version">
 Version current
 </div>
 <div class="nav-header-groups">
-<select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
 </div>
 </header>
 <nav class="nav-toc">
 <ul>
-  <li><a href="index.html#fetch-csv-via-akka-http-and-publish-the-data-as-json-to-kafka" class="header">Fetch CSV via Akka HTTP and publish the data as JSON to Kafka</a></li>
-  <li><a href="step1.html" class="page">Step 1: Send HTTP request</a></li>
-  <li><a href="step2.html" class="page">Step 2: extract HTTP entity</a></li>
-  <li><a href="step3.html" class="page">Step 3: parse CSV</a></li>
-  <li><a href="step4.html" class="page">Step 4: Producing JSON</a></li>
-  <li><a href="step5.html" class="page">Step 5: Cleanse lines from data source</a></li>
-  <li><a href="step6.html" class="page">Step 6: Adding Coordinated Shutdown</a></li>
-  <li><a href="step7.html" class="page">Step 7: Produce to Kafka</a></li>
-  <li><a href="step8.html" class="page">Step 8: Scheduled download</a></li>
+  <li><a href="http-csv-to-kafka.html" class="page">Fetch CSV via Akka HTTP and publish the data as JSON to Kafka</a></li>
 </ul>
 </nav>
 </div>
@@ -114,27 +106,18 @@ Version current
 <aside class="show-for-large">
 <header class="nav-header fixed-sidebar-header">
 <div class="nav-header-title">
-<h1><a href="index.html">Alpakka step-by-step example</a></h1>
+<h1><a href="index.html">Alpakka Samples</a></h1>
 </div>
 <div class="nav-header-version">
 Version current
 </div>
 <div class="nav-header-groups">
-<select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
 </div>
 </header>
 <nav class="site-nav fixed-sidebar-contents">
 <div class="nav-toc">
 <ul>
-  <li><a href="index.html#fetch-csv-via-akka-http-and-publish-the-data-as-json-to-kafka" class="header">Fetch CSV via Akka HTTP and publish the data as JSON to Kafka</a></li>
-  <li><a href="step1.html" class="page">Step 1: Send HTTP request</a></li>
-  <li><a href="step2.html" class="page">Step 2: extract HTTP entity</a></li>
-  <li><a href="step3.html" class="page">Step 3: parse CSV</a></li>
-  <li><a href="step4.html" class="page">Step 4: Producing JSON</a></li>
-  <li><a href="step5.html" class="page">Step 5: Cleanse lines from data source</a></li>
-  <li><a href="step6.html" class="page">Step 6: Adding Coordinated Shutdown</a></li>
-  <li><a href="step7.html" class="page">Step 7: Produce to Kafka</a></li>
-  <li><a href="step8.html" class="page">Step 8: Scheduled download</a></li>
+  <li><a href="http-csv-to-kafka.html" class="page">Fetch CSV via Akka HTTP and publish the data as JSON to Kafka</a></li>
 </ul>
 </div>
 </nav>
@@ -149,51 +132,10 @@ Version current
 
 <article class="page-content row">
 <div class="small-12 large-9 column" id="docs">
-<h1><a href="#alpakka-step-by-step-example" name="alpakka-step-by-step-example" class="anchor"><span class="anchor-link"></span></a>Alpakka step-by-step example</h1>
-<h2><a href="#fetch-csv-via-akka-http-and-publish-the-data-as-json-to-kafka" name="fetch-csv-via-akka-http-and-publish-the-data-as-json-to-kafka" class="anchor"><span class="anchor-link"></span></a>Fetch CSV via Akka HTTP and publish the data as JSON to Kafka</h2>
-<p>This example uses <a href="https://doc.akka.io/docs/akka-http/10.1.8/client-side/connection-level.html#opening-http-connections">Akka HTTP to send the HTTP request</a> and Akka HTTPs primary JSON support via <a href="https://doc.akka.io/docs/akka-http/10.1.8/common/json-support.html#spray-json-support">Spray JSON</a> to convert the map into a JSON structure.</p>
+<h1><a href="#alpakka-samples" name="alpakka-samples" class="anchor"><span class="anchor-link"></span></a>Alpakka Samples</h1>
 <div class="toc ">
 <ul>
-  <li><a href="step1.html" class="page">Step 1: Send HTTP request</a>
-  <ul>
-    <li><a href="step1.html#description" class="header">Description</a></li>
-    <li><a href="step1.html#code" class="header">Code</a></li>
-  </ul></li>
-  <li><a href="step2.html" class="page">Step 2: extract HTTP entity</a>
-  <ul>
-    <li><a href="step2.html#description" class="header">Description</a></li>
-    <li><a href="step2.html#code" class="header">Code</a></li>
-  </ul></li>
-  <li><a href="step3.html" class="page">Step 3: parse CSV</a>
-  <ul>
-    <li><a href="step3.html#description" class="header">Description</a></li>
-    <li><a href="step3.html#code" class="header">Code</a></li>
-  </ul></li>
-  <li><a href="step4.html" class="page">Step 4: Producing JSON</a>
-  <ul>
-    <li><a href="step4.html#description" class="header">Description</a></li>
-    <li><a href="step4.html#code" class="header">Code</a></li>
-  </ul></li>
-  <li><a href="step5.html" class="page">Step 5: Cleanse lines from data source</a>
-  <ul>
-    <li><a href="step5.html#description" class="header">Description</a></li>
-    <li><a href="step5.html#code" class="header">Code</a></li>
-  </ul></li>
-  <li><a href="step6.html" class="page">Step 6: Adding Coordinated Shutdown</a>
-  <ul>
-    <li><a href="step6.html#description" class="header">Description</a></li>
-    <li><a href="step6.html#code" class="header">Code</a></li>
-  </ul></li>
-  <li><a href="step7.html" class="page">Step 7: Produce to Kafka</a>
-  <ul>
-    <li><a href="step7.html#description" class="header">Description</a></li>
-    <li><a href="step7.html#code" class="header">Code</a></li>
-  </ul></li>
-  <li><a href="step8.html" class="page">Step 8: Scheduled download</a>
-  <ul>
-    <li><a href="step8.html#description" class="header">Description</a></li>
-    <li><a href="step8.html#code" class="header">Code</a></li>
-  </ul></li>
+  <li><a href="http-csv-to-kafka.html" class="page">Fetch CSV via Akka HTTP and publish the data as JSON to Kafka</a></li>
 </ul>
 </div>
 </div>
@@ -205,14 +147,14 @@ Version current
 <div class="nav-prev small-6 column">
 </div>
 <div class="nav-next small-6 column clearfix">
-<a class="float-right" href="step1.html">Step 1: Send HTTP request <i class="icon-next"></i></a>
+<a class="float-right" href="http-csv-to-kafka.html">Fetch CSV via Akka HTTP and publish the data as JSON to Kafka <i class="icon-next"></i></a>
 </div>
 </section>
 </div>
 </div>
 
 <div class="source-github row">
-Found an error in this documentation? The source code for this page can be found <a href="https://github.com/akka/alpakka-samples/tree/vcurrent/docs/src/main/paradox/index.md">here</a>.
+Found an error in this documentation? The source code for this page can be found <a href="https://github.com/akka/alpakka-samples/tree/vcurrent/src/main/paradox/index.md">here</a>.
 Please feel free to edit and contribute a pull request.
 </div>
 
