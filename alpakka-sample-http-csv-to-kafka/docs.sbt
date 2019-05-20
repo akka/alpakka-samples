@@ -14,6 +14,8 @@ lazy val docs = project
       "akka.version" -> Dependencies.AkkaVersion,
       "project.url" -> "https://akka.io/alpakka-samples/http-csv-to-kafka/",
       "canonical.base_url" -> "https://akka.io/alpakka-samples/http-csv-to-kafka/",
+      "github.base_url" -> "https://github.com/akka/alpakka-samples/tree/master/",
+      "github.root.base_dir" -> (baseDirectory in ThisBuild).value.getParent.toString,
       "akka-http.version" -> Dependencies.AkkaHttpVersion,
       "extref.alpakka-docs.base_url" -> s"https://doc.akka.io/docs/alpakka/${Dependencies.AlpakkaVersion}/%s",
       "extref.alpakka-kafka-docs.base_url" -> s"https://doc.akka.io/docs/alpakka-kafka/${Dependencies.AlpakkaKafkaVersion}/%s",
