@@ -1,8 +1,11 @@
 lazy val docs = project
-  .enablePlugins(AkkaParadoxPlugin)
+  .enablePlugins(AkkaParadoxPlugin, ParadoxSitePlugin, GhpagesPlugin)
   .settings(
-    name := "Alpakka",
-    Compile / paradoxProperties ++= Map(
+    name := "Alpakka Samples",
+    previewFixedPort := Some(8085),
+    Paradox / sourceDirectory := sourceDirectory.value / "main",
+    Paradox / siteSubdirName := "http-csv-to-kafka",
+    Paradox / paradoxProperties ++= Map(
       "akka.version" -> Dependencies.AkkaVersion,
       "akka-http.version" -> Dependencies.AkkaHttpVersion,
       "extref.alpakka-docs.base_url" -> s"https://doc.akka.io/docs/alpakka/${Dependencies.AlpakkaVersion}/%s",
@@ -21,6 +24,8 @@ lazy val docs = project
       "scaladoc.akka.stream.alpakka.base_url" ->  s"https://doc.akka.io/api/alpakka/${Dependencies.AlpakkaVersion}",
       "scaladoc.akka.kafka.base_url" ->  s"https://doc.akka.io/api/alpakka-kafka/${Dependencies.AlpakkaKafkaVersion}",
     ),
-    paradoxGroups := Map("Language" -> Seq("Java", "Scala")),
+    Paradox / paradoxGroups := Map("Language" -> Seq("Java", "Scala")),
     resolvers += Resolver.jcenterRepo,
+    git.remoteRepo := "git@github.com:akka/alpakka-samples.git",
+    ghpagesNoJekyll := true
   )
