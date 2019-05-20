@@ -4,6 +4,7 @@ lazy val docs = project
   .enablePlugins(AkkaParadoxPlugin, ParadoxSitePlugin, GhpagesPlugin)
   .settings(
     name := "Alpakka Samples",
+    description := "Fetch CSV via Akka HTTP and publish the data as JSON to Kafka",
     version := "current",
     isSnapshot := false,
     previewFixedPort := Some(8085),
