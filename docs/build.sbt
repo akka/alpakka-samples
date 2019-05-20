@@ -14,3 +14,6 @@ resolvers += Resolver.jcenterRepo
 git.remoteRepo := "git@github.com:akka/alpakka-samples.git"
 ghpagesNoJekyll := true
   
+ghpagesCleanSite / excludeFilter := new FileFilter{
+  def accept(f: File) = (ghpagesRepository.value / "http-csv-to-kafka").getCanonicalPath == f.getCanonicalPath
+}

@@ -11,6 +11,8 @@ lazy val docs = project
     Paradox / siteSubdirName := "http-csv-to-kafka",
     Paradox / paradoxProperties ++= Map(
       "akka.version" -> Dependencies.AkkaVersion,
+      "project.url" -> "https://akka.io/alpakka-samples/http-csv-to-kafka/",
+      "canonical.base_url" -> "https://akka.io/alpakka-samples/http-csv-to-kafka/",
       "akka-http.version" -> Dependencies.AkkaHttpVersion,
       "extref.alpakka-docs.base_url" -> s"https://doc.akka.io/docs/alpakka/${Dependencies.AlpakkaVersion}/%s",
       "extref.alpakka-kafka-docs.base_url" -> s"https://doc.akka.io/docs/alpakka-kafka/${Dependencies.AlpakkaKafkaVersion}/%s",
