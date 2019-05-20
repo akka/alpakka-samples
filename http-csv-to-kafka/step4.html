@@ -2,11 +2,10 @@
 <html class="no-js" lang="en">
 
 <head>
-<title>Alpakka Samples</title>
+<title>Step 4: Producing JSON &bull; Alpakka step-by-step example</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content="Alpakka Samples"/>
-<link rel="canonical" href="https://akka.io/alpakka-samples/index.html"/>
 <script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
 <script type="text/javascript" src="lib/foundation/dist/js/foundation.min.js"></script>
 <link rel="stylesheet" type="text/css" href="lib/normalize.css/normalize.css"/>
@@ -87,17 +86,30 @@ document.getElementsByTagName('head')[0].appendChild(s);
 <div id="overlay" class="overlay-nav" data-toggler="nav-open">
 <header class="nav-header">
 <div class="nav-header-title">
-<h1><a href="index.html">Alpakka Samples</a></h1>
+<h1><a href="index.html">Alpakka step-by-step example</a></h1>
 </div>
 <div class="nav-header-version">
 Version current
 </div>
 <div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
 </div>
 </header>
 <nav class="nav-toc">
 <ul>
-  <li><a href="http-csv-to-kafka.html" class="page">Fetch CSV via Akka HTTP and publish the data as JSON to Kafka</a></li>
+  <li><a href="index.html#fetch-csv-via-akka-http-and-publish-the-data-as-json-to-kafka" class="header">Fetch CSV via Akka HTTP and publish the data as JSON to Kafka</a></li>
+  <li><a href="step1.html" class="page">Step 1: Send HTTP request</a></li>
+  <li><a href="step2.html" class="page">Step 2: extract HTTP entity</a></li>
+  <li><a href="step3.html" class="page">Step 3: parse CSV</a></li>
+  <li><a href="step4.html#step-4-producing-json" class="active page">Step 4: Producing JSON</a>
+  <ul>
+    <li><a href="step4.html#description" class="header">Description</a></li>
+    <li><a href="step4.html#code" class="header">Code</a></li>
+  </ul></li>
+  <li><a href="step5.html" class="page">Step 5: Cleanse lines from data source</a></li>
+  <li><a href="step6.html" class="page">Step 6: Adding Coordinated Shutdown</a></li>
+  <li><a href="step7.html" class="page">Step 7: Produce to Kafka</a></li>
+  <li><a href="step8.html" class="page">Step 8: Scheduled download</a></li>
 </ul>
 </nav>
 </div>
@@ -106,18 +118,31 @@ Version current
 <aside class="show-for-large">
 <header class="nav-header fixed-sidebar-header">
 <div class="nav-header-title">
-<h1><a href="index.html">Alpakka Samples</a></h1>
+<h1><a href="index.html">Alpakka step-by-step example</a></h1>
 </div>
 <div class="nav-header-version">
 Version current
 </div>
 <div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
 </div>
 </header>
 <nav class="site-nav fixed-sidebar-contents">
 <div class="nav-toc">
 <ul>
-  <li><a href="http-csv-to-kafka.html" class="page">Fetch CSV via Akka HTTP and publish the data as JSON to Kafka</a></li>
+  <li><a href="index.html#fetch-csv-via-akka-http-and-publish-the-data-as-json-to-kafka" class="header">Fetch CSV via Akka HTTP and publish the data as JSON to Kafka</a></li>
+  <li><a href="step1.html" class="page">Step 1: Send HTTP request</a></li>
+  <li><a href="step2.html" class="page">Step 2: extract HTTP entity</a></li>
+  <li><a href="step3.html" class="page">Step 3: parse CSV</a></li>
+  <li><a href="step4.html#step-4-producing-json" class="active page">Step 4: Producing JSON</a>
+  <ul>
+    <li><a href="step4.html#description" class="header">Description</a></li>
+    <li><a href="step4.html#code" class="header">Code</a></li>
+  </ul></li>
+  <li><a href="step5.html" class="page">Step 5: Cleanse lines from data source</a></li>
+  <li><a href="step6.html" class="page">Step 6: Adding Coordinated Shutdown</a></li>
+  <li><a href="step7.html" class="page">Step 7: Produce to Kafka</a></li>
+  <li><a href="step8.html" class="page">Step 8: Scheduled download</a></li>
 </ul>
 </div>
 </nav>
@@ -132,12 +157,75 @@ Version current
 
 <article class="page-content row">
 <div class="small-12 large-9 column" id="docs">
-<h1><a href="#alpakka-samples" name="alpakka-samples" class="anchor"><span class="anchor-link"></span></a>Alpakka Samples</h1>
-<div class="toc ">
-<ul>
-  <li><a href="http-csv-to-kafka.html" class="page">Fetch CSV via Akka HTTP and publish the data as JSON to Kafka</a></li>
-</ul>
-</div>
+<h1><a href="#step-4-producing-json" name="step-4-producing-json" class="anchor"><span class="anchor-link"></span></a>Step 4: Producing JSON</h1>
+<h3><a href="#description" name="description" class="anchor"><span class="anchor-link"></span></a>Description</h3>
+<p>The helper method <code>toJson</code> turns the maps into JSON by using <a href="https://github.com/spray/spray-json">Spray JSON</a>. </p>
+<p>The JSON structure is converted to <code>String</code>s via <code>compactPrint</code>.</p>
+<h3><a href="#code" name="code" class="anchor"><span class="anchor-link"></span></a>Code</h3>
+<dl>
+  <dt>Scala</dt>
+  <dd>
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/vcurrent/step_004_producing_json/src/main/scala/samples/Main.scala" target="_blank" title="Go to snippet source"></a><code class="language-scala">/*
+ * Copyright (C) 2016-2019 Lightbend Inc. &lt;http://www.lightbend.com&gt;
+ */
+
+package samples
+
+import akka.Done
+import akka.actor._
+import akka.http.scaladsl._
+import akka.http.scaladsl.model.StatusCodes._
+import akka.http.scaladsl.model.headers.Accept
+import akka.http.scaladsl.model.{ HttpRequest, HttpResponse, MediaRanges }
+import akka.stream._
+import akka.stream.alpakka.csv.scaladsl.{ CsvParsing, CsvToMap }
+import akka.stream.scaladsl.{ Sink, Source }
+import akka.util.ByteString
+import spray.json.{ DefaultJsonProtocol, JsValue, JsonWriter }
+
+import scala.concurrent.Future
+
+object Main
+  extends App
+    with DefaultJsonProtocol {
+
+  implicit val actorSystem = ActorSystem(&quot;alpakka-samples&quot;)
+
+  import actorSystem.dispatcher
+
+  implicit val mat: Materializer = ActorMaterializer()
+
+  val httpRequest = HttpRequest(uri = &quot;https://www.nasdaq.com/screening/companies-by-name.aspx?exchange=NASDAQ&amp;render=download&quot;)
+    .withHeaders(Accept(MediaRanges.`text/*`))
+
+  def extractEntityData(response: HttpResponse): Source[ByteString, _] =
+    response match {
+      case HttpResponse(OK, _, entity, _) =&gt; entity.dataBytes
+      case notOkResponse =&gt;
+        Source.failed(new RuntimeException(s&quot;illegal response $notOkResponse&quot;))
+    }
+
+  def toJson(map: Map[String, String])(
+    implicit jsWriter: JsonWriter[Map[String, String]]): JsValue = jsWriter.write(map)
+
+  val future: Future[Done] =
+    Source
+      .single(httpRequest) //: HttpRequest
+      .mapAsync(1)(Http().singleRequest(_)) //: HttpResponse
+      .flatMapConcat(extractEntityData) //: ByteString
+      .via(CsvParsing.lineScanner()) //: List[ByteString]
+      .via(CsvToMap.toMapAsStrings()) //: Map[String, ByteString]
+      .map(toJson) //: JsValue
+      .map(_.compactPrint) //: String (JSON formatted)
+      .runWith(Sink.foreach(println))
+
+  future.map{ _ =&gt;
+    println(&quot;Done!&quot;)
+    actorSystem.terminate()
+  }
+
+}</code></pre></dd>
+</dl>
 </div>
 </article>
 
@@ -145,16 +233,17 @@ Version current
 <div class="small-12 large-9 column">
 <section class="nav-prev-next row">
 <div class="nav-prev small-6 column">
+<a href="step3.html"><i class="icon-prev"></i> <span class="link-prev">Step 3: parse CSV</span></a>
 </div>
 <div class="nav-next small-6 column clearfix">
-<a class="float-right" href="http-csv-to-kafka.html">Fetch CSV via Akka HTTP and publish the data as JSON to Kafka <i class="icon-next"></i></a>
+<a class="float-right" href="step5.html">Step 5: Cleanse lines from data source <i class="icon-next"></i></a>
 </div>
 </section>
 </div>
 </div>
 
 <div class="source-github row">
-Found an error in this documentation? The source code for this page can be found <a href="https://github.com/akka/alpakka-samples/tree/vcurrent/src/main/paradox/index.md">here</a>.
+Found an error in this documentation? The source code for this page can be found <a href="https://github.com/akka/alpakka-samples/tree/vcurrent/docs/src/main/paradox/step4.md">here</a>.
 Please feel free to edit and contribute a pull request.
 </div>
 
