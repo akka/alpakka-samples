@@ -1,7 +1,11 @@
+import sbt.Keys.isSnapshot
+
 lazy val docs = project
   .enablePlugins(AkkaParadoxPlugin, ParadoxSitePlugin, GhpagesPlugin)
   .settings(
     name := "Alpakka Samples",
+    version := "current",
+    isSnapshot := false,
     previewFixedPort := Some(8085),
     Paradox / sourceDirectory := sourceDirectory.value / "main",
     Paradox / siteSubdirName := "http-csv-to-kafka",
