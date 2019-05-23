@@ -1,10 +1,3 @@
 # Alpakka Samples
 
-@@toc { depth=1 }
-
-@@@ index
-
-* [1](http-csv-to-kafka.md)
-
-@@@
-
+@extref:[Fetch CSV via Akka HTTP and publish the data as JSON to Kafka](http-csv-to-kafka:index.html)
