@@ -4,6 +4,7 @@ name := "Alpakka Samples"
 version := "current"
 isSnapshot := false
 previewFixedPort := Some(8085)
+scmInfo := Some(ScmInfo(url("https://github.com/akka/alpakka-samples"), "git@github.com:akka/alpakka-samples.git"))
 
 val HttpCsvToKafka = config("HttpCsvToKafka")
 ParadoxPlugin.paradoxSettings(HttpCsvToKafka)
@@ -32,6 +33,3 @@ resolvers += Resolver.jcenterRepo
 git.remoteRepo := "git@github.com:akka/alpakka-samples.git"
 ghpagesNoJekyll := true
   
-ghpagesCleanSite / excludeFilter := new FileFilter{
-  def accept(f: File) = (ghpagesRepository.value / "http-csv-to-kafka").getCanonicalPath == f.getCanonicalPath
-}
