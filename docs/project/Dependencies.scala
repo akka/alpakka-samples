@@ -1,5 +1,5 @@
-import scala.meta._
 import sbt._
+import scala.meta._
 
 object Dependencies {
 
