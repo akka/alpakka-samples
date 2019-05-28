@@ -1,6 +1,9 @@
 @@include[readme](/README.md)
 
-@@toc { depth=2 }
+Dependencies
+: @@snip [snip](/project/Dependencies.scala) { #dependencies }
+
+Show [Alpakka samples listing](../index.html).
 
 @@@ index
 
