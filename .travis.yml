@@ -1,12 +1,25 @@
 language: scala
 jdk: oraclejdk8
 
+addons:
+  apt:
+    packages:
+    - sshpass
+
 jobs:
   include:
     - script: cd alpakka-sample-mqtt-http-to-s3-java && sbt compile
     - script: cd alpakka-sample-sqs-java && sbt compile
     - script: cd alpakka-sample-http-csv-to-kafka && sbt compile
     - script: cd docs && sbt makeSite
+
+    - stage: publish
+      script: eval "$(ssh-agent -s)" && sshpass -p $DEPLOY_PASSPHRASE ssh-add .travis/id_rsa && cd docs && sbt ghpagesPushSite
+
+stages:
+  # runs on main repo master commits
+  - name: publish
+    if: repo = akka/alpakka-samples AND branch = master AND type = push
 
 before_cache:
   - find $HOME/.ivy2 -name "ivydata-*.properties" -print -delete
@@ -16,3 +29,9 @@ cache:
   directories:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/boot
+    - $HOME/.sbt/launchers
+
+env:
+  global:
+    # travis encrypt DEPLOY_PASSPHRASE=...
+    - secure: "uoQV67/O+vpfM2P5E4WGVTkl/8c76p2SCIXkFXoiO0LhwAOju/xzDyqAIav6UeA+0LvlPmlKybcU8pM3qUF4zYG/Xk5ByFj6OHCZJcAj3sXZItfSjet38BV9D8KbpitAykMk2q01cazs3LVHFsCh5qbjwK8FFsPNlR5njN8Z/KKr1UMBBDMtoDsLnEu+/ylbHSHDYdfQKiDQwWGbLmmShWyunxygyX1VNFETqqpVMvM5yWcDyW+IqdBmENycm72NuPdTHLlhPFOMSgMCfSuctSZgA32xHNGhw12AAfsKe2pOGNjh5UMLGJXZALK/T0uUDlpP+KCAq8JaU4krygievRAtGndJm3rrFzm7Q5ftxgIrhwXvyGUC3S3cXMufLughgNnc88VagsBb3jIsGE+LQrGuDscLVF4T1oZoxGsEYsO8jXiJw9268M7HPA3poUXCi5x6unGPaNvIPYVNihp1oCZz13VrCIDZYqlf7jLVmvElHLNZPTWhBkXncmoSmZBkN0dV8144iY/BOXYkPePa+4qx+7882HjO0IHgETllZFALL37JiLs3FNWdfLkdzEo24gkz1iUIFjesReMC5ifeTH87kq7WJlsDskgdhOsCDYRYJM26xUsHkmoL5C9grIigsYl+icuAQcCOWecw17sxlbxxQSbMVrkSGGrIy6YN8cA="
