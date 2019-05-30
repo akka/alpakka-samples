@@ -1,11 +1,6 @@
 language: scala
 jdk: oraclejdk8
 
-addons:
-  apt:
-    packages:
-    - sshpass
-
 jobs:
   include:
     - script: cd alpakka-sample-mqtt-http-to-s3-java && sbt compile
@@ -14,7 +9,7 @@ jobs:
     - script: cd docs && sbt makeSite
 
     - stage: publish
-      script: eval "$(ssh-agent -s)" && chmod 600 .travis/id_rsa && sshpass -p $DEPLOY_PASSPHRASE ssh-add .travis/id_rsa && cd docs && sbt ghpagesPushSite
+      script: eval "$(ssh-agent -s)" && ssh-keygen -p -P "$DEPLOY_PASSPHRASE" -N "" -f .travis/id_rsa && chmod 600 .travis/id_rsa && ssh-add .travis/id_rsa && cd docs && sbt ghpagesPushSite
 
 stages:
   - name: test
