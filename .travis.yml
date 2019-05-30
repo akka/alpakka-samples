@@ -9,7 +9,7 @@ jobs:
     - script: cd docs && sbt makeSite
 
     - stage: publish
-      script: eval "$(ssh-agent -s)" && ssh-keygen -p -P "$DEPLOY_PASSPHRASE" -N "" -f .travis/id_rsa && chmod 600 .travis/id_rsa && ssh-add .travis/id_rsa && cd docs && sbt ghpagesPushSite
+      script: eval "$(ssh-agent -s)" && chmod 600 .travis/id_rsa && ssh-keygen -p -P "$DEPLOY_PASSPHRASE" -N "" -f .travis/id_rsa && ssh-add .travis/id_rsa && cd docs && sbt ghpagesPushSite
 
 stages:
   - name: test
