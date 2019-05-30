@@ -90,13 +90,16 @@ document.getElementsByTagName('head')[0].appendChild(s);
 <h1><a href="index.html">Alpakka Samples</a></h1>
 </div>
 <div class="nav-header-version">
-Version 53-61990901+20190530-1214
+Version 56-7cd10d92+20190530-1221
 </div>
 <div class="nav-header-groups">
 </div>
 </header>
 <nav class="nav-toc">
 <ul>
+  <li><a href="index.html#" class="header"><a href="http-csv-to-kafka/">Fetch CSV via HTTP and publish to Kafka</a></a></li>
+  <li><a href="index.html#" class="header"><a href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-sqs-java" title="Amazon SQS" target="_blank" rel="noopener noreferrer">Amazon SQS</a></a></li>
+  <li><a href="index.html#" class="header"><a href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-mqtt-http-to-s3-java" title="MQTT topic triggers file download which is uploaded to AWS S3" target="_blank" rel="noopener noreferrer">MQTT topic triggers file download which is uploaded to AWS S3</a></a></li>
 </ul>
 </nav>
 </div>
@@ -108,7 +111,7 @@ Version 53-61990901+20190530-1214
 <h1><a href="index.html">Alpakka Samples</a></h1>
 </div>
 <div class="nav-header-version">
-Version 53-61990901+20190530-1214
+Version 56-7cd10d92+20190530-1221
 </div>
 <div class="nav-header-groups">
 </div>
@@ -116,6 +119,9 @@ Version 53-61990901+20190530-1214
 <nav class="site-nav fixed-sidebar-contents">
 <div class="nav-toc">
 <ul>
+  <li><a href="index.html#" class="header"><a href="http-csv-to-kafka/">Fetch CSV via HTTP and publish to Kafka</a></a></li>
+  <li><a href="index.html#" class="header"><a href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-sqs-java" title="Amazon SQS" target="_blank" rel="noopener noreferrer">Amazon SQS</a></a></li>
+  <li><a href="index.html#" class="header"><a href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-mqtt-http-to-s3-java" title="MQTT topic triggers file download which is uploaded to AWS S3" target="_blank" rel="noopener noreferrer">MQTT topic triggers file download which is uploaded to AWS S3</a></a></li>
 </ul>
 </div>
 </nav>
@@ -131,7 +137,12 @@ Version 53-61990901+20190530-1214
 <article class="page-content row">
 <div class="small-12 large-9 column" id="docs">
 <h1><a href="#alpakka-samples" name="alpakka-samples" class="anchor"><span class="anchor-link"></span></a>Alpakka Samples</h1>
-<p><a href="http-csv-to-kafka/">Fetch CSV via Akka HTTP and publish the data as JSON to Kafka</a></p>
+<h3><a href="#" name="" class="anchor"><span class="anchor-link"></span></a><a href="http-csv-to-kafka/">Fetch CSV via HTTP and publish to Kafka</a></h3>
+<p>This example uses Akka HTTP to send the HTTP request and Akka HTTP&rsquo;s JSON support to convert the map into a JSON structure which gets published to a Kafka topic.</p>
+<h3><a href="#" name="" class="anchor"><span class="anchor-link"></span></a><a href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-sqs-java" title="Amazon SQS" target="_blank" rel="noopener noreferrer">Amazon SQS</a></h3>
+<p>Listen to an Amazon SQS topic, enrich the message via calling an actor, publish a new message to SQS and acknowledge/delete the original message. (Java only)</p>
+<h3><a href="#" name="" class="anchor"><span class="anchor-link"></span></a><a href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-mqtt-http-to-s3-java" title="MQTT topic triggers file download which is uploaded to AWS S3" target="_blank" rel="noopener noreferrer">MQTT topic triggers file download which is uploaded to AWS S3</a></h3>
+<p>Listen to a MQTT topic, download from the URL passed in the received message, and upload the data from that address to AWS S3. (Java only)</p>
 </div>
 </article>
 
