@@ -14,9 +14,10 @@ jobs:
     - script: cd docs && sbt makeSite
 
     - stage: publish
-      script: eval "$(ssh-agent -s)" && sshpass -p $DEPLOY_PASSPHRASE ssh-add .travis/id_rsa && cd docs && sbt ghpagesPushSite
+      script: eval "$(ssh-agent -s)" && chmod 600 .travis/id_rsa && sshpass -p $DEPLOY_PASSPHRASE ssh-add .travis/id_rsa && cd docs && sbt ghpagesPushSite
 
 stages:
+  - name: test
   # runs on main repo master commits
   - name: publish
     if: repo = akka/alpakka-samples AND branch = master AND type = push
