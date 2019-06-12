@@ -30,9 +30,7 @@ object Dependencies {
     }
 
     val ScalaVersion = versions("scalaVer")
-    val ScalaTestVersion = versions("ScalaTestVersion")
     val AkkaVersion = versions("AkkaVersion")
-    val AkkaHttpVersion = versions("AkkaHttpVersion")
     val AlpakkaVersion = versions("AlpakkaVersion")
     val AlpakkaKafkaVersion = versions("AlpakkaKafkaVersion")
   }

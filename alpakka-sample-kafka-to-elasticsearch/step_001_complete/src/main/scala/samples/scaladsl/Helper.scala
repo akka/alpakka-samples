@@ -59,7 +59,7 @@ trait Helper {
     producing
   }
 
-  def readFromElasticsearch(indexName: String)(implicit actorSystem: ActorSystem, materializer: Materializer, restClient: RestClient): Future[immutable.Seq[Movie]] = {
+  def readFromElasticsearch(indexName: String)(implicit actorSystem: ActorSystem, materializer: Materializer): Future[immutable.Seq[Movie]] = {
     val reading = ElasticsearchSource
       .typed[Movie](indexName, "_doc", """{"match_all": {}}""")
       .map(_.source)

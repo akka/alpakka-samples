@@ -1,5 +1,10 @@
 @@include[readme](/README.md)
 
+Dependencies (sbt notation)
+
+: @@snip [snip](/project/Dependencies.scala) { #deps }
+
+
 @@toc { depth=2 }
 
 @@@ index

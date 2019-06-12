@@ -37,7 +37,6 @@ KafkaToElasticsearch / paradoxProperties ++= Map(
   "github.root.base_dir" -> s"${baseDirectory.value}/..",
   "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.KafkaToElasticsearch.AkkaVersion}",
   "extref.alpakka-kafka.base_url" -> s"https://doc.akka.io/docs/alpakka-kafka/${Dependencies.KafkaToElasticsearch.AlpakkaKafkaVersion}/%s",
-  "extref.akka-http.base_url" -> s"https://doc.akka.io/docs/akka-http/${Dependencies.KafkaToElasticsearch.AkkaHttpVersion}/%s",
   "extref.alpakka.base_url" -> s"https://doc.akka.io/docs/alpakka/${Dependencies.KafkaToElasticsearch.AlpakkaVersion}/%s",
   "extref.akka.base_url" -> s"https://doc.akka.io/docs/akka/${Dependencies.KafkaToElasticsearch.AkkaVersion}/%s",
 )
