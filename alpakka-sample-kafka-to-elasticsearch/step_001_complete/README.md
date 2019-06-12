@@ -1,4 +1,4 @@
-## Step 5: Read from a Kafka topic and publish to Elasticsearch
+## Complete
 
 ### Description
 - Configure Kafka consumer (1)
