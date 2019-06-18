@@ -20,4 +20,19 @@ object Dependencies {
     val AlpakkaKafkaVersion = versions("AlpakkaKafkaVersion")
   }
 
+  object KafkaToElasticsearch {
+    val versions = {
+      val source = IO.read(file(".") / ".." / "alpakka-sample-kafka-to-elasticsearch" / "project" / "Dependencies.scala")
+      val tree = source.parse[Source].get
+      tree.collect {
+        case q"val ${v: Pat.Var} = ${s: Lit.String}" => v.name.value -> s.value
+      }.toMap
+    }
+
+    val ScalaVersion = versions("scalaVer")
+    val AkkaVersion = versions("AkkaVersion")
+    val AlpakkaVersion = versions("AlpakkaVersion")
+    val AlpakkaKafkaVersion = versions("AlpakkaKafkaVersion")
+  }
+
 }
