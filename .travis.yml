@@ -3,12 +3,16 @@ jdk: oraclejdk8
 
 jobs:
   include:
+    - script: cd alpakka-sample-http-csv-to-kafka && sbt compile
+      name: Compile Alpakka Http Csv Kafka sample
+    - script: cd alpakka-sample-http-jdbc-to-elasticsearch && sbt compile
+      name: Compile Alpakka JDBC to Elasticsearch sample
+    - script: cd alpakka-sample-http-kafka-to-elasticsearch && sbt compile
+      name: Compile Alpakka Kafka to Elasticsearch sample
     - script: cd alpakka-sample-mqtt-http-to-s3-java && sbt compile
       name: Compile Alpakka Mqtt Http S3 sample
     - script: cd alpakka-sample-sqs-java && sbt compile
       name: Compile Alpakka Sqs Java sample
-    - script: cd alpakka-sample-http-csv-to-kafka && sbt compile
-      name: Compile Alpakka Http Csv Kafka sample
     - script: cd docs && sbt makeSite
       name: Build documentation website
 
