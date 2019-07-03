@@ -25,6 +25,23 @@ HttpCsvToKafka / paradoxProperties ++= Map(
 )
 HttpCsvToKafka / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
 
+val JdbcToElasticsearch = config("jdbc-to-elasticsearch")
+ParadoxPlugin.paradoxSettings(JdbcToElasticsearch)
+ParadoxSitePlugin.paradoxSettings(JdbcToElasticsearch)
+AkkaParadoxPlugin.akkaParadoxSettings(JdbcToElasticsearch)
+JdbcToElasticsearch / siteSubdirName := JdbcToElasticsearch.name
+JdbcToElasticsearch / paradox / sourceDirectory := baseDirectory.value / ".." / s"alpakka-sample-${JdbcToElasticsearch.name}" / "docs" / "src" / "main" / "paradox"
+JdbcToElasticsearch / paradoxProperties ++= Map(
+  "project.url" -> s"${homepage.value.get}/${JdbcToElasticsearch.name}",
+  "canonical.base_url" -> s"${homepage.value.get}/${JdbcToElasticsearch.name}",
+  "snip.build.base_dir" -> s"${baseDirectory.value}/../alpakka-sample-${JdbcToElasticsearch.name}",
+  "github.root.base_dir" -> s"${baseDirectory.value}/..",
+  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.JdbcToElasticsearch.AkkaVersion}",
+  "extref.alpakka.base_url" -> s"https://doc.akka.io/docs/alpakka/${Dependencies.JdbcToElasticsearch.AlpakkaVersion}/%s",
+  "extref.akka.base_url" -> s"https://doc.akka.io/docs/akka/${Dependencies.JdbcToElasticsearch.AkkaVersion}/%s",
+)
+JdbcToElasticsearch / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
+
 val KafkaToElasticsearch = config("kafka-to-elasticsearch")
 ParadoxPlugin.paradoxSettings(KafkaToElasticsearch)
 ParadoxSitePlugin.paradoxSettings(KafkaToElasticsearch)
@@ -47,6 +64,7 @@ KafkaToElasticsearch / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
 Paradox / siteSubdirName := ""
 paradoxProperties ++= Map(
   "extref.http-csv-to-kafka.base_url" -> s"${(HttpCsvToKafka / siteSubdirName).value}/",
+  "extref.jdbc-to-elasticsearch.base_url" -> s"${(JdbcToElasticsearch / siteSubdirName).value}/",
   "extref.kafka-to-elasticsearch.base_url" -> s"${(KafkaToElasticsearch / siteSubdirName).value}/",
 )
 
