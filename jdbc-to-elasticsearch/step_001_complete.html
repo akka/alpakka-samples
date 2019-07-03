@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<head>
+<title>Complete &bull; Alpakka step-by-step example</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="Example solutions for Enterprise Integrations using Alpakka and Reactive Streams."/>
+<link rel="canonical" href="https://akka.io/alpakka-samples/jdbc-to-elasticsearch/step_001_complete.html"/>
+<script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="lib/foundation/dist/js/foundation.min.js"></script>
+<link rel="stylesheet" type="text/css" href="lib/normalize.css/normalize.css"/>
+<link rel="stylesheet" type="text/css" href="lib/foundation/dist/css/foundation.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.css" />
+<link rel="stylesheet" type="text/css" href="css/icons.css"/>
+<link rel="stylesheet" type="text/css" href="css/page.css"/>
+<link rel="shortcut icon" href="images/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png"/>
+<link rel="manifest" href="images/manifest.json"/>
+<meta name="msapplication-TileImage" content="images/mstile-150x150.png"/>
+<meta name="msapplication-TileColor" content="#15a9ce"/>
+<meta name="theme-color" content="#15a9ce"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<!-- OneTrust Cookies Consent Notice (Production Standard, akka.io, en-GB) start -->
+<script src="https://optanon.blob.core.windows.net/consent/159bb13d-6748-4399-806e-ac28db879785.js" type="text/javascript" charset="UTF-8"></script>
+<script type="text/javascript">
+function OptanonWrapper() { }
+</script>
+<!-- OneTrust Cookies Consent Notice (Production Standard, akka.io, en-GB) end -->
+<!--Google Analytics-->
+<script type="text/plain" class="optanon-category-2">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', '']);
+_gaq.push(['_setDomainName', '']);
+_gaq.push(['_trackPageview']);
+(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})()
+</script>
+<script type="text/plain" class="optanon-category-2">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-23127719-1', 'lightbend.com', {'allowLinker': true, 'name': 'tsTracker'});
+ga('tsTracker.require', 'linker');
+ga('tsTracker.linker:autoLink', ['lightbend.com','playframework.com','scala-lang.org','scaladays.org','spray.io','akka.io','scala-sbt.org','scala-ide.org']);
+ga('tsTracker.send', 'pageview');
+</script>
+<!--Marketo-->
+<script type="text/plain" class="optanon-category-3">
+(function() {
+var didInit = false;
+function initMunchkin() {
+if(didInit === false) {
+didInit = true;
+Munchkin.init('558-NCX-702', { 'asyncOnly': true, 'disableClickDelay': true });
+}
+}
+var s = document.createElement('script');
+s.type = 'text/javascript';
+s.async = true;
+s.src = '//munchkin.marketo.net/munchkin.js';
+s.onreadystatechange = function() {
+if (this.readyState == 'complete' || this.readyState == 'loaded') {
+initMunchkin();
+}
+};
+s.onload = initMunchkin;
+document.getElementsByTagName('head')[0].appendChild(s);
+})();
+</script>
+</head>
+
+<body id="underlay" data-toggler="nav-open">
+
+<header class="site-header hide-for-large">
+<div class="sticky-header clearfix">
+<a href="https://akka.io"><img class="logo" src="images/akka-logo-reverse.svg"/></a>
+
+<button class="menu-icon float-right" type="button" data-toggle="underlay overlay"></button>
+</div>
+<div id="overlay" class="overlay-nav" data-toggler="nav-open">
+<header class="nav-header">
+<div class="nav-header-title">
+<h1><a href="index.html">Alpakka step-by-step example</a></h1>
+</div>
+<div class="nav-header-version">
+Version 68-3b138d9b
+</div>
+<div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
+</div>
+</header>
+<nav class="nav-toc">
+<ul>
+  <li><a href="index.html#read-from-a-database-and-publish-to-elasticsearch" class="header">Read from a database and publish to Elasticsearch</a></li>
+  <li><a href="step_001_complete.html#complete" class="active page">Complete</a>
+  <ul>
+    <li><a href="step_001_complete.html#description" class="header">Description</a></li>
+    <li><a href="step_001_complete.html#imports" class="header">Imports</a></li>
+    <li><a href="step_001_complete.html#flow" class="header">Flow</a></li>
+    <li><a href="step_001_complete.html#slick-setup" class="header">Slick setup</a></li>
+    <li><a href="step_001_complete.html#data-class-and-json-mapping-for-elasticsearch" class="header">Data class and JSON mapping for Elasticsearch</a></li>
+    <li><a href="step_001_complete.html#elasticsearch-setup" class="header">Elasticsearch setup</a></li>
+  </ul></li>
+</ul>
+</nav>
+</div>
+</header>
+
+<aside class="show-for-large">
+<header class="nav-header fixed-sidebar-header">
+<div class="nav-header-title">
+<h1><a href="index.html">Alpakka step-by-step example</a></h1>
+</div>
+<div class="nav-header-version">
+Version 68-3b138d9b
+</div>
+<div class="nav-header-groups">
+<select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
+</div>
+</header>
+<nav class="site-nav fixed-sidebar-contents">
+<div class="nav-toc">
+<ul>
+  <li><a href="index.html#read-from-a-database-and-publish-to-elasticsearch" class="header">Read from a database and publish to Elasticsearch</a></li>
+  <li><a href="step_001_complete.html#complete" class="active page">Complete</a>
+  <ul>
+    <li><a href="step_001_complete.html#description" class="header">Description</a></li>
+    <li><a href="step_001_complete.html#imports" class="header">Imports</a></li>
+    <li><a href="step_001_complete.html#flow" class="header">Flow</a></li>
+    <li><a href="step_001_complete.html#slick-setup" class="header">Slick setup</a></li>
+    <li><a href="step_001_complete.html#data-class-and-json-mapping-for-elasticsearch" class="header">Data class and JSON mapping for Elasticsearch</a></li>
+    <li><a href="step_001_complete.html#elasticsearch-setup" class="header">Elasticsearch setup</a></li>
+  </ul></li>
+</ul>
+</div>
+</nav>
+<footer class="nav-footer fixed-sidebar-footer">
+<a href="https://akka.io"><img class="logo" src="images/akka-logo-reverse.svg"/></a>
+
+</footer>
+</aside>
+
+<main class="fixed-shift-for-large expanded row">
+<section class="site-content small-12 column">
+
+<article class="page-content row">
+<div class="small-12 large-9 column" id="docs">
+<h2><a href="#complete" name="complete" class="anchor"><span class="anchor-link"></span></a>Complete</h2>
+<h3><a href="#description" name="description" class="anchor"><span class="anchor-link"></span></a>Description</h3>
+<p>This example reads the <code>MOVIES</code> table in a relational database using Alpakka Slick and writes it to an Elasticsearch index.</p>
+<h3><a href="#imports" name="imports" class="anchor"><span class="anchor-link"></span></a>Imports</h3>
+<dl>
+  <dt>Java</dt>
+  <dd>
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/java/samples/javadsl/Main.java#L8-L28" target="_blank" title="Go to snippet source"></a><code class="language-java">import akka.Done;
+import akka.actor.ActorSystem;
+import akka.stream.ActorMaterializer;
+import akka.stream.Materializer;
+import akka.stream.alpakka.elasticsearch.ElasticsearchWriteSettings;
+import akka.stream.alpakka.elasticsearch.WriteMessage;
+import akka.stream.alpakka.elasticsearch.javadsl.ElasticsearchSink;
+import akka.stream.alpakka.slick.javadsl.Slick;
+import akka.stream.alpakka.slick.javadsl.SlickRow;
+import akka.stream.alpakka.slick.javadsl.SlickSession;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
+import org.testcontainers.elasticsearch.ElasticsearchContainer;
+import samples.scaladsl.Helper;
+
+import java.io.IOException;
+import java.util.concurrent.CompletionStage;
+</code></pre></dd>
+  <dt>Scala</dt>
+  <dd>
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Main.scala#L8-L21" target="_blank" title="Go to snippet source"></a><code class="language-scala">import akka.Done
+import akka.actor.ActorSystem
+import akka.stream.alpakka.elasticsearch.WriteMessage.createIndexMessage
+import akka.stream.alpakka.elasticsearch.scaladsl.ElasticsearchSink
+import akka.stream.alpakka.slick.javadsl.SlickSession
+import akka.stream.alpakka.slick.scaladsl.Slick
+import akka.stream.{ActorMaterializer, Materializer}
+import org.apache.http.HttpHost
+import org.elasticsearch.client.RestClient
+import spray.json.DefaultJsonProtocol.{jsonFormat4, _}
+import spray.json.JsonFormat
+
+import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContext, Future}</code></pre></dd>
+</dl>
+<h3><a href="#flow" name="flow" class="anchor"><span class="anchor-link"></span></a>Flow</h3>
+<ul>
+  <li>Construct the Slick <code>Source</code> for the H2 table and query all data in the table <span class="group-scala">Map each tuple into a <code>Movie</code> case class instance</span></li>
+  <li>The first argument of the <code>IndexMessage</code> is the <em>id</em> of the document.</li>
+  <li>Prepare the Elastic <code>Sink</code> that the data needs to be drained to</li>
+  <li>Close the Elastic client upon completion of indexing the data</li>
+</ul>
+<dl>
+  <dt>Java</dt>
+  <dd>
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/java/samples/javadsl/Main.java#L67-L111" target="_blank" title="Go to snippet source"></a><code class="language-java">ActorSystem system = ActorSystem.create();
+Materializer materializer = ActorMaterializer.create(system);
+
+final CompletionStage&lt;Done&gt; done =
+        Slick.source(
+                session,
+                &quot;SELECT * FROM MOVIE&quot;,
+                (SlickRow row) -&gt;
+                        new Movie(row.nextInt(), row.nextString(), row.nextString(), row.nextDouble()))
+                .map(movie -&gt; WriteMessage.createIndexMessage(String.valueOf(movie.id), movie))
+                .runWith(
+                        ElasticsearchSink.create(
+                                &quot;movie&quot;,
+                                &quot;boxoffice&quot;,
+                                ElasticsearchWriteSettings.Default(),
+                                elasticSearchClient,
+                                objectToJsonMapper),
+                        materializer);
+
+done.thenRunAsync(
+        () -&gt; {
+            try {
+                elasticSearchClient.close();
+            } catch (IOException ignored) {
+                ignored.printStackTrace();
+            }
+        },
+        system.dispatcher())</code></pre></dd>
+  <dt>Scala</dt>
+  <dd>
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Main.scala#L64-L76" target="_blank" title="Go to snippet source"></a><code class="language-scala">val done: Future[Done] =
+  Slick
+    .source(TableQuery[Movies].result)
+    .map {
+      case (id, genre, title, gross) =&gt; Movie(id, genre, title, gross)
+    }
+    .map(movie =&gt; createIndexMessage(movie.id.toString, movie))
+    .runWith(ElasticsearchSink.create[Movie](&quot;movie&quot;, &quot;_doc&quot;))
+
+done.onComplete {
+  case _ =&gt;
+    elasticSearchClient.close()
+}</code></pre></dd>
+</dl>
+<h3><a href="#slick-setup" name="slick-setup" class="anchor"><span class="anchor-link"></span></a>Slick setup</h3>
+<ul>
+  <li>Instantiate a Slick database session using the config parameters defined in key <code>slick-h2-mem</code> and mount closing it on shutdown of the Actor System <span class="group-scala">- Slick definition of the MOVIE table</span></li>
+</ul>
+<dl>
+  <dt>Java</dt>
+  <dd>
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/java/samples/javadsl/Main.java#L72-L73" target="_blank" title="Go to snippet source"></a><code class="language-java">SlickSession session = SlickSession.forConfig(&quot;slick-h2-mem&quot;);
+system.registerOnTermination(session::close);</code></pre></dd>
+  <dt>Scala</dt>
+  <dd>
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Main.scala#L35-L47" target="_blank" title="Go to snippet source"></a><code class="language-scala"><br/>implicit val session = SlickSession.forConfig(&quot;slick-h2-mem&quot;)                         // (1)
+actorSystem.registerOnTermination(session.close())
+
+import session.profile.api._
+class Movies(tag: Tag) extends Table[(Int, String, String, Double)](tag, &quot;MOVIE&quot;) {   // (2)
+  def id = column[Int](&quot;ID&quot;)
+  def title = column[String](&quot;TITLE&quot;)
+  def genre = column[String](&quot;GENRE&quot;)
+  def gross = column[Double](&quot;GROSS&quot;)
+
+  override def * = (id, title, genre, gross)
+}</code></pre></dd>
+</dl>
+<h3><a href="#data-class-and-json-mapping-for-elasticsearch" name="data-class-and-json-mapping-for-elasticsearch" class="anchor"><span class="anchor-link"></span></a>Data class and JSON mapping for Elasticsearch</h3>
+<ul>
+  <li>Class that holds the Movie data</li>
+  <li><span class="group-scala">Instantiate the Spray json format that converts the <code>Movie</code> case class to json</span><span class="group-java">Instantiate the Jackson Object mapper that converts the <code>Movie</code> class to json</span></li>
+</ul>
+<dl>
+  <dt>Java</dt>
+  <dd>
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/java/samples/javadsl/Main.java#L39-L83" target="_blank" title="Go to snippet source"></a><code class="language-java">public static class Movie {
+    public final int id;
+    public final String title;
+    public final String genre;
+    public final double gross;
+
+    @JsonCreator
+    public Movie(
+            @JsonProperty(&quot;id&quot;) int id,
+            @JsonProperty(&quot;title&quot;) String title,
+            @JsonProperty(&quot;genre&quot;) String genre,
+            @JsonProperty(&quot;gross&quot;) double gross) {
+        this.id = id;
+        this.title = title;
+        this.genre = genre;
+        this.gross = gross;
+    }
+}
+
+    final ObjectMapper objectToJsonMapper = new ObjectMapper();</code></pre></dd>
+  <dt>Scala</dt>
+  <dd>
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Main.scala#L53-L55" target="_blank" title="Go to snippet source"></a><code class="language-scala">case class Movie(id: Int, title: String, genre: String, gross: Double)
+
+implicit val format: JsonFormat[Movie] = jsonFormat4(Movie)</code></pre></dd>
+</dl>
+<h3><a href="#elasticsearch-setup" name="elasticsearch-setup" class="anchor"><span class="anchor-link"></span></a>Elasticsearch setup</h3>
+<ul>
+  <li>Instantiate Elastic REST client</li>
+</ul>
+<dl>
+  <dt>Java</dt>
+  <dd>
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/java/samples/javadsl/Main.java#L79" target="_blank" title="Go to snippet source"></a><code class="language-java">RestClient elasticSearchClient = RestClient.builder(HttpHost.create(elasticsearchAddress)).build();</code></pre></dd>
+  <dt>Scala</dt>
+  <dd>
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Main.scala#L59-L60" target="_blank" title="Go to snippet source"></a><code class="language-scala">implicit val elasticSearchClient: RestClient =
+  RestClient.builder(HttpHost.create(elasticsearchAddress)).build()</code></pre></dd>
+</dl>
+</div>
+</article>
+
+<div class="row">
+<div class="small-12 large-9 column">
+<section class="nav-prev-next row">
+<div class="nav-prev small-6 column">
+<a href="index.html"><i class="icon-prev"></i> <span class="link-prev">Alpakka step-by-step example</span></a>
+</div>
+<div class="nav-next small-6 column clearfix">
+</div>
+</section>
+</div>
+</div>
+
+<div class="source-github row">
+Found an error in this documentation? The source code for this page can be found <a href="https://github.com/akka/alpakka-samples/tree/master/home/travis/build/akka/alpakka-samples/alpakka-sample-jdbc-to-elasticsearch/docs/src/main/paradox/step_001_complete.md">here</a>.
+Please feel free to edit and contribute a pull request.
+</div>
+
+
+<footer class="page-footer row clearfix">
+<img class="akka-icon float-left show-for-medium" src="images/akka-icon.svg"/>
+<section class="copyright">
+<div>Alpakka Samples is Open Source and available under the Apache 2 License.</div>
+<p class="legal">
+&copy; 2011-2019 <a href="https://www.lightbend.com" target="_blank">Lightbend, Inc.</a> | 
+<a href="https://www.lightbend.com/legal/licenses" target="_blank">Licenses</a> | 
+<a href="https://www.lightbend.com/legal/terms" target="_blank">Terms</a> | 
+<a href="https://www.lightbend.com/legal/privacy" target="_blank">Privacy Policy</a> | 
+<a href="https://akka.io/cookie/" target="_blank">Cookie Listing</a> | 
+<a class="optanon-toggle-display">Cookie Settings</a>
+</p>
+</section>
+</footer>
+
+</section>
+</main>
+
+<script type="text/javascript" src="js/scrollsneak.js"></script>
+<script type="text/javascript">jQuery(document).foundation();</script>
+<script type="text/javascript" src="js/groups.js"></script>
+<script type="text/javascript" src="js/page.js"></script>
+<script type="text/javascript" src="js/magellan.js"></script>
+
+<style type="text/css">@import "lib/prettify/prettify.css";</style>
+<script type="text/javascript" src="lib/prettify/prettify.js"></script>
+<script type="text/javascript" src="lib/prettify/lang-scala.js"></script>
+<script type="text/javascript">//<![CDATA[
+jQuery(function(){window.prettyPrint && prettyPrint()});
+//]]></script>
+<!-- hook for including project specific javascript into the generated docs -->
+
+</body>
+</html>
