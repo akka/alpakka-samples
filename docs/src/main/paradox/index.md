@@ -3,6 +3,9 @@
 ### @extref:[Fetch CSV via HTTP and publish to Kafka](http-csv-to-kafka:index.html)
 This example uses Akka HTTP to send the HTTP request and Akka HTTP's JSON support to convert the map into a JSON structure which gets published to a Kafka topic.
 
+### @extref:[Examples using JMS](jms:index.html)
+This example uses receives JMS messages with Alpakka JMS and sends those to different technologies.
+
 ### @extref:[Read from a database and write to Elasticsearch](jdbc-to-elasticsearch:index.html)
 This example uses Alpakka Slick to read from a relational database and write the data to Elasticsearch.
 
