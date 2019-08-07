@@ -1,4 +1,4 @@
-# Alpakka Samples
+# Alpakka sample
 
 ## Fetch CSV via Akka HTTP and publish the data as JSON to Kafka
 

@@ -1,11 +1,16 @@
 @@include[readme](/README.md)
 
-Dependencies (sbt notation)
+### Dependencies
 
+Dependencies (sbt notation)
 : @@snip [snip](/project/Dependencies.scala) { #deps }
 
 
-@@toc { depth=2 }
+### All Alpakka samples
+
+Show [Alpakka samples listing](../index.html).
+
+@@toc
 
 @@@ index
 

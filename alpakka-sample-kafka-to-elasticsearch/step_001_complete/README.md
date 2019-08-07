@@ -1,4 +1,4 @@
-## Complete
+## Example code
 
 ### Description
 - Configure Kafka consumer (1)

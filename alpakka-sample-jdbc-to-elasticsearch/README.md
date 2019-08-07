@@ -1,4 +1,4 @@
-# Alpakka step-by-step example
+# Alpakka sample
 
 ## Read from a database and publish to Elasticsearch
 

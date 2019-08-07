@@ -1,4 +1,6 @@
-# Alpakka JMS examples
+# Alpakka sample
+
+## Receive JMS messages
 
 These examples show small usages of @extref[Alpakka JMS](alpakka:jms).
 
