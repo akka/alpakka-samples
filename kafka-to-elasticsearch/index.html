@@ -2,7 +2,7 @@
 <html class="no-js" lang="en">
 
 <head>
-<title>Alpakka step-by-step example</title>
+<title>Alpakka sample</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content="Example solutions for Enterprise Integrations using Alpakka and Reactive Streams."/>
@@ -87,10 +87,10 @@ document.getElementsByTagName('head')[0].appendChild(s);
 <div id="overlay" class="overlay-nav" data-toggler="nav-open">
 <header class="nav-header">
 <div class="nav-header-title">
-<h1><a href="index.html">Alpakka step-by-step example</a></h1>
+<h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 70-b2111e65
+Version 76-e1cbf29a
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -99,7 +99,7 @@ Version 70-b2111e65
 <nav class="nav-toc">
 <ul>
   <li><a href="index.html#read-from-a-kafka-topic-and-publish-to-elasticsearch" class="header">Read from a Kafka topic and publish to Elasticsearch</a></li>
-  <li><a href="step_001_complete.html" class="page">Complete</a></li>
+  <li><a href="step_001_complete.html" class="page">Example code</a></li>
 </ul>
 </nav>
 </div>
@@ -108,10 +108,10 @@ Version 70-b2111e65
 <aside class="show-for-large">
 <header class="nav-header fixed-sidebar-header">
 <div class="nav-header-title">
-<h1><a href="index.html">Alpakka step-by-step example</a></h1>
+<h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 70-b2111e65
+Version 76-e1cbf29a
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -121,7 +121,7 @@ Version 70-b2111e65
 <div class="nav-toc">
 <ul>
   <li><a href="index.html#read-from-a-kafka-topic-and-publish-to-elasticsearch" class="header">Read from a Kafka topic and publish to Elasticsearch</a></li>
-  <li><a href="step_001_complete.html" class="page">Complete</a></li>
+  <li><a href="step_001_complete.html" class="page">Example code</a></li>
 </ul>
 </div>
 </nav>
@@ -136,9 +136,12 @@ Version 70-b2111e65
 
 <article class="page-content row">
 <div class="small-12 large-9 column" id="docs">
-<h1><a href="#alpakka-step-by-step-example" name="alpakka-step-by-step-example" class="anchor"><span class="anchor-link"></span></a>Alpakka step-by-step example</h1>
+<h1><a href="#alpakka-sample" name="alpakka-sample" class="anchor"><span class="anchor-link"></span></a>Alpakka sample</h1>
 <h2><a href="#read-from-a-kafka-topic-and-publish-to-elasticsearch" name="read-from-a-kafka-topic-and-publish-to-elasticsearch" class="anchor"><span class="anchor-link"></span></a>Read from a Kafka topic and publish to Elasticsearch</h2>
 <p>This example uses <a href="https://doc.akka.io/docs/alpakka-kafka/1.0.4/">Alpakka Kafka</a> to subscribe to a Kafka topic, parses JSON into a data class and stores the object in Elasticsearch. After storing the Kafka offset is committed back to Kafka. This gives at-least-once semantics.</p>
+<p>Browse the sources at <a href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch" title="Github" target="_blank" rel="noopener noreferrer">Github</a>.</p>
+<p>To try out this project clone <a href="https://github.com/akka/alpakka-samples" title="the Alpakka Samples repository" target="_blank" rel="noopener noreferrer">the Alpakka Samples repository</a> and find it in the <code>alpakka-sample-kafka-to-elasticsearch</code> directory.</p>
+<h3><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h3>
 <dl>
   <dt>Dependencies (sbt notation)
   </dt>
@@ -158,9 +161,11 @@ val AlpakkaKafkaVersion = &quot;1.0.4&quot;
   &quot;com.typesafe.akka&quot; %% &quot;akka-slf4j&quot; % AkkaVersion,
   &quot;ch.qos.logback&quot; % &quot;logback-classic&quot; % &quot;1.2.3&quot;,</code></pre></dd>
 </dl>
+<h3><a href="#all-alpakka-samples" name="all-alpakka-samples" class="anchor"><span class="anchor-link"></span></a>All Alpakka samples</h3>
+<p>Show <a href="../index.html">Alpakka samples listing</a>.</p>
 <div class="toc ">
 <ul>
-  <li><a href="step_001_complete.html" class="page">Complete</a>
+  <li><a href="step_001_complete.html" class="page">Example code</a>
   <ul>
     <li><a href="step_001_complete.html#description" class="header">Description</a></li>
     <li><a href="step_001_complete.html#data-class-and-json-mapping" class="header">Data class and JSON mapping</a></li>
@@ -179,7 +184,7 @@ val AlpakkaKafkaVersion = &quot;1.0.4&quot;
 <div class="nav-prev small-6 column">
 </div>
 <div class="nav-next small-6 column clearfix">
-<a class="float-right" href="step_001_complete.html">Complete <i class="icon-next"></i></a>
+<a class="float-right" href="step_001_complete.html">Example code <i class="icon-next"></i></a>
 </div>
 </section>
 </div>

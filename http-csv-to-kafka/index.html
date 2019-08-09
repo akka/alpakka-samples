@@ -2,7 +2,7 @@
 <html class="no-js" lang="en">
 
 <head>
-<title>Alpakka Samples</title>
+<title>Alpakka sample</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="description" content="Example solutions for Enterprise Integrations using Alpakka and Reactive Streams."/>
@@ -87,10 +87,10 @@ document.getElementsByTagName('head')[0].appendChild(s);
 <div id="overlay" class="overlay-nav" data-toggler="nav-open">
 <header class="nav-header">
 <div class="nav-header-title">
-<h1><a href="index.html">Alpakka Samples</a></h1>
+<h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 70-b2111e65
+Version 76-e1cbf29a
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -115,10 +115,10 @@ Version 70-b2111e65
 <aside class="show-for-large">
 <header class="nav-header fixed-sidebar-header">
 <div class="nav-header-title">
-<h1><a href="index.html">Alpakka Samples</a></h1>
+<h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 70-b2111e65
+Version 76-e1cbf29a
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -150,10 +150,12 @@ Version 70-b2111e65
 
 <article class="page-content row">
 <div class="small-12 large-9 column" id="docs">
-<h1><a href="#alpakka-samples" name="alpakka-samples" class="anchor"><span class="anchor-link"></span></a>Alpakka Samples</h1>
+<h1><a href="#alpakka-sample" name="alpakka-sample" class="anchor"><span class="anchor-link"></span></a>Alpakka sample</h1>
 <h2><a href="#fetch-csv-via-akka-http-and-publish-the-data-as-json-to-kafka" name="fetch-csv-via-akka-http-and-publish-the-data-as-json-to-kafka" class="anchor"><span class="anchor-link"></span></a>Fetch CSV via Akka HTTP and publish the data as JSON to Kafka</h2>
 <p>This example uses <a href="https://doc.akka.io/docs/akka-http/10.1.8/client-side/connection-level.html#opening-http-connections">Akka HTTP to send the HTTP request</a> and Akka HTTPs primary JSON support via <a href="https://doc.akka.io/docs/akka-http/10.1.8/common/json-support.html#spray-json-support">Spray JSON</a> (for Scala) or Jackson JSON (for Java) to convert the map into a JSON structure which gets published to a Kafka topic.</p>
-<p>Check out the <a href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-http-csv-to-kafka" title="Source repository" target="_blank" rel="noopener noreferrer">Source repository</a>.</p>
+<p>Browse the sources at <a href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-http-csv-to-kafka" title="Github" target="_blank" rel="noopener noreferrer">Github</a>.</p>
+<p>To try out this project clone <a href="https://github.com/akka/alpakka-samples" title="the Alpakka Samples repository" target="_blank" rel="noopener noreferrer">the Alpakka Samples repository</a> and find it in the <code>alpakka-sample-http-csv-to-kafka</code> directory.</p>
+<h3><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h3>
 <dl>
   <dt>Dependencies</dt>
   <dd>
@@ -179,7 +181,52 @@ val dependencies = List(
   &quot;ch.qos.logback&quot; % &quot;logback-classic&quot; % &quot;1.2.3&quot;
 )</code></pre></dd>
 </dl>
+<h3><a href="#all-alpakka-samples" name="all-alpakka-samples" class="anchor"><span class="anchor-link"></span></a>All Alpakka samples</h3>
 <p>Show <a href="../index.html">Alpakka samples listing</a>.</p>
+<div class="toc ">
+<ul>
+  <li><a href="step1.html" class="page">Step 1: Send HTTP request</a>
+  <ul>
+    <li><a href="step1.html#description" class="header">Description</a></li>
+    <li><a href="step1.html#code" class="header">Code</a></li>
+  </ul></li>
+  <li><a href="step2.html" class="page">Step 2: extract HTTP entity</a>
+  <ul>
+    <li><a href="step2.html#description" class="header">Description</a></li>
+    <li><a href="step2.html#code" class="header">Code</a></li>
+  </ul></li>
+  <li><a href="step3.html" class="page">Step 3: parse CSV</a>
+  <ul>
+    <li><a href="step3.html#description" class="header">Description</a></li>
+    <li><a href="step3.html#code" class="header">Code</a></li>
+  </ul></li>
+  <li><a href="step4.html" class="page">Step 4: Producing JSON</a>
+  <ul>
+    <li><a href="step4.html#description" class="header">Description</a></li>
+    <li><a href="step4.html#code" class="header">Code</a></li>
+  </ul></li>
+  <li><a href="step5.html" class="page">Step 5: Cleanse lines from data source</a>
+  <ul>
+    <li><a href="step5.html#description" class="header">Description</a></li>
+    <li><a href="step5.html#code" class="header">Code</a></li>
+  </ul></li>
+  <li><a href="step6.html" class="page">Step 6: Adding Coordinated Shutdown</a>
+  <ul>
+    <li><a href="step6.html#description" class="header">Description</a></li>
+    <li><a href="step6.html#code" class="header">Code</a></li>
+  </ul></li>
+  <li><a href="step7.html" class="page">Step 7: Produce to Kafka</a>
+  <ul>
+    <li><a href="step7.html#description" class="header">Description</a></li>
+    <li><a href="step7.html#code" class="header">Code</a></li>
+  </ul></li>
+  <li><a href="step8.html" class="page">Step 8: Scheduled download</a>
+  <ul>
+    <li><a href="step8.html#description" class="header">Description</a></li>
+    <li><a href="step8.html#code" class="header">Code</a></li>
+  </ul></li>
+</ul>
+</div>
 </div>
 </article>
 
