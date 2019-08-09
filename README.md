@@ -1,3 +1,3 @@
 # Alpakka samples
 
-[Alpakka documentation](https://developer.lightbend.com/docs/alpakka/current/)
+[Alpakka documentation](https://docs.akka.io/docs/alpakka/)
