@@ -57,38 +57,67 @@ body {
 
 /* layout */
 
-.fixed-sidebar-header {
-  position: fixed;
+/* (not large size) */
+@media screen and (max-width:63.9375em) {
+
+}
+
+/* (large size) */
+@media screen and (min-width:64em) {
+  .sticky-sidebar {
+    position: sticky;
+    top: 0px;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 18.750rem;
+    height: calc(100vh - 40px);
+    min-height: calc(100vh - 40px);
+  }
+  body > main {
+    margin-top: 40px;
+  }
+  .site-content-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    align-content: flex-start;
+  }
+} 
+
+.sticky-sidebar-header {
+  position: relative;
   top: 0;
   left: 0;
-  height: 160px;
-  width: 25%;
-  max-width: 20rem;
+  height: 180px;
+  padding: 10px 0;
   z-index: 10;
   background: #15a9ce;
   color: #fff;
+  width: 18.750rem;
 }
 
-.fixed-sidebar-contents {
-  position: fixed;
-  top: 160px;
+.sticky-sidebar-contents {
+  position: relative;
+  top: 0;
   left: 0;
-  bottom: 3rem;
-  width: 25%;
-  max-width: 20rem;
+  width: 18.750rem;
+  padding: 1rem 0 3rem 0;
   overflow-x: hidden;
   overflow-y: auto;
   background: #fff;
   transition: all 300ms ease-in-out;
 }
 
-.fixed-sidebar-footer {
+.sticky-sidebar-footer {
   position: fixed;
   left: 0;
   bottom: 0;
   height: 3rem;
-  width: 25%;
-  max-width: 20rem;
+  width: 18.750rem;
   overflow: hidden;
   background: #128aaa;
   color: #fff;
@@ -97,37 +126,33 @@ body {
 
 .fixed-shift-for-large {
   overflow-x: hidden;
+  margin: 0;
 }
 
-@media screen and (min-width:64em) {
-  .fixed-shift-for-large {
-    margin-left: 25%;
-  }
-}
 
-@media screen and (min-width:80em) {
+@media screen and (min-width:110em) {
   .fixed-shift-for-large {
-    margin-left: 20rem;
+    margin: auto;
   }
 }
 
 /* content */
 
 .site-content .row {
-  max-width: 90rem;
+  max-width: 67.500rem;
 }
 
 /* adjust top margin for sticky header (not large size) */
 @media screen and (max-width:63.9375em) {
   .site-content {
-    margin-top: 4rem;
+    margin-top: 0;
   }
 }
 
 .page-content {
   position: relative;
   min-height: 600px;
-  padding-top: 0.9375rem;
+  padding-top: 1.5rem;
 }
 
 /* headers */
@@ -485,10 +510,29 @@ table code {
 }
 
 
-/* sticky header with overlay menu (for small/medium screens) */
+/* sticky header with overlay menu (for small/medium screens) - also adjust lightbend banner for this use case */
+@media screen and (max-width:64em) {
+  .lightbend-banner .wrapper > div.nav .drop-down {
+    display: none !important;
+  }
+  .lightbend-banner .wrapper {
+    height: 50px !important;
+  }
+  .lightbend-banner .wrapper > div {
+    height: 50px !important;
+  }
+  .lightbend-banner .wrapper > div.nav a.banner-btn {
+    margin-bottom: 8px !important;
+  }
+}
 
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 12;
+}
 .sticky-header {
-  position: fixed;
+  position: relative;
   top: 0;
   left: 0;
   z-index: 11;
@@ -506,17 +550,17 @@ table code {
 
 .sticky-header .menu-icon {
   margin-top: 1rem;
-  margin-right: 1rem;
+  margin-right: 1.5rem;
 }
 
 .overlay-nav {
-  position: fixed;
+  position: relative;
   z-index: 10;
   top: 0;
   left: 0;
   height: 0;
   width: 100%;
-  padding-top: 3rem;
+  padding-top: 0;
   background: #fff;
   overflow-x: hidden;
   overflow-y: auto;
@@ -524,7 +568,7 @@ table code {
 }
 
 .overlay-nav.nav-open {
-  height: 100%;
+  height: calc(100vh - 48px);
 }
 
 /* prevent scrolling of the body */
