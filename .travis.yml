@@ -3,6 +3,8 @@ jdk: openjdk8
 
 jobs:
   include:
+    - script: cd alpakka-sample-ftp-to-file && sbt compile
+      name: Compile Alpakka FTP to file sample
     - script: cd alpakka-sample-http-csv-to-kafka && sbt compile
       name: Compile Alpakka Http Csv Kafka sample
     - script: cd alpakka-sample-jdbc-to-elasticsearch && sbt compile
