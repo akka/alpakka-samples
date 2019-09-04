@@ -1,5 +1,8 @@
 # Alpakka Samples
 
+### @extref:[Download all files from an FTP server](ftp-to-file:index.html)
+This example uses Alpakka FTP to download files from an FTP server.
+
 ### @extref:[Fetch CSV via HTTP and publish to Kafka](http-csv-to-kafka:index.html)
 This example uses Akka HTTP to send the HTTP request and Akka HTTP's JSON support to convert the map into a JSON structure which gets published to a Kafka topic.
 

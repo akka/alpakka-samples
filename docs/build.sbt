@@ -6,6 +6,23 @@ scmInfo := Some(ScmInfo(url("https://github.com/akka/alpakka-samples"), "git@git
 homepage := Some(url("https://akka.io/alpakka-samples"))
 description := "Example solutions for Enterprise Integrations using Alpakka and Reactive Streams."
 
+val FtpToFile = config("ftp-to-file")
+ParadoxPlugin.paradoxSettings(FtpToFile)
+ParadoxSitePlugin.paradoxSettings(FtpToFile)
+AkkaParadoxPlugin.akkaParadoxSettings(FtpToFile)
+FtpToFile / siteSubdirName := FtpToFile.name
+FtpToFile / paradox / sourceDirectory := baseDirectory.value / ".." / s"alpakka-sample-${FtpToFile.name}" / "docs" / "src" / "main" / "paradox"
+FtpToFile / paradoxProperties ++= Map(
+  "project.url" -> s"${homepage.value.get}/${FtpToFile.name}",
+  "canonical.base_url" -> s"${homepage.value.get}/${FtpToFile.name}",
+  "snip.build.base_dir" -> s"${baseDirectory.value}/../alpakka-sample-${FtpToFile.name}",
+  "github.root.base_dir" -> s"${baseDirectory.value}/..",
+  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.FtpToFile.AkkaVersion}",
+  "extref.alpakka.base_url" -> s"https://doc.akka.io/docs/alpakka/${Dependencies.FtpToFile.AlpakkaVersion}/%s",
+  "extref.akka.base_url" -> s"https://doc.akka.io/docs/akka/${Dependencies.FtpToFile.AkkaVersion}/%s",
+)
+FtpToFile / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
+
 val HttpCsvToKafka = config("http-csv-to-kafka")
 ParadoxPlugin.paradoxSettings(HttpCsvToKafka)
 ParadoxSitePlugin.paradoxSettings(HttpCsvToKafka)
@@ -82,6 +99,7 @@ KafkaToElasticsearch / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
 
 Paradox / siteSubdirName := ""
 paradoxProperties ++= Map(
+  "extref.ftp-to-file.base_url" -> s"${(FtpToFile / siteSubdirName).value}/",
   "extref.http-csv-to-kafka.base_url" -> s"${(HttpCsvToKafka / siteSubdirName).value}/",
   "extref.jdbc-to-elasticsearch.base_url" -> s"${(JdbcToElasticsearch / siteSubdirName).value}/",
   "extref.jms.base_url" -> s"${(Jms / siteSubdirName).value}/",
