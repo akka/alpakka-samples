@@ -5,6 +5,12 @@ previewFixedPort := Some(8085)
 scmInfo := Some(ScmInfo(url("https://github.com/akka/alpakka-samples"), "git@github.com:akka/alpakka-samples.git"))
 homepage := Some(url("https://akka.io/alpakka-samples"))
 description := "Example solutions for Enterprise Integrations using Alpakka and Reactive Streams."
+version := {
+  val time = java.time.LocalDateTime.now().withSecond(0).withNano(0)
+  java.time.format.DateTimeFormatter.ISO_DATE.format(time) + " " + java.time.format.DateTimeFormatter.ISO_TIME.format(time)
+}
+
+
 
 val FtpToFile = config("ftp-to-file")
 ParadoxPlugin.paradoxSettings(FtpToFile)
