@@ -9,8 +9,7 @@ version := {
   val time = java.time.LocalDateTime.now().withSecond(0).withNano(0)
   java.time.format.DateTimeFormatter.ISO_DATE.format(time) + " " + java.time.format.DateTimeFormatter.ISO_TIME.format(time)
 }
-
-
+isSnapshot := true
 
 val FtpToFile = config("ftp-to-file")
 ParadoxPlugin.paradoxSettings(FtpToFile)
