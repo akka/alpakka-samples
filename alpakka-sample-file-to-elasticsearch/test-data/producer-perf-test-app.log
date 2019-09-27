@@ -1,0 +1,21 @@
+Waiting for Kafka to be ready..
+4973 records sent, 994.6 records/sec (0.01 MB/sec), 74.8 ms avg latency, 878.0 ms max latency.
+5032 records sent, 1006.4 records/sec (0.01 MB/sec), 20.9 ms avg latency, 92.0 ms max latency.
+4981 records sent, 995.0 records/sec (0.01 MB/sec), 20.3 ms avg latency, 89.0 ms max latency.
+5028 records sent, 1005.2 records/sec (0.01 MB/sec), 16.6 ms avg latency, 97.0 ms max latency.
+5002 records sent, 1000.2 records/sec (0.01 MB/sec), 10.9 ms avg latency, 97.0 ms max latency.
+4994 records sent, 996.4 records/sec (0.01 MB/sec), 5.3 ms avg latency, 71.0 ms max latency.
+5024 records sent, 1004.8 records/sec (0.01 MB/sec), 4.5 ms avg latency, 40.0 ms max latency.
+4990 records sent, 997.0 records/sec (0.01 MB/sec), 2.7 ms avg latency, 52.0 ms max latency.
+5017 records sent, 1003.4 records/sec (0.01 MB/sec), 2.8 ms avg latency, 49.0 ms max latency.
+5002 records sent, 1000.4 records/sec (0.01 MB/sec), 2.3 ms avg latency, 23.0 ms max latency.
+5001 records sent, 999.6 records/sec (0.01 MB/sec), 2.6 ms avg latency, 33.0 ms max latency.
+5002 records sent, 1000.4 records/sec (0.01 MB/sec), 2.1 ms avg latency, 39.0 ms max latency.
+5005 records sent, 1000.8 records/sec (0.01 MB/sec), 2.6 ms avg latency, 28.0 ms max latency.
+5000 records sent, 999.8 records/sec (0.01 MB/sec), 2.3 ms avg latency, 44.0 ms max latency.
+4999 records sent, 999.8 records/sec (0.01 MB/sec), 2.1 ms avg latency, 43.0 ms max latency.
+5005 records sent, 1000.8 records/sec (0.01 MB/sec), 2.3 ms avg latency, 35.0 ms max latency.
+4996 records sent, 999.2 records/sec (0.01 MB/sec), 3.2 ms avg latency, 71.0 ms max latency.
+5006 records sent, 1001.2 records/sec (0.01 MB/sec), 2.4 ms avg latency, 52.0 ms max latency.
+5001 records sent, 999.8 records/sec (0.01 MB/sec), 2.7 ms avg latency, 61.0 ms max latency.
+100000 records sent, 999.880014 records/sec (0.01 MB/sec), 9.27 ms avg latency, 878.00 ms max latency, 2 ms 50th, 43 ms 95th, 99 ms 99th, 210 ms 99.9th.

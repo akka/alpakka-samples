@@ -1,0 +1,60 @@
+2019-09-20 21:18:24,664 [myid:] - INFO  [main:QuorumPeerConfig@103] - Reading configuration from: /opt/zookeeper-3.4.6/bin/../conf/zoo.cfg
+2019-09-20 21:18:24,677 [myid:] - INFO  [main:DatadirCleanupManager@78] - autopurge.snapRetainCount set to 3
+2019-09-20 21:18:24,677 [myid:] - INFO  [main:DatadirCleanupManager@79] - autopurge.purgeInterval set to 1
+2019-09-20 21:18:24,679 [myid:] - WARN  [main:QuorumPeerMain@113] - Either no config or no quorum defined in config, running  in standalone mode
+2019-09-20 21:18:24,679 [myid:] - INFO  [PurgeTask:DatadirCleanupManager$PurgeTask@138] - Purge task started.
+2019-09-20 21:18:24,740 [myid:] - INFO  [main:QuorumPeerConfig@103] - Reading configuration from: /opt/zookeeper-3.4.6/bin/../conf/zoo.cfg
+2019-09-20 21:18:24,744 [myid:] - INFO  [PurgeTask:DatadirCleanupManager$PurgeTask@144] - Purge task completed.
+2019-09-20 21:18:24,755 [myid:] - INFO  [main:ZooKeeperServerMain@95] - Starting server
+2019-09-20 21:18:24,767 [myid:] - INFO  [main:Environment@100] - Server environment:zookeeper.version=3.4.6-1569965, built on 02/20/2014 09:09 GMT
+2019-09-20 21:18:24,767 [myid:] - INFO  [main:Environment@100] - Server environment:host.name=a8b2f9155c9c
+2019-09-20 21:18:24,767 [myid:] - INFO  [main:Environment@100] - Server environment:java.version=1.7.0_65
+2019-09-20 21:18:24,767 [myid:] - INFO  [main:Environment@100] - Server environment:java.vendor=Oracle Corporation
+2019-09-20 21:18:24,767 [myid:] - INFO  [main:Environment@100] - Server environment:java.home=/usr/lib/jvm/java-7-openjdk-amd64/jre
+2019-09-20 21:18:24,768 [myid:] - INFO  [main:Environment@100] - Server environment:java.class.path=/opt/zookeeper-3.4.6/bin/../build/classes:/opt/zookeeper-3.4.6/bin/../build/lib/*.jar:/opt/zookeeper-3.4.6/bin/../lib/slf4j-log4j12-1.6.1.jar:/opt/zookeeper-3.4.6/bin/../lib/slf4j-api-1.6.1.jar:/opt/zookeeper-3.4.6/bin/../lib/netty-3.7.0.Final.jar:/opt/zookeeper-3.4.6/bin/../lib/log4j-1.2.16.jar:/opt/zookeeper-3.4.6/bin/../lib/jline-0.9.94.jar:/opt/zookeeper-3.4.6/bin/../zookeeper-3.4.6.jar:/opt/zookeeper-3.4.6/bin/../src/java/lib/*.jar:/opt/zookeeper-3.4.6/bin/../conf:
+2019-09-20 21:18:24,768 [myid:] - INFO  [main:Environment@100] - Server environment:java.library.path=/usr/java/packages/lib/amd64:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib
+2019-09-20 21:18:24,768 [myid:] - INFO  [main:Environment@100] - Server environment:java.io.tmpdir=/tmp
+2019-09-20 21:18:24,771 [myid:] - INFO  [main:Environment@100] - Server environment:java.compiler=<NA>
+2019-09-20 21:18:24,772 [myid:] - INFO  [main:Environment@100] - Server environment:os.name=Linux
+2019-09-20 21:18:24,772 [myid:] - INFO  [main:Environment@100] - Server environment:os.arch=amd64
+2019-09-20 21:18:24,772 [myid:] - INFO  [main:Environment@100] - Server environment:os.version=4.15.0-60-generic
+2019-09-20 21:18:24,772 [myid:] - INFO  [main:Environment@100] - Server environment:user.name=root
+2019-09-20 21:18:24,772 [myid:] - INFO  [main:Environment@100] - Server environment:user.home=/root
+2019-09-20 21:18:24,772 [myid:] - INFO  [main:Environment@100] - Server environment:user.dir=/opt/zookeeper-3.4.6
+2019-09-20 21:18:24,774 [myid:] - INFO  [main:ZooKeeperServer@755] - tickTime set to 2000
+2019-09-20 21:18:24,774 [myid:] - INFO  [main:ZooKeeperServer@764] - minSessionTimeout set to -1
+2019-09-20 21:18:24,774 [myid:] - INFO  [main:ZooKeeperServer@773] - maxSessionTimeout set to -1
+2019-09-20 21:18:24,848 [myid:] - INFO  [main:NIOServerCnxnFactory@94] - binding to port 0.0.0.0/0.0.0.0:2181
+2019-09-20 21:18:25,632 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /172.22.0.4:40840
+2019-09-20 21:18:25,642 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /172.22.0.4:40840
+2019-09-20 21:18:25,646 [myid:] - INFO  [SyncThread:0:FileTxnLog@199] - Creating new log file: log.1
+2019-09-20 21:18:25,704 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x16d508a508b0000 with negotiated timeout 30000 for client /172.22.0.4:40840
+2019-09-20 21:18:25,978 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x16d508a508b0000
+2019-09-20 21:18:25,991 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /172.22.0.4:40840 which had sessionid 0x16d508a508b0000
+2019-09-20 21:18:26,553 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /172.22.0.3:53232
+2019-09-20 21:18:26,558 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /172.22.0.3:53232
+2019-09-20 21:18:26,561 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x16d508a508b0001 with negotiated timeout 30000 for client /172.22.0.3:53232
+2019-09-20 21:18:26,611 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /172.22.0.2:34810
+2019-09-20 21:18:26,624 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /172.22.0.2:34810
+2019-09-20 21:18:26,626 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x16d508a508b0002 with negotiated timeout 6000 for client /172.22.0.2:34810
+2019-09-20 21:18:26,818 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x16d508a508b0002 type:create cxid:0x2 zxid:0x6 txntype:-1 reqpath:n/a Error Path:/brokers Error:KeeperErrorCode = NoNode for /brokers
+2019-09-20 21:18:26,822 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x16d508a508b0001
+2019-09-20 21:18:26,826 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /172.22.0.3:53232 which had sessionid 0x16d508a508b0001
+2019-09-20 21:18:26,874 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x16d508a508b0002 type:create cxid:0x6 zxid:0xb txntype:-1 reqpath:n/a Error Path:/config Error:KeeperErrorCode = NoNode for /config
+2019-09-20 21:18:26,904 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x16d508a508b0002 type:create cxid:0x9 zxid:0xe txntype:-1 reqpath:n/a Error Path:/admin Error:KeeperErrorCode = NoNode for /admin
+2019-09-20 21:18:27,473 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x16d508a508b0002 type:create cxid:0x15 zxid:0x19 txntype:-1 reqpath:n/a Error Path:/cluster Error:KeeperErrorCode = NoNode for /cluster
+2019-09-20 21:18:30,748 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /172.22.0.4:40860
+2019-09-20 21:18:30,755 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /172.22.0.4:40860
+2019-09-20 21:18:30,759 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x16d508a508b0003 with negotiated timeout 30000 for client /172.22.0.4:40860
+2019-09-20 21:18:31,767 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /172.22.0.3:53252
+2019-09-20 21:18:31,774 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /172.22.0.3:53252
+2019-09-20 21:18:31,777 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x16d508a508b0004 with negotiated timeout 30000 for client /172.22.0.3:53252
+2019-09-20 21:18:31,838 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x16d508a508b0003 type:setData cxid:0x4 zxid:0x23 txntype:-1 reqpath:n/a Error Path:/config/topics/replicated-topic Error:KeeperErrorCode = NoNode for /config/topics/replicated-topic
+2019-09-20 21:18:32,106 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@592] - Got user-level KeeperException when processing sessionid:0x16d508a508b0002 type:multi cxid:0x39 zxid:0x26 txntype:-1 reqpath:n/a aborting remaining multi ops. Error Path:/admin/preferred_replica_election Error:KeeperErrorCode = NoNode for /admin/preferred_replica_election
+2019-09-20 21:18:32,118 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x16d508a508b0003
+2019-09-20 21:18:32,128 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /172.22.0.4:40860 which had sessionid 0x16d508a508b0003
+2019-09-20 21:18:32,850 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x16d508a508b0004
+2019-09-20 21:18:32,864 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /172.22.0.3:53252 which had sessionid 0x16d508a508b0004
+2019-09-20 21:18:35,655 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x16d508a508b0002 type:setData cxid:0x4e zxid:0x30 txntype:-1 reqpath:n/a Error Path:/config/topics/__consumer_offsets Error:KeeperErrorCode = NoNode for /config/topics/__consumer_offsets
+2019-09-20 21:26:17,574 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x16d508a508b0002
+2019-09-20 21:26:17,580 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /172.22.0.2:34810 which had sessionid 0x16d508a508b0002
