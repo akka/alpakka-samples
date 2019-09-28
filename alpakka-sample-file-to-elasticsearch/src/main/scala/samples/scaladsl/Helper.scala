@@ -7,23 +7,16 @@ package samples.scaladsl
 import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 
 import akka.actor.ActorSystem
-import akka.stream.alpakka.elasticsearch.WriteMessage
-import akka.stream.alpakka.elasticsearch.scaladsl.{ElasticsearchFlow, ElasticsearchSource}
+import akka.stream.Materializer
+import akka.stream.alpakka.elasticsearch.scaladsl.ElasticsearchSource
 import akka.stream.alpakka.file.scaladsl.Directory
-import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.{ActorMaterializer, Materializer}
-import akka.{Done, NotUsed}
-import org.apache.http.HttpHost
-import org.elasticsearch.client.RestClient
+import akka.stream.scaladsl.{Keep, Sink}
 import org.slf4j.LoggerFactory
 import org.testcontainers.elasticsearch.ElasticsearchContainer
-import spray.json.DefaultJsonProtocol._
-import spray.json._
+import samples.scaladsl.Main.elasticsearchClient
 
 import scala.collection.immutable
-import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
-import samples.scaladsl.Main.{elasticsearchClient, elasticsearchContainer}
+import scala.concurrent.Future
 
 trait Helper {
 
