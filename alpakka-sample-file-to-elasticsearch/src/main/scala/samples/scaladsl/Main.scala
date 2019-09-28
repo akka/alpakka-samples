@@ -7,20 +7,16 @@ package samples.scaladsl
 import java.nio.file._
 
 import akka.actor.ActorSystem
-import akka.stream.alpakka.elasticsearch.{WriteMessage, WriteResult}
+import akka.stream.alpakka.elasticsearch.WriteMessage
 import akka.stream.alpakka.elasticsearch.scaladsl.ElasticsearchFlow
 import akka.stream.alpakka.file.DirectoryChange
-import akka.stream.alpakka.file.scaladsl.FileTailSource
-import akka.stream.alpakka.file.scaladsl.DirectoryChangesSource
-import akka.stream.scaladsl.{Flow, Keep, MergeHub, RunnableGraph, Sink, Source}
+import akka.stream.alpakka.file.scaladsl.{DirectoryChangesSource, FileTailSource}
+import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, KillSwitches, Materializer, UniqueKillSwitch}
 import akka.{Done, NotUsed}
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
-import samples.scaladsl.Main.{listFiles, testDataPath}
-import spray.json._
 
-import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 
@@ -32,7 +28,8 @@ object Main extends App with Helper {
   implicit val actorMaterializer: Materializer = ActorMaterializer()
   implicit val executionContext: ExecutionContext = actorSystem.dispatcher
 
-  val streamRuntime = 500.seconds
+  val streamRuntime = 5.seconds
+  val substreamMergeParallelism = 47
 
   // Elasticsearch client setup
   implicit val elasticsearchClient: RestClient =
@@ -63,38 +60,17 @@ object Main extends App with Helper {
       .toMat(Sink.ignore)(Keep.both)
 
     sink
-
-//    val mergeHub = MergeHub
-//      .source(perProducerBufferSize = 16)
-//      .toMat(elasticsearchSink)(Keep.both)
-//
-//    mergeHub.run()
   }
 
   val (control, stream) = changes
-    .statefulMapConcat { () =>
-      //val sink = indexInElasticsearch
-      val tailedLogs = mutable.Map[Path, UniqueKillSwitch]()
-
-      {
-        case (path, DirectoryChange.Creation) =>
-          println(s"File create detected: $path")
-          val source = tailLog(path)
-          val killSwitch: UniqueKillSwitch = source.viaMat(KillSwitches.single)(Keep.right).toMat(Sink.ignore)(Keep.left).run()
-          tailedLogs += path -> killSwitch
-          List(source)
-        case (path, DirectoryChange.Deletion) =>
-          println(s"File delete detected: $path")
-          tailedLogs.get(path).foreach { killSwitch =>
-            println(s"Shutting tail log stream for: $path")
-            killSwitch.shutdown()
-            tailedLogs -= path
-          }
-          Nil
-        case _                                => Nil
-      }
+    .mapConcat {
+      case (path, DirectoryChange.Creation) =>
+        println(s"File create detected: $path")
+        val source = tailLog(path)
+        List(source)
+      case _                                => Nil
     }
-    .flatMapMerge(47, identity) // merge substreams and flatten elements emitted
+    .flatMapMerge(substreamMergeParallelism, identity) // merge substreams and flatten elements emitted
     .toMat(elasticsearchIndexSink)(Keep.right)
     .run()
 
