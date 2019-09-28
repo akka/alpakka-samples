@@ -32,7 +32,7 @@ object Main extends App with Helper {
   implicit val actorMaterializer: Materializer = ActorMaterializer()
   implicit val executionContext: ExecutionContext = actorSystem.dispatcher
 
-  val streamRuntime = 5.seconds
+  val streamRuntime = 500.seconds
 
   // Elasticsearch client setup
   implicit val elasticsearchClient: RestClient =
@@ -49,17 +49,40 @@ object Main extends App with Helper {
   val fs = FileSystems.getDefault
   val changes = DirectoryChangesSource(fs.getPath(inputLogsPath), pollInterval = 1.second, maxBufferSize = 1000)
 
-  val (control, stream): (UniqueKillSwitch, Future[Done]) = changes
+  lazy val elasticsearchIndexSink: Sink[LogLine, (UniqueKillSwitch, Future[Done])] = {
+    val sink = Flow[LogLine]
+      .map(WriteMessage.createIndexMessage[LogLine])
+      .via(ElasticsearchFlow.create(indexName, typeName))
+      .map { writeResult =>
+        writeResult.error.foreach { errorJson =>
+          throw new RuntimeException(s"Elasticsearch index failed ${writeResult.errorReason.getOrElse(errorJson)}")
+        }
+        writeResult
+      }
+      .viaMat(KillSwitches.single)(Keep.right)
+      .toMat(Sink.ignore)(Keep.both)
+
+    sink
+
+//    val mergeHub = MergeHub
+//      .source(perProducerBufferSize = 16)
+//      .toMat(elasticsearchSink)(Keep.both)
+//
+//    mergeHub.run()
+  }
+
+  val (control, stream) = changes
     .statefulMapConcat { () =>
-      val sink = indexInElasticsearch()
+      //val sink = indexInElasticsearch
       val tailedLogs = mutable.Map[Path, UniqueKillSwitch]()
 
       {
         case (path, DirectoryChange.Creation) =>
           println(s"File create detected: $path")
-          val killSwitch: UniqueKillSwitch = tailLog(path).toMat(sink)(Keep.left).run()
+          val source = tailLog(path)
+          val killSwitch: UniqueKillSwitch = source.viaMat(KillSwitches.single)(Keep.right).toMat(Sink.ignore)(Keep.left).run()
           tailedLogs += path -> killSwitch
-          Nil
+          List(source)
         case (path, DirectoryChange.Deletion) =>
           println(s"File delete detected: $path")
           tailedLogs.get(path).foreach { killSwitch =>
@@ -71,39 +94,20 @@ object Main extends App with Helper {
         case _                                => Nil
       }
     }
-    .viaMat(KillSwitches.single)(Keep.right)
-    .toMat(Sink.ignore)(Keep.both).run()
+    .flatMapMerge(47, identity) // merge substreams and flatten elements emitted
+    .toMat(elasticsearchIndexSink)(Keep.right)
+    .run()
 
-  def tailLog(path: Path): Source[LogLine, UniqueKillSwitch] = FileTailSource
+  def tailLog(path: Path): Source[LogLine, NotUsed] = FileTailSource
     .lines(
       path = path,
       maxLineSize = 8192,
       pollingInterval = 250.millis
     )
     .map { line =>
-      //println(line)
+      println(s"> $line")
       LogLine(line, 0)
     }
-    .viaMat(KillSwitches.single)(Keep.right)
-
-  def indexInElasticsearch(): Sink[LogLine, NotUsed] = {
-    val elasticsearchSink = Flow[LogLine]
-      .map(WriteMessage.createIndexMessage[LogLine])
-      .via(ElasticsearchFlow.create(indexName, typeName))
-      .map { writeResult =>
-        writeResult.error.foreach { errorJson =>
-          throw new RuntimeException(s"Elasticsearch index failed ${writeResult.errorReason.getOrElse(errorJson)}")
-        }
-        writeResult
-      }
-      .toMat(Sink.ignore)(Keep.left)
-
-    val mergeHub = MergeHub
-      .source(perProducerBufferSize = 16)
-      .to(elasticsearchSink)
-
-    mergeHub.run()
-  }
 
   val run = for {
     _ <- {
@@ -135,5 +139,5 @@ object Main extends App with Helper {
     }
   } yield ()
 
-  Await.result(run, 20.seconds)
+  Await.result(run, streamRuntime + 20.seconds)
 }
