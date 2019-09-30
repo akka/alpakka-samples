@@ -5,13 +5,15 @@
 package samples.scaladsl
 
 import java.nio.file._
+import java.time.format.DateTimeFormatter
+import java.time.{LocalDateTime, ZoneOffset, ZonedDateTime}
 
 import akka.actor.ActorSystem
 import akka.stream.alpakka.elasticsearch.WriteMessage
 import akka.stream.alpakka.elasticsearch.scaladsl.ElasticsearchFlow
 import akka.stream.alpakka.file.DirectoryChange
 import akka.stream.alpakka.file.scaladsl.{DirectoryChangesSource, FileTailSource}
-import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
+import akka.stream.scaladsl.{Flow, Keep, RunnableGraph, Sink, Source}
 import akka.stream.{ActorMaterializer, KillSwitches, Materializer, UniqueKillSwitch}
 import akka.{Done, NotUsed}
 import org.apache.http.HttpHost
@@ -19,8 +21,9 @@ import org.elasticsearch.client.RestClient
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.matching.Regex
 
-object Main extends App with Helper {
+object Main extends App with RunOps {
 
   import JsonFormats._
 
@@ -29,7 +32,7 @@ object Main extends App with Helper {
   implicit val executionContext: ExecutionContext = actorSystem.dispatcher
 
   val streamRuntime = 5.seconds
-  val substreamMergeParallelism = 47
+  val streamParallelism = 47
 
   // Elasticsearch client setup
   implicit val elasticsearchClient: RestClient =
@@ -43,11 +46,90 @@ object Main extends App with Helper {
   val testDataPath = "./test-data"
   val inputLogsPath = s"$testDataPath/input"
 
-  val fs = FileSystems.getDefault
-  val changes = DirectoryChangesSource(fs.getPath(inputLogsPath), pollInterval = 1.second, maxBufferSize = 1000)
+  sealed trait DateTimeExtractor {
+    def regex: Regex
+    def parse(dateStr: String): Long
+    def maybeParse(dateStr: String): Option[Long] = {
+      val matched: Option[String] = regex.findFirstIn(dateStr)
+      matched.map(parse)
+    }
+  }
 
-  lazy val elasticsearchIndexSink: Sink[LogLine, (UniqueKillSwitch, Future[Done])] = {
-    val sink = Flow[LogLine]
+  /**
+   * ZonedDateTime
+   * Ex)
+   * 2016-01-19T15:21:32.59+02:00
+   * https://regex101.com/r/LYluKk/4
+   */
+  final class ZonedDateTimeExtractor extends DateTimeExtractor {
+    val regex: Regex = """((?:(\d{4}-\d{2}-\d{2})[T| ](\d{2}:\d{2}:\d{2}(?:\.\d+)?))(Z|[\+-]\d{2}:\d{2})+)""".r
+    def parse(dateStr: String): Long = ZonedDateTime.parse(dateStr, DateTimeFormatter.ISO_ZONED_DATE_TIME).toInstant.toEpochMilli
+  }
+
+  /**
+   * LocalDateTime
+   * Ex)
+   * 2019-09-20 21:18:24,774
+   * https://regex101.com/r/LYluKk/3
+   */
+  final class LocalDateTimeExtractor extends DateTimeExtractor {
+    private val pattern = DateTimeFormatter.ofPattern("yyyy-MM-dd kk:mm:ss,SSS")
+    val regex: Regex = """((?:(\d{4}-\d{2}-\d{2})[T| ](\d{2}:\d{2}:\d{2}(?:\.\d+)?)),(\d{3}?))""".r
+    def parse(dateStr: String): Long = LocalDateTime.parse(dateStr, pattern).toInstant(ZoneOffset.UTC).toEpochMilli
+  }
+
+  val dateTimeExtractors = List(new ZonedDateTimeExtractor, new LocalDateTimeExtractor)
+
+  val fs = FileSystems.getDefault
+  val directoryChangesSource: Source[(Path, DirectoryChange), NotUsed] =
+    DirectoryChangesSource(fs.getPath(inputLogsPath), pollInterval = 1.second, maxBufferSize = 1000)
+
+  val tailNewLogs: Flow[(Path, DirectoryChange), Source[LogLine, NotUsed], NotUsed] =
+    Flow[(Path, DirectoryChange)]
+      .collect { case (path, DirectoryChange.Creation) => path }
+      .map { path =>
+        println(s"File create detected: $path")
+        fileTailSource(path)
+      }
+
+  final case class LogAcc(lineNo: Long = 0L, logLine: Option[LogLine] = None)
+
+  def fileTailSource(path: Path): Source[LogLine, NotUsed] = {
+    val filename = path.getFileName.toString
+    val directory = path.getParent.toString
+
+    FileTailSource
+      .lines(
+        path = path,
+        maxLineSize = 8192,
+        pollingInterval = 250.millis
+      )
+      .map { line =>
+        log.debug(s"Parsed > $line")
+        line
+      }
+      .scan(LogAcc()) { (acc, line) =>
+        val lineNo = acc.lineNo + 1
+        val date = extractDate(line)
+        LogAcc(lineNo,
+          Some(LogLine(line, lineNo, date, filename, directory))
+        )
+      }
+      .mapConcat(_.logLine.toList)
+  }
+
+  def extractDate(line: String): Long = {
+    dateTimeExtractors
+      .view
+      .map(_.maybeParse(line))
+      .collectFirst {
+        case Some(d) => d
+      }
+      .getOrElse(-1L)
+  }
+
+  val elasticsearchIndexSink: Sink[LogLine, (UniqueKillSwitch, Future[Done])] =
+    Flow[LogLine]
       .map(WriteMessage.createIndexMessage[LogLine])
       .via(ElasticsearchFlow.create(indexName, typeName))
       .map { writeResult =>
@@ -59,60 +141,20 @@ object Main extends App with Helper {
       .viaMat(KillSwitches.single)(Keep.right)
       .toMat(Sink.ignore)(Keep.both)
 
-    sink
-  }
-
-  val (control, stream) = changes
-    .mapConcat {
-      case (path, DirectoryChange.Creation) =>
-        println(s"File create detected: $path")
-        val source = tailLog(path)
-        List(source)
-      case _                                => Nil
-    }
-    .flatMapMerge(substreamMergeParallelism, identity) // merge substreams and flatten elements emitted
+  val graph: RunnableGraph[(UniqueKillSwitch, Future[Done])] = directoryChangesSource
+    .via(tailNewLogs)
+    .flatMapMerge(streamParallelism, identity)
     .toMat(elasticsearchIndexSink)(Keep.right)
-    .run()
-
-  def tailLog(path: Path): Source[LogLine, NotUsed] = FileTailSource
-    .lines(
-      path = path,
-      maxLineSize = 8192,
-      pollingInterval = 250.millis
-    )
-    .map { line =>
-      println(s"> $line")
-      LogLine(line, 0)
-    }
 
   val run = for {
-    _ <- {
-      println(s"Copying test data to: $inputLogsPath")
-      copyTo(testDataPath, inputLogsPath)
-    }
-    _ <- {
-      println(s"Running index stream for $streamRuntime")
-      Thread.sleep(streamRuntime.toMillis)
-      println(s"Shutting down index stream")
-      control.shutdown()
-      println(s"Wait for index stream to shutdown")
-      stream
-    }
-    results <- {
-      println(s"Querying elasticsearch for ...")
-      readFromElasticsearch(indexName)
-    }
-    _ <- {
-      println(s"Deleting logs from: $inputLogsPath")
-      deleteFrom(inputLogsPath)
-    }
-    _ <- {
-      results.foreach(m => println(s"Results:\n$m"))
-      println(s"Stop containers..")
-      stopContainers()
-      println(s"Kill actor system")
-      actorSystem.terminate()
-    }
+    _ <-                deleteAllFilesFrom(inputLogsPath)
+    (control, stream) = graph.run()
+    _ <-                copyTestDataTo(testDataPath, inputLogsPath)
+    _ <-                runStreamForAwhileAndShutdown(streamRuntime, control, stream)
+    results <-          queryElasticsearch(indexName)
+    _ =                 printResults(results)
+    _ <-                deleteAllFilesFrom(inputLogsPath)
+    _ <-                shutdown(actorSystem)
   } yield ()
 
   Await.result(run, streamRuntime + 20.seconds)
