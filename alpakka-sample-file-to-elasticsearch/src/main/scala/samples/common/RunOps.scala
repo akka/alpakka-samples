@@ -2,47 +2,38 @@
  * Copyright (C) 2016-2019 Lightbend Inc. <http://www.lightbend.com>
  */
 
-package samples.scaladsl
+package samples.common
 
 import java.nio.file.{Files, Path, Paths, StandardCopyOption}
+import java.time.ZonedDateTime
 
-import akka.Done
-import akka.actor.ActorSystem
-import akka.stream.{Materializer, UniqueKillSwitch}
-import akka.stream.alpakka.elasticsearch.scaladsl.ElasticsearchSource
+import akka.actor.{ActorSystem, Terminated}
 import akka.stream.alpakka.file.scaladsl.Directory
 import akka.stream.scaladsl.{Keep, Sink}
+import akka.stream.{Materializer, UniqueKillSwitch}
+import org.elasticsearch.client.RestClient
 import org.slf4j.LoggerFactory
 import org.testcontainers.elasticsearch.ElasticsearchContainer
-import samples.scaladsl.Main.elasticsearchClient
+import samples.scaladsl.LogFileSummary.LogFileSummaries
+import samples.scaladsl.LogLine
 
-import scala.collection.immutable
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
 trait RunOps {
   final val log = LoggerFactory.getLogger(getClass)
 
-  import JsonFormats._
-
   // Testcontainers: start Elasticsearch in Docker
   val elasticsearchContainer = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.3")
   elasticsearchContainer.start()
   val elasticsearchAddress = elasticsearchContainer.getHttpHostAddress
 
-  def queryElasticsearch(indexName: String)(implicit actorSystem: ActorSystem, materializer: Materializer): Future[immutable.Seq[LogLine]] = {
-    val reading = ElasticsearchSource
-      .typed[LogLine](indexName, "_doc", """{"match_all": {}}""")
-      .map(_.source)
-      .runWith(Sink.seq)
-    reading.foreach(_ => log.info("Reading finished"))(actorSystem.dispatcher)
-    reading
-  }
-
-  def stopContainers() = {
-    elasticsearchClient.close()
+  def stopContainers()(implicit esClient: RestClient): Unit = {
+    esClient.close()
     elasticsearchContainer.stop()
   }
+
+  def now(): Long = ZonedDateTime.now.toInstant.toEpochMilli
 
   def listFiles(path: String)(implicit mat: Materializer): Future[Seq[Path]] =
     Directory.ls(Paths.get(path)).filterNot(Files.isDirectory(_)).toMat(Sink.seq)(Keep.right).run()
@@ -68,25 +59,13 @@ trait RunOps {
     }
   }
 
-  def runStreamForAwhileAndShutdown(waitInterval: FiniteDuration,
-                                    control: UniqueKillSwitch,
-                                    stream: Future[Done])(implicit mat: Materializer): Future[Done] = {
-    log.info(s"Running index stream for $waitInterval")
-    Thread.sleep(waitInterval.toMillis)
-    log.info(s"Shutting down index stream")
-    control.shutdown()
-    log.info(s"Wait for index stream to shutdown")
-    stream
-  }
-
-  def printResults(results: Seq[LogLine]): Unit = {
-    results.foreach(m => log.info(s"Results:\n$m"))
-  }
-
-  def shutdown(actorSystem: ActorSystem): Future[Terminated] = {
-    println(s"Stop containers..")
+  def shutdown(actorSystem: ActorSystem)(implicit esClient: RestClient): Future[Terminated] = {
+    log.info(s"Stop containers")
     stopContainers()
-    println(s"Kill actor system")
+    log.info(s"Kill actor system")
     actorSystem.terminate()
   }
 }
+
+// for Java DSL
+final class RunOpsImpl extends RunOps
