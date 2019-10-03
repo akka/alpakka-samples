@@ -50,7 +50,7 @@ trait RunOps {
     implicit val ec = mat.executionContext
     for {
       files <- listFiles(path)
-    } yield files filterNot(_ == ".gitignore") foreach { file =>
+    } yield files filterNot(_.getFileName.toString == ".gitignore") foreach { file =>
       log.info(s"Deleting file: $file")
       Files.delete(file)
     }

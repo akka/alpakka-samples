@@ -1,4 +1,4 @@
 .idea/
 target
-!test-data/input/.gitignore
 test-data/input/*
+!test-data/input/.gitignore
