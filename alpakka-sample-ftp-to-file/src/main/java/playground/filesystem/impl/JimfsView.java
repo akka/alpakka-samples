@@ -197,7 +197,7 @@ public class JimfsView implements FileSystemView {
             }
 
             // .. => parent directory (if not root)
-            if (tok.equals("..")) {
+            if (tok.equals("src/main")) {
                 if (resArg.startsWith(normalizedRootDir)) {
                     int slashIndex = resArg.lastIndexOf("/");
                     if (slashIndex != -1) {
