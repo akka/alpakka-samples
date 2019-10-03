@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-09-27 08:15:00
+Version 2019-10-03 14:37:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -246,7 +246,6 @@ Version 2019-09-27 08:15:00
 <nav class="nav-toc">
 <ul>
   <li><a href="index.html#download-all-files-an-ftp-server-to-local-files" class="header">Download all files an FTP server to local files</a></li>
-  <li><a href="step_001_complete.html" class="page">Explanation</a></li>
   <li><a href="full-source.html" class="page">Full source</a></li>
 </ul>
 </nav>
@@ -259,7 +258,7 @@ Version 2019-09-27 08:15:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-09-27 08:15:00
+Version 2019-10-03 14:37:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -269,7 +268,6 @@ Version 2019-09-27 08:15:00
 <div class="nav-toc">
 <ul>
   <li><a href="index.html#download-all-files-an-ftp-server-to-local-files" class="header">Download all files an FTP server to local files</a></li>
-  <li><a href="step_001_complete.html" class="page">Explanation</a></li>
   <li><a href="full-source.html" class="page">Full source</a></li>
 </ul>
 </div>
@@ -293,22 +291,81 @@ Version 2019-09-27 08:15:00
   <dt>Dependencies (sbt notation)
   </dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-ftp-to-file/project/Dependencies.scala#L6-L14" target="_blank" title="Go to snippet source"></a><code class="language-scala">val AkkaVersion = &quot;2.5.23&quot;
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-ftp-to-file/project/Dependencies.scala#L6-L14" target="_blank" title="Go to snippet source"></a><code class="language-scala">val AkkaVersion = &quot;2.5.25&quot;
 val AlpakkaVersion = &quot;1.1.1&quot;
 
   &quot;com.typesafe.akka&quot; %% &quot;akka-stream&quot; % AkkaVersion,
   &quot;com.lightbend.akka&quot; %% &quot;akka-stream-alpakka-ftp&quot; % AlpakkaVersion,</code></pre></dd>
 </dl>
+<h3><a href="#imports" name="imports" class="anchor"><span class="anchor-link"></span></a>Imports</h3>
+<dl>
+  <dt>Java</dt>
+  <dd>
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-ftp-to-file/src/main/java/samples/javadsl/Main.java#L9-L12" target="_blank" title="Go to snippet source"></a><code class="language-java">import akka.stream.alpakka.ftp.FtpSettings;
+import akka.stream.alpakka.ftp.javadsl.Ftp;
+import akka.stream.javadsl.FileIO;
+import akka.stream.javadsl.Sink;</code></pre></dd>
+  <dt>Scala</dt>
+  <dd>
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-ftp-to-file/src/main/scala/samples/scaladsl/Main.scala#L8-L11" target="_blank" title="Go to snippet source"></a><code class="language-scala">import akka.stream.alpakka.ftp.FtpSettings
+import akka.stream.alpakka.ftp.scaladsl.Ftp
+import akka.stream.scaladsl.{FileIO, Sink}
+import akka.stream.{ActorMaterializer, IOResult, Materializer}</code></pre></dd>
+</dl>
+<h3><a href="#flow" name="flow" class="anchor"><span class="anchor-link"></span></a>Flow</h3>
+<ul>
+  <li>list FTP server contents (1),</li>
+  <li>just bother about file entries (2),</li>
+  <li>for each file prepare for awaiting <span class="group-scala"><code>Future</code></span><span class="group-java"><code>CompletionStage</code></span> results ignoring the stream order (3),</li>
+  <li>run a new stream copying the file contents to a local file (4),</li>
+  <li>combine the filename and the copying result (5),</li>
+  <li>collect all filenames with results into a sequence (6)</li>
+</ul>
+<dl>
+  <dt>Java</dt>
+  <dd>
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-ftp-to-file/src/main/java/samples/javadsl/Main.java#L44-L66" target="_blank" title="Go to snippet source"></a><code class="language-java">final FtpSettings ftpSettings =
+        FtpSettings.create(InetAddress.getByName(&quot;localhost&quot;)).withPort(port);
+final int parallelism = 5;
+
+final CompletionStage&lt;List&lt;Pair&lt;String, IOResult&gt;&gt;&gt; fetchedFiles =
+        Ftp.ls(&quot;/&quot;, ftpSettings) // : FtpFile (1)
+                .filter(ftpFile -&gt; ftpFile.isFile()) // : FtpFile (2)
+                .mapAsyncUnordered(
+                        parallelism,
+                        ftpFile -&gt; { // (3)
+                            final Path localPath = targetDir.resolve(&quot;.&quot; + ftpFile.path());
+                            final CompletionStage&lt;IOResult&gt; fetchFile =
+                                    Ftp.fromPath(ftpFile.path(), ftpSettings)
+                                            .runWith(FileIO.toPath(localPath), materializer); // (4)
+                            return fetchFile.thenApply(
+                                    ioResult -&gt; // (5)
+                                            Pair.create(ftpFile.path(), ioResult));
+                        }) // : (String, IOResult)
+                .runWith(Sink.seq(), materializer); // (6)</code></pre></dd>
+  <dt>Scala</dt>
+  <dd>
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-ftp-to-file/src/main/scala/samples/scaladsl/Main.scala#L42-L62" target="_blank" title="Go to snippet source"></a><code class="language-scala">val ftpSettings = FtpSettings(InetAddress.getByName(&quot;localhost&quot;)).withPort(port)
+
+val fetchedFiles: Future[immutable.Seq[(String, IOResult)]] =
+  Ftp
+    .ls(&quot;/&quot;, ftpSettings)                                    //: FtpFile (1)
+    .filter(ftpFile =&gt; ftpFile.isFile)                       //: FtpFile (2)
+    .mapAsyncUnordered(parallelism = 5) { ftpFile =&gt;         // (3)
+      val localPath = targetDir.resolve(&quot;.&quot; + ftpFile.path)
+      val fetchFile: Future[IOResult] = Ftp
+        .fromPath(ftpFile.path, ftpSettings)
+        .runWith(FileIO.toPath(localPath))                   // (4)
+      fetchFile.map { ioResult =&gt;                            // (5)
+        (ftpFile.path, ioResult)
+      }
+    }                                                        //: (String, IOResult)
+    .runWith(Sink.seq)                                       // (6)</code></pre></dd>
+</dl>
 <h3><a href="#all-alpakka-samples" name="all-alpakka-samples" class="anchor"><span class="anchor-link"></span></a>All Alpakka samples</h3>
 <p>Show <a href="../index.html">Alpakka samples listing</a>.</p>
 <div class="toc ">
 <ul>
-  <li><a href="step_001_complete.html" class="page">Explanation</a>
-  <ul>
-    <li><a href="step_001_complete.html#description" class="header">Description</a></li>
-    <li><a href="step_001_complete.html#imports" class="header">Imports</a></li>
-    <li><a href="step_001_complete.html#flow" class="header">Flow</a></li>
-  </ul></li>
   <li><a href="full-source.html" class="page">Full source</a></li>
 </ul>
 </div>
@@ -320,7 +377,7 @@ val AlpakkaVersion = &quot;1.1.1&quot;
 <div class="nav-prev small-6 column">
 </div>
 <div class="nav-next small-6 column clearfix">
-<a class="float-right" href="step_001_complete.html">Explanation <i class="icon-next"></i></a>
+<a class="float-right" href="full-source.html">Full source <i class="icon-next"></i></a>
 </div>
 </section>
 </div>
