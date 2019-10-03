@@ -8,3 +8,11 @@ Dependencies (sbt notation)
 ### All Alpakka samples
 
 Show [Alpakka samples listing](../index.html).
+
+@@toc
+
+@@@ index
+
+* [5](code.md)
+
+@@@

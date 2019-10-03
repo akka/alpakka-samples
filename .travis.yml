@@ -13,6 +13,8 @@ jobs:
       name: Compile Alpakka JMS samples
     - script: cd alpakka-sample-kafka-to-elasticsearch && sbt compile
       name: Compile Alpakka Kafka to Elasticsearch sample
+    - script: cd alpakka-sample-file-to-elasticsearch && sbt compile
+      name: Compile Alpakka File to Elasticsearch sample
     - script: cd alpakka-sample-mqtt-http-to-s3-java && sbt compile
       name: Compile Alpakka Mqtt Http S3 sample
     - script: cd alpakka-sample-sqs-java && sbt compile

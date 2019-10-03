@@ -8,17 +8,14 @@ import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 import java.time.ZonedDateTime
 
 import akka.actor.{ActorSystem, Terminated}
+import akka.stream.Materializer
 import akka.stream.alpakka.file.scaladsl.Directory
 import akka.stream.scaladsl.{Keep, Sink}
-import akka.stream.{Materializer, UniqueKillSwitch}
 import org.elasticsearch.client.RestClient
 import org.slf4j.LoggerFactory
 import org.testcontainers.elasticsearch.ElasticsearchContainer
-import samples.scaladsl.LogFileSummary.LogFileSummaries
-import samples.scaladsl.LogLine
 
 import scala.concurrent.Future
-import scala.concurrent.duration.FiniteDuration
 
 trait RunOps {
   final val log = LoggerFactory.getLogger(getClass)
@@ -53,7 +50,7 @@ trait RunOps {
     implicit val ec = mat.executionContext
     for {
       files <- listFiles(path)
-    } yield files foreach { file =>
+    } yield files filterNot(_ == ".gitignore") foreach { file =>
       log.info(s"Deleting file: $file")
       Files.delete(file)
     }

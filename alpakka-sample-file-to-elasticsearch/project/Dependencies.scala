@@ -13,12 +13,12 @@ object Dependencies {
     // for JSON in Scala
     "io.spray" %% "spray-json" % "1.3.5",
     // for JSON in Java
-    "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.9.9",
-    "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.9.9",
+    "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.10.0",
+    "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.10.0",
     // Logging
     "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,
     "ch.qos.logback" % "logback-classic" % "1.2.3",
     // #deps
-    "org.testcontainers" % "elasticsearch" % "1.12.1"
+    "org.testcontainers" % "elasticsearch" % "1.12.2"
   )
 }

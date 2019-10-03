@@ -1,4 +1,4 @@
-package samples;
+package samples.javadsl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,6 +9,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.util.Optional;
 
+// #logline
+
+// Type in Elasticsearch (2)
 public class LogLine {
     public final String line;
     public final Long lineNo;
@@ -38,11 +41,13 @@ public class LogLine {
 }
 
 class JsonMappers {
-    // Jackson conversion setup
+    // Jackson conversion setup (3)
     public final static ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
     public final static ObjectWriter logLineWriter = mapper.writerFor(LogLine.class);
     public final static ObjectReader logLineReader = mapper.readerFor(LogLine.class);
 }
+
+// #logline
 
 class LogAcc {
     public final Long lineNo;
