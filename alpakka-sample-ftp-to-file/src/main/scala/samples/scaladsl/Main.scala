@@ -1,7 +1,3 @@
-/*
- * Copyright (C) 2016-2019 Lightbend Inc. <http://www.lightbend.com>
- */
-
 package samples.scaladsl
 
 import java.net.InetAddress
