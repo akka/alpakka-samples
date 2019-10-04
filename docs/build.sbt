@@ -101,6 +101,22 @@ KafkaToElasticsearch / paradoxProperties ++= Map(
 )
 KafkaToElasticsearch / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
 
+val FileToElasticsearch = config("file-to-elasticsearch")
+ParadoxPlugin.paradoxSettings(FileToElasticsearch)
+ParadoxSitePlugin.paradoxSettings(FileToElasticsearch)
+AkkaParadoxPlugin.akkaParadoxSettings(FileToElasticsearch)
+FileToElasticsearch / siteSubdirName := FileToElasticsearch.name
+FileToElasticsearch / paradox / sourceDirectory := baseDirectory.value / ".." / s"alpakka-sample-${FileToElasticsearch.name}" / "docs" / "src" / "main" / "paradox"
+FileToElasticsearch / paradoxProperties ++= Map(
+  "project.url" -> s"${homepage.value.get}/${FileToElasticsearch.name}",
+  "canonical.base_url" -> s"${homepage.value.get}/${FileToElasticsearch.name}",
+  "snip.build.base_dir" -> s"${baseDirectory.value}/../alpakka-sample-${FileToElasticsearch.name}",
+  "github.root.base_dir" -> s"${baseDirectory.value}/..",
+  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.FileToElasticsearch.AkkaVersion}",
+  "extref.alpakka.base_url" -> s"https://doc.akka.io/docs/alpakka/${Dependencies.FileToElasticsearch.AlpakkaVersion}/%s",
+  "extref.akka.base_url" -> s"https://doc.akka.io/docs/akka/${Dependencies.FileToElasticsearch.AkkaVersion}/%s",
+)
+FileToElasticsearch / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
 
 Paradox / siteSubdirName := ""
 paradoxProperties ++= Map(
@@ -109,6 +125,7 @@ paradoxProperties ++= Map(
   "extref.jdbc-to-elasticsearch.base_url" -> s"${(JdbcToElasticsearch / siteSubdirName).value}/",
   "extref.jms.base_url" -> s"${(Jms / siteSubdirName).value}/",
   "extref.kafka-to-elasticsearch.base_url" -> s"${(KafkaToElasticsearch / siteSubdirName).value}/",
+  "extref.file-to-elasticsearch.base_url" -> s"${(FileToElasticsearch / siteSubdirName).value}/",
 )
 
 resolvers += Resolver.jcenterRepo

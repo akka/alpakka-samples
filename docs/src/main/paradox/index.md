@@ -15,6 +15,9 @@ This example uses Alpakka Slick to read from a relational database and write the
 ### @extref:[Read from Kafka and write to Elasticsearch](kafka-to-elasticsearch:index.html)
 This example uses Alpakka Kafka to read from an Apache Kafka topic, parse the messages as JSON and write the data to Elasticsearch, committing offsets to Kafka after successfully updating Elasticsearch.
 
+### @extref:[Read files from a directory and write to Elasticsearch](file-to-elasticsearch:index.html)
+This example uses Alpakka File to watch for new files created in a directory and then tails them (similar to Elasticsearch's `logstash` utility). The tailed logs are parsed and indexed in Elasticsearch using Alpakka Elasticsearch.
+
 ### @link:[Amazon SQS](https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-sqs-java) { open=new }
 Listen to an Amazon SQS topic, enrich the message via calling an actor, publish a new message to SQS and acknowledge/delete the original message. (Java only)
 
