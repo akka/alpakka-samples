@@ -23,8 +23,6 @@ import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import samples.common.DateTimeExtractor;
-import samples.common.RunOps;
-import samples.common.RunOpsImpl;
 
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -35,8 +33,6 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static scala.compat.java8.FutureConverters.toJava;
-
 public class Main {
 
     private static final Logger log = LoggerFactory.getLogger(Main.class);
@@ -45,12 +41,10 @@ public class Main {
     private Materializer materializer;
     private RestClient elasticsearchClient;
 
-    private final RunOps runOps;
     private final String elasticsearchAddress;
 
-    public Main(RunOps runOps) {
-        this.runOps = runOps;
-        this.elasticsearchAddress = runOps.elasticsearchAddress();
+    public Main() {
+        this.elasticsearchAddress = RunOps.elasticsearchAddress();
     }
 
     private final static Duration streamRuntime = Duration.ofSeconds(10L);
@@ -81,7 +75,7 @@ public class Main {
                 .filter(pair -> pair.second() == DirectoryChange.Creation)
                 .map(pair -> {
                     Path path = pair.first();
-                    log.info("File create detected: " + path.toString());
+                    log.info("File create detected: {}", path.toString());
                     // create a new `FileTailSource` and return it as a sub-stream (6)
                     return fileTailSource(path);
                 });
@@ -95,7 +89,7 @@ public class Main {
         return FileTailSource
                 .createLines(path, 8192, Duration.ofMillis(250))
                 .map(line -> {
-                    log.debug("Parsed > " + line);
+                    log.debug("Parsed > {}", line);
                     return line;
                 })
                 .scan(new LogAcc(), (acc, line) -> {
@@ -109,11 +103,9 @@ public class Main {
                 })
                 .mapConcat(logAcc -> {
                     if (logAcc.logLine.isPresent()) {
-                        ArrayList<LogLine> list = new ArrayList<>();
-                        list.add(logAcc.logLine.get());
-                        return list;
+                        Collections.singletonList(logAcc.logLine.get());
                     }
-                    return new ArrayList<>();
+                    return Collections.emptyList();
                 });
     }
 
@@ -153,7 +145,7 @@ public class Main {
                 // track statistics per log file (13)
                 .scan(new HashMap<>(), (summaries, logLine) -> {
                     Pair<String, String> key = Pair.create(logLine.directory, logLine.filename);
-                    Long timestamp = runOps.now();
+                    Long timestamp = RunOps.now();
                     if (summaries.containsKey(key)) {
                         LogFileSummary summary = summaries.get(key);
                         LogFileSummary newSummary = new LogFileSummary(summary.directory, summary.filename, summary.firstSeen, timestamp, logLine.lineNo);
@@ -190,7 +182,7 @@ public class Main {
     // #query-elasticsearch
 
     private void printResults(List<LogLine> results, Map<Pair<String, String>, LogFileSummary> summaries) {
-        results.stream().forEach(result -> log.debug("Results < " + result));
+        results.stream().forEach(result -> log.debug("Results < {}", result.toString()));
 
         String fmt = "%-32s%-32s%-16s%-16s%s";
         String header = String.format(fmt, "Directory", "File", "First Seen", "Last Updated", "Number of Lines");
@@ -200,7 +192,7 @@ public class Main {
                 .map(s -> String.format(fmt, s.directory, s.filename, s.firstSeen, s.lastUpdated, s.numberOfLines))
                 .collect(Collectors.joining("\n"));
 
-        log.info("LogFileSummaries:\n" + header + "\n" + summariesStr);
+        log.info("LogFileSummaries:\n{}\n{}", header, summariesStr);
     }
 
     private CompletionStage<Terminated> run() throws Exception {
@@ -230,16 +222,16 @@ public class Main {
 
         // #running-the-app
 
-        toJava(runOps.deleteAllFilesFrom(inputLogsPath, materializer)).toCompletableFuture().get(10, TimeUnit.SECONDS);
+        RunOps.deleteAllFilesFrom(inputLogsPath, materializer).toCompletableFuture().get(10, TimeUnit.SECONDS);
 
         // run the graph and capture the materialized values (16)
         Pair<UniqueKillSwitch, CompletionStage<HashMap<Pair<String, String>, LogFileSummary>>> running = graph.run(materializer);
         UniqueKillSwitch control = running.first();
         CompletionStage<HashMap<Pair<String, String>, LogFileSummary>> stream = running.second();
 
-        toJava(runOps.copyTestDataTo(testDataPath, inputLogsPath, materializer)).toCompletableFuture().get(10, TimeUnit.SECONDS);
+        RunOps.copyTestDataTo(testDataPath, inputLogsPath, materializer).toCompletableFuture().get(10, TimeUnit.SECONDS);
 
-        log.info("Running index stream for" + streamRuntime.toString());
+        log.info("Running index stream for ", streamRuntime.toString());
         Thread.sleep(streamRuntime.toMillis());
         log.info("Shutting down index stream");
         control.shutdown();
@@ -251,16 +243,15 @@ public class Main {
 
         printResults(results, summaries);
 
-        toJava(runOps.deleteAllFilesFrom(inputLogsPath, materializer)).toCompletableFuture().get(10, TimeUnit.SECONDS);
+        RunOps.deleteAllFilesFrom(inputLogsPath, materializer).toCompletableFuture().get(10, TimeUnit.SECONDS);
 
-        return toJava(runOps.shutdown(actorSystem, elasticsearchClient));
+        return RunOps.shutdown(actorSystem, elasticsearchClient);
 
         // #running-the-app
     }
 
     public static void main(String[] args) throws Exception {
-        RunOpsImpl runOps = new RunOpsImpl();
-        Main main = new Main(runOps);
+        Main main = new Main();
         CompletionStage<Terminated> run = main.run();
 
         run.toCompletableFuture().get(10, TimeUnit.SECONDS);

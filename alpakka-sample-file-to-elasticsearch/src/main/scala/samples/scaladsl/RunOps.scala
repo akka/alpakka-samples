@@ -1,9 +1,4 @@
-/*
- * Copyright (C) 2016-2019 Lightbend Inc. <http://www.lightbend.com>
- */
-
-package samples.common
-
+package samples.scaladsl
 import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 import java.time.ZonedDateTime
 
@@ -17,13 +12,13 @@ import org.testcontainers.elasticsearch.ElasticsearchContainer
 
 import scala.concurrent.Future
 
-trait RunOps {
+object RunOps {
   final val log = LoggerFactory.getLogger(getClass)
 
   // Testcontainers: start Elasticsearch in Docker
-  val elasticsearchContainer = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.3")
+  private[samples] val elasticsearchContainer = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.3")
   elasticsearchContainer.start()
-  val elasticsearchAddress = elasticsearchContainer.getHttpHostAddress
+  val elasticsearchAddress: String = elasticsearchContainer.getHttpHostAddress
 
   def stopContainers()(implicit esClient: RestClient): Unit = {
     esClient.close()
@@ -63,6 +58,3 @@ trait RunOps {
     actorSystem.terminate()
   }
 }
-
-// for Java DSL
-final class RunOpsImpl extends RunOps

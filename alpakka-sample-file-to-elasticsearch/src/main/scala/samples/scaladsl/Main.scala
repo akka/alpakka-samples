@@ -16,15 +16,16 @@ import akka.stream.scaladsl.{Flow, Keep, RunnableGraph, Sink, Source}
 import akka.stream.{ActorMaterializer, KillSwitches, Materializer, UniqueKillSwitch}
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
-import samples.common.{DateTimeExtractor, RunOps}
+import samples.common.DateTimeExtractor
 import samples.scaladsl.LogFileSummary.LogFileSummaries
 
 import scala.collection.immutable
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-object Main extends App with RunOps {
+object Main extends App {
 
+  import RunOps._
   import JsonFormats._
 
   implicit val actorSystem: ActorSystem = ActorSystem()
@@ -61,7 +62,7 @@ object Main extends App with RunOps {
       // only watch for file creation events (5)
       .collect { case (path, DirectoryChange.Creation) => path }
       .map { path =>
-        log.info(s"File create detected: $path")
+        log.info("File create detected: {}", path)
         // create a new `FileTailSource` and return it as a sub-stream (6)
         fileTailSource(path)
       }
@@ -78,7 +79,7 @@ object Main extends App with RunOps {
         pollingInterval = 250.millis
       )
       .map { line =>
-        log.debug(s"Parsed > $line")
+        log.debug("Parsed > {}", line)
         line
       }
       .scan(LogAcc()) { (acc, line) =>
@@ -148,16 +149,16 @@ object Main extends App with RunOps {
   def runStreamForAwhileAndShutdown(waitInterval: FiniteDuration,
                                     control: UniqueKillSwitch,
                                     stream: Future[LogFileSummaries])(implicit mat: Materializer): Future[LogFileSummaries] = {
-    log.info(s"Running index stream for $waitInterval")
+    log.info("Running index stream for {}", waitInterval)
     Thread.sleep(waitInterval.toMillis)
-    log.info(s"Shutting down index stream")
+    log.info("Shutting down index stream")
     control.shutdown()
-    log.info(s"Wait for index stream to shutdown")
+    log.info("Wait for index stream to shutdown")
     stream
   }
 
   def printResults(results: Seq[LogLine], summaries: LogFileSummaries): Unit = {
-    results.foreach(m => log.debug(s"Results < $m"))
+    results.foreach(m => log.debug("Results < {}", m))
 
     val fmt = "%-32s%-32s%-16s%-16s%s"
     val header = fmt.format("Directory", "File", "First Seen", "Last Updated", "Number of Lines")
@@ -166,7 +167,7 @@ object Main extends App with RunOps {
       fmt.format(directory, filename, firstSeen, lastUpdated, numberOfLines)
     }.mkString("\n")
 
-    log.info(s"LogFileSummaries:\n$header\n$summariesStr")
+    log.info("LogFileSummaries:\n{}\n{}", header, summariesStr)
   }
 
   // #stream-composing

@@ -1,6 +1,4 @@
-# Alpakka sample
-
-## Tail files added to a directory and publish to Elasticsearch
+# Tail files added to a directory and publish to Elasticsearch
 
 This sample is a simplified implementation of a log file to Elasticsearch utility @link:[`logstash`](https://www.elastic.co/products/logstash).
 The application will use @extref[Alpakka File](alpakka:file.html) to watch a directory for new file creation events and then tail the files for their contents.
