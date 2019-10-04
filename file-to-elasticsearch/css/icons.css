@@ -1,0 +1,38 @@
+@font-face {
+  font-family: 'icons';
+  font-weight: normal;
+  font-style: normal;
+  src: url('fonts/icons.eot?2');
+  src: url('fonts/icons.eot?2#iefix') format('embedded-opentype'),
+       url('fonts/icons.woff2?2') format('woff2'),
+       url('fonts/icons.woff?2') format('woff'),
+       url('fonts/icons.ttf?2') format('truetype'),
+       url('fonts/icons.svg?2#icons') format('svg');
+}
+
+.icon-prev:before,
+.icon-next:before,
+.icon-up:before,
+.icon-down:before,
+.icon-link:before {
+  font-family: "icons";
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  display: inline-block;
+  text-decoration: inherit;
+  width: 1em;
+  margin-right: .2em;
+  text-align: center;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-prev:before { content: '\3c'; } /* '&lt;' */
+.icon-next:before { content: '\3e'; } /* '&gt;' */
+.icon-up:before { content: '\5e'; } /* '^' */
+.icon-down:before { content: '\76'; } /* 'v' */
+.icon-link:before { content: '\a7'; } /* '§' */
