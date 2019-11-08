@@ -17,7 +17,6 @@ import akka.kafka.Subscriptions;
 import akka.kafka.javadsl.Committer;
 import akka.kafka.javadsl.Consumer;
 import akka.kafka.javadsl.Producer;
-import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
 import akka.stream.alpakka.elasticsearch.ElasticsearchSourceSettings;
 import akka.stream.alpakka.elasticsearch.ElasticsearchWriteSettings;
@@ -77,7 +76,6 @@ public class Main {
     }
 
     private ActorSystem actorSystem;
-    private Materializer materializer;
     private RestClient elasticsearchClient;
 
     private Consumer.DrainingControl<Done> readFromKafkaToEleasticsearch() {
@@ -93,9 +91,7 @@ public class Main {
 
         // #flow
         Consumer.DrainingControl<Done> control =
-                Consumer.committableSource(kafkaConsumerSettings, Subscriptions.topics(topic)) // (5)
-                        .asSourceWithContext(cm -> cm.committableOffset()) // (6)
-                        .map(cm -> cm.record())
+                Consumer.sourceWithOffsetContext(kafkaConsumerSettings, Subscriptions.topics(topic)) // (5)
                         .map(
                                 consumerRecord -> { // (7)
                                     Movie movie = JsonMappers.movieReader.readValue(consumerRecord.value());
@@ -120,32 +116,29 @@ public class Main {
                                                     });
                                     return NotUsed.notUsed();
                                 })
-                        .asSource() // (10)
-                        .map(pair -> pair.second())
-                        .toMat(Committer.sink(CommitterSettings.create(actorSystem)), Keep.both()) // (11)
+                        .toMat(Committer.sinkWithOffsetContext(CommitterSettings.create(actorSystem)), Keep.both()) // (11)
                         .mapMaterializedValue(Consumer::createDrainingControl) // (12)
-                        .run(materializer);
+                        .run(actorSystem);
         // #flow
         return control;
     }
 
     private CompletionStage<Terminated> run() throws Exception {
         actorSystem = ActorSystem.create();
-        materializer = ActorMaterializer.create(actorSystem);
         // #es-setup
         // Elasticsearch client setup (4)
         elasticsearchClient = RestClient.builder(HttpHost.create(elasticsearchAddress)).build();
         // #es-setup
 
         List<Movie> movies = Arrays.asList(new Movie(23, "Psycho"), new Movie(423, "Citizen Kane"));
-        CompletionStage<Done> writing = helper.writeToKafka(topic, movies, actorSystem, materializer);
+        CompletionStage<Done> writing = helper.writeToKafka(topic, movies, actorSystem);
         writing.toCompletableFuture().get(10, TimeUnit.SECONDS);
 
         Consumer.DrainingControl<Done> control = readFromKafkaToEleasticsearch();
         TimeUnit.SECONDS.sleep(5);
         CompletionStage<Done> copyingFinished = control.drainAndShutdown(actorSystem.dispatcher());
         copyingFinished.toCompletableFuture().get(10, TimeUnit.SECONDS);
-        CompletionStage<List<Movie>> reading = helper.readFromElasticsearch(elasticsearchClient, indexName, actorSystem, materializer);
+        CompletionStage<List<Movie>> reading = helper.readFromElasticsearch(elasticsearchClient, indexName, actorSystem);
 
         return reading.thenCompose(
                 ms -> {

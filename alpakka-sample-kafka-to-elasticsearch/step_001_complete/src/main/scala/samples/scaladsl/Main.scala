@@ -11,7 +11,6 @@ import akka.kafka.scaladsl.{Committer, Consumer}
 import akka.stream.alpakka.elasticsearch.WriteMessage
 import akka.stream.alpakka.elasticsearch.scaladsl.ElasticsearchFlow
 import akka.stream.scaladsl.Keep
-import akka.stream.{ActorMaterializer, Materializer}
 import akka.{Done, NotUsed}
 import org.apache.http.HttpHost
 import org.apache.kafka.clients.consumer.ConsumerConfig
@@ -28,7 +27,6 @@ object Main extends App with Helper {
   import JsonFormats._
 
   implicit val actorSystem: ActorSystem = ActorSystem()
-  implicit val actorMaterializer: Materializer = ActorMaterializer()
   implicit val executionContext: ExecutionContext = actorSystem.dispatcher
 
   val topic = "movies-to-elasticsearch"
@@ -56,9 +54,7 @@ object Main extends App with Helper {
   private def readFromKafkaWriteToElasticsearch() = {
     // #flow
     val control: Consumer.DrainingControl[Done] = Consumer
-      .committableSource(kafkaConsumerSettings, Subscriptions.topics(topic)) // (5)
-      .asSourceWithContext(_.committableOffset) // (6)
-      .map(_.record)
+      .sourceWithOffsetContext(kafkaConsumerSettings, Subscriptions.topics(topic)) // (5)
       .map { consumerRecord => // (7)
         val movie = consumerRecord.value().parseJson.convertTo[Movie]
         WriteMessage.createUpsertMessage(movie.id.toString, movie)
@@ -70,12 +66,7 @@ object Main extends App with Helper {
         }
         NotUsed
       }
-      .asSource // (10)
-      .map {
-        case (_, committableOffset) =>
-          committableOffset
-      }
-      .toMat(Committer.sink(CommitterSettings(actorSystem)))(Keep.both) // (11)
+      .toMat(Committer.sinkWithOffsetContext(CommitterSettings(actorSystem)))(Keep.both) // (11)
       .mapMaterializedValue(Consumer.DrainingControl.apply) // (12)
       .run()
     // #flow

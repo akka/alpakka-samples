@@ -4,7 +4,6 @@ import akka.Done;
 import akka.actor.ActorSystem;
 import akka.kafka.ProducerSettings;
 import akka.kafka.javadsl.Producer;
-import akka.stream.Materializer;
 import akka.stream.alpakka.elasticsearch.ElasticsearchSourceSettings;
 import akka.stream.alpakka.elasticsearch.javadsl.ElasticsearchSource;
 import akka.stream.javadsl.Sink;
@@ -50,7 +49,7 @@ public class Helper {
         elasticsearchContainer.stop();
     }
 
-    CompletionStage<Done> writeToKafka(String topic, List<Movie> movies, ActorSystem actorSystem, Materializer materializer) {
+    CompletionStage<Done> writeToKafka(String topic, List<Movie> movies, ActorSystem actorSystem) {
         ProducerSettings<Integer, String> kafkaProducerSettings =
                 ProducerSettings.create(actorSystem, new IntegerSerializer(), new StringSerializer())
                         .withBootstrapServers(kafkaBootstrapServers);
@@ -63,12 +62,12 @@ public class Helper {
                                     String json = JsonMappers.movieWriter.writeValueAsString(movie);
                                     return new ProducerRecord<>(topic, movie.id, json);
                                 })
-                        .runWith(Producer.plainSink(kafkaProducerSettings), materializer);
+                        .runWith(Producer.plainSink(kafkaProducerSettings), actorSystem);
         producing.thenAccept(s -> log.info("Producing finished"));
         return producing;
     }
 
-    CompletionStage<List<Movie>> readFromElasticsearch(RestClient elasticsearchClient, String indexName, ActorSystem actorSystem, Materializer materializer) {
+    CompletionStage<List<Movie>> readFromElasticsearch(RestClient elasticsearchClient, String indexName, ActorSystem actorSystem) {
         CompletionStage<List<Movie>> reading =
                 ElasticsearchSource.typed(
                         indexName,
@@ -78,7 +77,7 @@ public class Helper {
                         elasticsearchClient,
                         Movie.class)
                         .map(readResult -> readResult.source())
-                        .runWith(Sink.seq(), materializer);
+                        .runWith(Sink.seq(), actorSystem);
         reading.thenAccept(
                 non -> {
                     log.info("Reading finished");

@@ -45,7 +45,7 @@ trait Helper {
   kafka.start()
   val kafkaBootstrapServers = kafka.getBootstrapServers
 
-  def writeToKafka(topic: String, movies: immutable.Iterable[Movie])(implicit actorSystem: ActorSystem, materializer: Materializer) = {
+  def writeToKafka(topic: String, movies: immutable.Iterable[Movie])(implicit actorSystem: ActorSystem) = {
     val kafkaProducerSettings = ProducerSettings(actorSystem, new IntegerSerializer, new StringSerializer)
       .withBootstrapServers(kafkaBootstrapServers)
 
@@ -59,7 +59,7 @@ trait Helper {
     producing
   }
 
-  def readFromElasticsearch(indexName: String)(implicit actorSystem: ActorSystem, materializer: Materializer): Future[immutable.Seq[Movie]] = {
+  def readFromElasticsearch(indexName: String)(implicit actorSystem: ActorSystem): Future[immutable.Seq[Movie]] = {
     val reading = ElasticsearchSource
       .typed[Movie](indexName, "_doc", """{"match_all": {}}""")
       .map(_.source)
