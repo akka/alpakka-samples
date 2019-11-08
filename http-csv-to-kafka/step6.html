@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-10-04 16:26:00
+Version 2019-11-08 14:19:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -269,7 +269,7 @@ Version 2019-10-04 16:26:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-10-04 16:26:00
+Version 2019-11-08 14:19:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -305,7 +305,7 @@ Version 2019-10-04 16:26:00
 <div class="small-12 column" id="docs">
 <h1><a href="#step-6-adding-coordinated-shutdown" name="step-6-adding-coordinated-shutdown" class="anchor"><span class="anchor-link"></span></a>Step 6: Adding Coordinated Shutdown</h1>
 <h3><a href="#description" name="description" class="anchor"><span class="anchor-link"></span></a>Description</h3>
-<p>To make sure Akka HTTP is shut down in a proper way it is added to Akka&rsquo;s <a href="https://doc.akka.io/docs/akka/2.5.21/actors.html#coordinated-shutdown">Coordinated shutdown</a>.</p>
+<p>To make sure Akka HTTP is shut down in a proper way it is added to Akka&rsquo;s <a href="https://doc.akka.io/docs/akka/2.6.0/actors.html#coordinated-shutdown">Coordinated shutdown</a>.</p>
 <h3><a href="#code" name="code" class="anchor"><span class="anchor-link"></span></a>Code</h3>
 <dl>
   <dt>Java</dt>
@@ -325,8 +325,6 @@ import akka.http.javadsl.model.HttpResponse;
 import akka.http.javadsl.model.MediaRanges;
 import akka.http.javadsl.model.StatusCodes;
 import akka.http.javadsl.model.headers.Accept;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import akka.stream.alpakka.csv.javadsl.CsvParsing;
 import akka.stream.alpakka.csv.javadsl.CsvToMap;
 import akka.stream.javadsl.Sink;
@@ -392,7 +390,6 @@ public class Main {
 
     private void run() throws Exception {
         ActorSystem system = ActorSystem.create();
-        Materializer materializer = ActorMaterializer.create(system);
         Http http = Http.get(system);
 
         CompletionStage&lt;Done&gt; completion =
@@ -403,7 +400,7 @@ public class Main {
                         .via(CsvToMap.toMap()) // : Map&lt;String, ByteString&gt;
                         .map(this::cleanseCsvData) // : Map&lt;String, String&gt;
                         .map(this::toJson) // : String
-                        .runWith(Sink.foreach(System.out::println), materializer);
+                        .runWith(Sink.foreach(System.out::println), system);
 
         CoordinatedShutdown cs = CoordinatedShutdown.get(system);
         cs.addTask(CoordinatedShutdown.PhaseActorSystemTerminate(), &quot;shut-down-client-http-pool&quot;, () -&gt;
@@ -448,8 +445,6 @@ object Main
 
   import actorSystem.dispatcher
 
-  implicit val mat: Materializer = ActorMaterializer()
-
   val httpRequest = HttpRequest(uri = &quot;https://www.nasdaq.com/screening/companies-by-name.aspx?exchange=NASDAQ&amp;render=download&quot;)
     .withHeaders(Accept(MediaRanges.`text/*`))
 
@@ -485,7 +480,7 @@ object Main
     Http().shutdownAllConnectionPools().map(_ =&gt; Done)
   )
 
-  future.map{ _ =&gt;
+  future.map { _ =&gt;
     println(&quot;Done!&quot;)
     cs.run(CoordinatedShutdown.UnknownReason)
   }

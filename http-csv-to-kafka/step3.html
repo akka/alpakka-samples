@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-10-04 16:26:00
+Version 2019-11-08 14:19:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -269,7 +269,7 @@ Version 2019-10-04 16:26:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-10-04 16:26:00
+Version 2019-11-08 14:19:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -305,7 +305,7 @@ Version 2019-10-04 16:26:00
 <div class="small-12 column" id="docs">
 <h2><a href="#step-3-parse-csv" name="step-3-parse-csv" class="anchor"><span class="anchor-link"></span></a>Step 3: parse CSV</h2>
 <h3><a href="#description" name="description" class="anchor"><span class="anchor-link"></span></a>Description</h3>
-<p>The binary data in <a href="https://doc.akka.io/api/akka/2.5.21/akka/util/ByteString.html">ByteString</a>s is passed into <a href="https://doc.akka.io/docs/alpakka/1.0.0/data-transformations/csv.html">Alpakka CSV</a> to be parsed and converted per line into a Map. The stream elements becomes a <span class="group-scala"><code>Map[String, ByteString]</code></span><span class="group-java"><code>Map&lt;String, ByteString&gt;</code></span>, one entry per column using the column headers as keys.</p>
+<p>The binary data in <a href="https://doc.akka.io/api/akka/2.6.0/akka/util/ByteString.html">ByteString</a>s is passed into <a href="https://doc.akka.io/docs/alpakka/1.1.2/data-transformations/csv.html">Alpakka CSV</a> to be parsed and converted per line into a Map. The stream elements becomes a <span class="group-scala"><code>Map[String, ByteString]</code></span><span class="group-java"><code>Map&lt;String, ByteString&gt;</code></span>, one entry per column using the column headers as keys.</p>
 <h3><a href="#code" name="code" class="anchor"><span class="anchor-link"></span></a>Code</h3>
 <dl>
   <dt>Java</dt>
@@ -324,8 +324,6 @@ import akka.http.javadsl.model.HttpResponse;
 import akka.http.javadsl.model.MediaRanges;
 import akka.http.javadsl.model.StatusCodes;
 import akka.http.javadsl.model.headers.Accept;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import akka.stream.alpakka.csv.javadsl.CsvParsing;
 import akka.stream.alpakka.csv.javadsl.CsvToMap;
 import akka.stream.javadsl.Sink;
@@ -358,7 +356,6 @@ public class Main {
 
     private void run() throws Exception {
         ActorSystem system = ActorSystem.create();
-        Materializer materializer = ActorMaterializer.create(system);
         Http http = Http.get(system);
 
         CompletionStage&lt;Done&gt; completion =
@@ -367,7 +364,7 @@ public class Main {
                         .flatMapConcat(this::extractEntityData) // : ByteString
                         .via(CsvParsing.lineScanner()) // : List&lt;ByteString&gt;
                         .via(CsvToMap.toMapAsStrings(StandardCharsets.UTF_8)) // : Map&lt;String, String&gt;
-                        .runWith(Sink.foreach(map -&gt; map.entrySet().stream().forEach(System.out::println)), materializer);
+                        .runWith(Sink.foreach(map -&gt; map.entrySet().stream().forEach(System.out::println)), system);
 
         completion
                 .thenAccept(
@@ -404,8 +401,6 @@ object Main extends App {
 
   import actorSystem.dispatcher
 
-  implicit val mat: Materializer = ActorMaterializer()
-
   val httpRequest = HttpRequest(uri = &quot;https://www.nasdaq.com/screening/companies-by-name.aspx?exchange=NASDAQ&amp;render=download&quot;)
     .withHeaders(Accept(MediaRanges.`text/*`))
 
@@ -425,7 +420,7 @@ object Main extends App {
       .via(CsvToMap.toMapAsStrings()) //: Map[String, ByteString]
       .runWith(Sink.foreach(println))
 
-  future.map{ _ =&gt;
+  future.map { _ =&gt;
     println(&quot;Done!&quot;)
     actorSystem.terminate()
   }

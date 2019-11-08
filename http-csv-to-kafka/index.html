@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-10-04 16:26:00
+Version 2019-11-08 14:19:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -265,7 +265,7 @@ Version 2019-10-04 16:26:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-10-04 16:26:00
+Version 2019-11-08 14:19:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -297,30 +297,31 @@ Version 2019-10-04 16:26:00
 <div class="small-12 column" id="docs">
 <h1><a href="#alpakka-sample" name="alpakka-sample" class="anchor"><span class="anchor-link"></span></a>Alpakka sample</h1>
 <h2><a href="#fetch-csv-via-akka-http-and-publish-the-data-as-json-to-kafka" name="fetch-csv-via-akka-http-and-publish-the-data-as-json-to-kafka" class="anchor"><span class="anchor-link"></span></a>Fetch CSV via Akka HTTP and publish the data as JSON to Kafka</h2>
-<p>This example uses <a href="https://doc.akka.io/docs/akka-http/10.1.8/client-side/connection-level.html#opening-http-connections">Akka HTTP to send the HTTP request</a> and Akka HTTPs primary JSON support via <a href="https://doc.akka.io/docs/akka-http/10.1.8/common/json-support.html#spray-json-support">Spray JSON</a> (for Scala) or Jackson JSON (for Java) to convert the map into a JSON structure which gets published to a Kafka topic.</p>
+<p>This example uses <a href="https://doc.akka.io/docs/akka-http/10.1.10/client-side/connection-level.html#opening-http-connections">Akka HTTP to send the HTTP request</a> and Akka HTTPs primary JSON support via <a href="https://doc.akka.io/docs/akka-http/10.1.10/common/json-support.html#spray-json-support">Spray JSON</a> (for Scala) or Jackson JSON (for Java) to convert the map into a JSON structure which gets published to a Kafka topic.</p>
 <p>Browse the sources at <a href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-http-csv-to-kafka" title="Github" target="_blank" rel="noopener noreferrer">Github</a>.</p>
 <p>To try out this project clone <a href="https://github.com/akka/alpakka-samples" title="the Alpakka Samples repository" target="_blank" rel="noopener noreferrer">the Alpakka Samples repository</a> and find it in the <code>alpakka-sample-http-csv-to-kafka</code> directory.</p>
 <h3><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h3>
 <dl>
   <dt>Dependencies</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-http-csv-to-kafka/project/Dependencies.scala#L6-L26" target="_blank" title="Go to snippet source"></a><code class="language-scala">val ScalaTestVersion = &quot;3.0.6&quot;
-val AkkaVersion = &quot;2.5.21&quot;
-val AkkaHttpVersion = &quot;10.1.8&quot;
-val AlpakkaVersion = &quot;1.0.0&quot;
-val AlpakkaKafkaVersion = &quot;1.0.3&quot;
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-http-csv-to-kafka/project/Dependencies.scala#L6-L27" target="_blank" title="Go to snippet source"></a><code class="language-scala">val ScalaTestVersion = &quot;3.0.6&quot;
+val AkkaVersion = &quot;2.6.0&quot;
+val AkkaHttpVersion = &quot;10.1.10&quot;
+val AlpakkaVersion = &quot;1.1.2&quot;
+val AlpakkaKafkaVersion = &quot;1.1.0&quot;
 
 val dependencies = List(
   &quot;com.lightbend.akka&quot; %% &quot;akka-stream-alpakka-csv&quot; % AlpakkaVersion,
   &quot;com.typesafe.akka&quot; %% &quot;akka-stream-kafka&quot; % AlpakkaKafkaVersion,
+  &quot;com.typesafe.akka&quot; %% &quot;akka-stream&quot; % AkkaVersion,
   &quot;com.typesafe.akka&quot; %% &quot;akka-http&quot; % AkkaHttpVersion,
   // Used from Scala
   &quot;com.typesafe.akka&quot; %% &quot;akka-http-spray-json&quot; % AkkaHttpVersion,
   // Used from Java
-  &quot;com.fasterxml.jackson.datatype&quot; % &quot;jackson-datatype-jdk8&quot; % &quot;2.9.9&quot;,
-  &quot;com.fasterxml.jackson.datatype&quot; % &quot;jackson-datatype-jsr310&quot; % &quot;2.9.9&quot;,
+  &quot;com.fasterxml.jackson.datatype&quot; % &quot;jackson-datatype-jdk8&quot; % &quot;2.10.0&quot;,
+  &quot;com.fasterxml.jackson.datatype&quot; % &quot;jackson-datatype-jsr310&quot; % &quot;2.10.0&quot;,
 
-  &quot;org.testcontainers&quot; % &quot;kafka&quot; % &quot;1.11.1&quot;,
+  &quot;org.testcontainers&quot; % &quot;kafka&quot; % &quot;1.12.3&quot;,
   
   &quot;com.typesafe.akka&quot; %% &quot;akka-slf4j&quot; % AkkaVersion,
   &quot;ch.qos.logback&quot; % &quot;logback-classic&quot; % &quot;1.2.3&quot;

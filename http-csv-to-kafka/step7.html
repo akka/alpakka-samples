@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-10-04 16:26:00
+Version 2019-11-08 14:19:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -269,7 +269,7 @@ Version 2019-10-04 16:26:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-10-04 16:26:00
+Version 2019-11-08 14:19:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -306,8 +306,8 @@ Version 2019-10-04 16:26:00
 <h1><a href="#step-7-produce-to-kafka" name="step-7-produce-to-kafka" class="anchor"><span class="anchor-link"></span></a>Step 7: Produce to Kafka</h1>
 <h3><a href="#description" name="description" class="anchor"><span class="anchor-link"></span></a>Description</h3>
 <p><a href="https://www.testcontainers.org/">Testcontainers</a> starts a Kafka broker in Docker. </p>
-<p><a href="https://doc.akka.io/docs/alpakka-kafka/1.0.3/producer.html">Alpakka Kafka</a> producer settings specify the broker address and the data types for Kafka&rsquo;s key and value.</p>
-<p><a href="https://doc.akka.io/api/akka/2.5.21/akka/kafka/scaladsl/Producer$.html">Producer.plainSink</a> sends the <code>ProducerRecord</code>s stream elements to the specified Kafka topic.</p>
+<p><a href="https://doc.akka.io/docs/alpakka-kafka/1.1.0/producer.html">Alpakka Kafka</a> producer settings specify the broker address and the data types for Kafka&rsquo;s key and value.</p>
+<p><a href="https://doc.akka.io/api/akka/2.6.0/akka/kafka/scaladsl/Producer$.html">Producer.plainSink</a> sends the <code>ProducerRecord</code>s stream elements to the specified Kafka topic.</p>
 <h3><a href="#code" name="code" class="anchor"><span class="anchor-link"></span></a>Code</h3>
 <dl>
   <dt>Java</dt>
@@ -332,8 +332,6 @@ import akka.kafka.ProducerSettings;
 import akka.kafka.Subscriptions;
 import akka.kafka.javadsl.Consumer;
 import akka.kafka.javadsl.Producer;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import akka.stream.alpakka.csv.javadsl.CsvParsing;
 import akka.stream.alpakka.csv.javadsl.CsvToMap;
 import akka.stream.javadsl.Keep;
@@ -410,7 +408,6 @@ public class Main {
         final String bootstrapServers = kafkaBroker.getBootstrapServers();
 
         ActorSystem system = ActorSystem.create();
-        Materializer materializer = ActorMaterializer.create(system);
         Http http = Http.get(system);
 
         ProducerSettings&lt;String, String&gt; kafkaProducerSettings =
@@ -429,7 +426,7 @@ public class Main {
                                 new ProducerRecord&lt;String, String&gt;(
                                         &quot;topic1&quot;, elem) // : Kafka ProducerRecord
                         )
-                        .runWith(Producer.plainSink(kafkaProducerSettings), materializer);
+                        .runWith(Producer.plainSink(kafkaProducerSettings), system);
 
         CoordinatedShutdown cs = CoordinatedShutdown.get(system);
         cs.addTask(CoordinatedShutdown.PhaseActorSystemTerminate(), &quot;shut-down-client-http-pool&quot;, () -&gt;
@@ -447,7 +444,7 @@ public class Main {
                         .map(ConsumerRecord::value)
                         .toMat(Sink.foreach(System.out::println), Keep.both())
                         .mapMaterializedValue(Consumer::createDrainingControl)
-                        .run(materializer);
+                        .run(system);
 
         completion
                 .thenApplyAsync(done -&gt; control.drainAndShutdown(system.dispatcher()))
@@ -496,8 +493,6 @@ object Main
   implicit val actorSystem = ActorSystem(&quot;alpakka-samples&quot;)
 
   import actorSystem.dispatcher
-
-  implicit val mat: Materializer = ActorMaterializer()
 
   val httpRequest = HttpRequest(uri = &quot;https://www.nasdaq.com/screening/companies-by-name.aspx?exchange=NASDAQ&amp;render=download&quot;)
     .withHeaders(Accept(MediaRanges.`text/*`))

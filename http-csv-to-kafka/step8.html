@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-10-04 16:26:00
+Version 2019-11-08 14:19:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -269,7 +269,7 @@ Version 2019-10-04 16:26:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-10-04 16:26:00
+Version 2019-11-08 14:19:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -333,8 +333,6 @@ import akka.kafka.ProducerSettings;
 import akka.kafka.Subscriptions;
 import akka.kafka.javadsl.Consumer;
 import akka.kafka.javadsl.Producer;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import akka.stream.alpakka.csv.javadsl.CsvParsing;
 import akka.stream.alpakka.csv.javadsl.CsvToMap;
 import akka.stream.javadsl.Keep;
@@ -413,7 +411,6 @@ public class Main {
         final String bootstrapServers = kafkaBroker.getBootstrapServers();
 
         ActorSystem system = ActorSystem.create();
-        Materializer materializer = ActorMaterializer.create(system);
         Http http = Http.get(system);
 
         ProducerSettings&lt;String, String&gt; kafkaProducerSettings =
@@ -436,7 +433,7 @@ public class Main {
                                         &quot;topic1&quot;, elem) // : Kafka ProducerRecord
                         )
                         .toMat(Producer.plainSink(kafkaProducerSettings), Keep.both())
-                        .run(materializer);
+                        .run(system);
 
         CoordinatedShutdown cs = CoordinatedShutdown.get(system);
         cs.addTask(CoordinatedShutdown.PhaseActorSystemTerminate(), &quot;shut-down-client-http-pool&quot;, () -&gt;
@@ -454,7 +451,7 @@ public class Main {
                         .map(ConsumerRecord::value)
                         .toMat(Sink.foreach(System.out::println), Keep.both())
                         .mapMaterializedValue(Consumer::createDrainingControl)
-                        .run(materializer);
+                        .run(system);
 
         Cancellable tick = stagePair.first();
         CompletionStage&lt;Done&gt; streamCompletion = stagePair.second();
@@ -509,8 +506,6 @@ object Main
   implicit val actorSystem = ActorSystem(&quot;alpakka-samples&quot;)
 
   import actorSystem.dispatcher
-
-  implicit val mat: Materializer = ActorMaterializer()
 
   val httpRequest = HttpRequest(uri = &quot;https://www.nasdaq.com/screening/companies-by-name.aspx?exchange=NASDAQ&amp;render=download&quot;)
     .withHeaders(Accept(MediaRanges.`text/*`))

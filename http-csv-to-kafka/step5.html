@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-10-04 16:26:00
+Version 2019-11-08 14:19:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -269,7 +269,7 @@ Version 2019-10-04 16:26:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-10-04 16:26:00
+Version 2019-11-08 14:19:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -305,7 +305,7 @@ Version 2019-10-04 16:26:00
 <div class="small-12 column" id="docs">
 <h1><a href="#step-5-cleanse-lines-from-data-source" name="step-5-cleanse-lines-from-data-source" class="anchor"><span class="anchor-link"></span></a>Step 5: Cleanse lines from data source</h1>
 <h3><a href="#description" name="description" class="anchor"><span class="anchor-link"></span></a>Description</h3>
-<p>The CSV data we receive happens to contain an empty column without a header. The <code>cleanseCsvData</code> removes that column and turns the column values from <a href="https://doc.akka.io/api/akka/2.5.21/akka/util/ByteString.html">ByteString</a>s into regular <code>String</code>s.</p>
+<p>The CSV data we receive happens to contain an empty column without a header. The <code>cleanseCsvData</code> removes that column and turns the column values from <a href="https://doc.akka.io/api/akka/2.6.0/akka/util/ByteString.html">ByteString</a>s into regular <code>String</code>s.</p>
 <h3><a href="#code" name="code" class="anchor"><span class="anchor-link"></span></a>Code</h3>
 <dl>
   <dt>Java</dt>
@@ -324,8 +324,6 @@ import akka.http.javadsl.model.HttpResponse;
 import akka.http.javadsl.model.MediaRanges;
 import akka.http.javadsl.model.StatusCodes;
 import akka.http.javadsl.model.headers.Accept;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import akka.stream.alpakka.csv.javadsl.CsvParsing;
 import akka.stream.alpakka.csv.javadsl.CsvToMap;
 import akka.stream.javadsl.Sink;
@@ -391,7 +389,6 @@ public class Main {
 
     private void run() throws Exception {
         ActorSystem system = ActorSystem.create();
-        Materializer materializer = ActorMaterializer.create(system);
         Http http = Http.get(system);
 
         CompletionStage&lt;Done&gt; completion =
@@ -402,7 +399,7 @@ public class Main {
                         .via(CsvToMap.toMap()) // : Map&lt;String, ByteString&gt;
                         .map(this::cleanseCsvData) // : Map&lt;String, String&gt;
                         .map(this::toJson) // : String
-                        .runWith(Sink.foreach(System.out::println), materializer);
+                        .runWith(Sink.foreach(System.out::println), system);
 
         completion
                 .thenAccept(
@@ -442,8 +439,6 @@ object Main
 
   import actorSystem.dispatcher
 
-  implicit val mat: Materializer = ActorMaterializer()
-
   val httpRequest = HttpRequest(uri = &quot;https://www.nasdaq.com/screening/companies-by-name.aspx?exchange=NASDAQ&amp;render=download&quot;)
     .withHeaders(Accept(MediaRanges.`text/*`))
 
@@ -474,7 +469,7 @@ object Main
       .map(_.compactPrint) //: String (JSON formatted)
       .runWith(Sink.foreach(println))
 
-  future.map{ _ =&gt;
+  future.map { _ =&gt;
     println(&quot;Done!&quot;)
     actorSystem.terminate()
   }
