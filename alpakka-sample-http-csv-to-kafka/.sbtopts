@@ -1,5 +1,0 @@
--J-Xmx4G
--J-XX:+UseConcMarkSweepGC
--J-XX:+CMSClassUnloadingEnabled
--J-Xss5M
--Duser.timezone=GMT

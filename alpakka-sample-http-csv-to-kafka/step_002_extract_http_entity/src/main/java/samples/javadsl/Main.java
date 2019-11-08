@@ -12,8 +12,6 @@ import akka.http.javadsl.model.HttpResponse;
 import akka.http.javadsl.model.MediaRanges;
 import akka.http.javadsl.model.StatusCodes;
 import akka.http.javadsl.model.headers.Accept;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
 import akka.util.ByteString;
@@ -43,14 +41,13 @@ public class Main {
 
     private void run() throws Exception {
         ActorSystem system = ActorSystem.create();
-        Materializer materializer = ActorMaterializer.create(system);
         Http http = Http.get(system);
 
         CompletionStage<Done> completion =
                 Source.single(httpRequest) // : HttpRequest
                         .mapAsync(1, http::singleRequest) // : HttpResponse
                         .flatMapConcat(this::extractEntityData) // : ByteString
-                        .runWith(Sink.foreach(bs -> System.out.println(bs.utf8String())), materializer);
+                        .runWith(Sink.foreach(bs -> System.out.println(bs.utf8String())), system);
 
         completion
                 .thenAccept(

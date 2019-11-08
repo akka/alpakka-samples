@@ -26,8 +26,6 @@ object Main
 
   import actorSystem.dispatcher
 
-  implicit val mat: Materializer = ActorMaterializer()
-
   val httpRequest = HttpRequest(uri = "https://www.nasdaq.com/screening/companies-by-name.aspx?exchange=NASDAQ&render=download")
     .withHeaders(Accept(MediaRanges.`text/*`))
 
@@ -63,7 +61,7 @@ object Main
     Http().shutdownAllConnectionPools().map(_ => Done)
   )
 
-  future.map{ _ =>
+  future.map { _ =>
     println("Done!")
     cs.run(CoordinatedShutdown.UnknownReason)
   }

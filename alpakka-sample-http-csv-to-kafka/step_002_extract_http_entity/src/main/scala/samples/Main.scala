@@ -22,8 +22,6 @@ object Main extends App {
 
   import actorSystem.dispatcher
 
-  implicit val mat: Materializer = ActorMaterializer()
-
   val httpRequest = HttpRequest(uri = "https://www.nasdaq.com/screening/companies-by-name.aspx?exchange=NASDAQ&render=download")
     .withHeaders(Accept(MediaRanges.`text/*`))
 
@@ -41,7 +39,7 @@ object Main extends App {
       .flatMapConcat(extractEntityData) //: ByteString
       .runWith(Sink.foreach(println))
 
-  future.map{ _ =>
+  future.map { _ =>
     println("Done!")
     actorSystem.terminate()
   }
