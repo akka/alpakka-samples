@@ -12,8 +12,6 @@ import akka.http.javadsl.model.HttpResponse;
 import akka.http.javadsl.model.MediaRanges;
 import akka.http.javadsl.model.StatusCodes;
 import akka.http.javadsl.model.headers.Accept;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import akka.stream.alpakka.csv.javadsl.CsvParsing;
 import akka.stream.alpakka.csv.javadsl.CsvToMap;
 import akka.stream.javadsl.Sink;
@@ -79,7 +77,6 @@ public class Main {
 
     private void run() throws Exception {
         ActorSystem system = ActorSystem.create();
-        Materializer materializer = ActorMaterializer.create(system);
         Http http = Http.get(system);
 
         CompletionStage<Done> completion =
@@ -90,7 +87,7 @@ public class Main {
                         .via(CsvToMap.toMap()) // : Map<String, ByteString>
                         .map(this::cleanseCsvData) // : Map<String, String>
                         .map(this::toJson) // : String
-                        .runWith(Sink.foreach(System.out::println), materializer);
+                        .runWith(Sink.foreach(System.out::println), system);
 
         completion
                 .thenAccept(

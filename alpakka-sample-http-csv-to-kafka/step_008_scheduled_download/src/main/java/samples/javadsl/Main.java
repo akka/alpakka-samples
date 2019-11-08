@@ -20,8 +20,6 @@ import akka.kafka.ProducerSettings;
 import akka.kafka.Subscriptions;
 import akka.kafka.javadsl.Consumer;
 import akka.kafka.javadsl.Producer;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import akka.stream.alpakka.csv.javadsl.CsvParsing;
 import akka.stream.alpakka.csv.javadsl.CsvToMap;
 import akka.stream.javadsl.Keep;
@@ -100,7 +98,6 @@ public class Main {
         final String bootstrapServers = kafkaBroker.getBootstrapServers();
 
         ActorSystem system = ActorSystem.create();
-        Materializer materializer = ActorMaterializer.create(system);
         Http http = Http.get(system);
 
         ProducerSettings<String, String> kafkaProducerSettings =
@@ -123,7 +120,7 @@ public class Main {
                                         "topic1", elem) // : Kafka ProducerRecord
                         )
                         .toMat(Producer.plainSink(kafkaProducerSettings), Keep.both())
-                        .run(materializer);
+                        .run(system);
 
         CoordinatedShutdown cs = CoordinatedShutdown.get(system);
         cs.addTask(CoordinatedShutdown.PhaseActorSystemTerminate(), "shut-down-client-http-pool", () ->
@@ -141,7 +138,7 @@ public class Main {
                         .map(ConsumerRecord::value)
                         .toMat(Sink.foreach(System.out::println), Keep.both())
                         .mapMaterializedValue(Consumer::createDrainingControl)
-                        .run(materializer);
+                        .run(system);
 
         Cancellable tick = stagePair.first();
         CompletionStage<Done> streamCompletion = stagePair.second();
