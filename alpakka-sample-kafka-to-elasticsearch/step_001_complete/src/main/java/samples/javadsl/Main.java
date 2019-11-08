@@ -93,7 +93,7 @@ public class Main {
         Consumer.DrainingControl<Done> control =
                 Consumer.sourceWithOffsetContext(kafkaConsumerSettings, Subscriptions.topics(topic)) // (5)
                         .map(
-                                consumerRecord -> { // (7)
+                                consumerRecord -> { // (6)
                                     Movie movie = JsonMappers.movieReader.readValue(consumerRecord.value());
                                     return WriteMessage.createUpsertMessage(String.valueOf(movie.id), movie);
                                 })
@@ -103,9 +103,9 @@ public class Main {
                                         "_doc",
                                         ElasticsearchWriteSettings.create(),
                                         elasticsearchClient,
-                                        JsonMappers.mapper)) // (8)
+                                        JsonMappers.mapper)) // (7)
                         .map(
-                                writeResult -> { // (9)
+                                writeResult -> { // (8)
                                     writeResult
                                             .getError()
                                             .ifPresent(
@@ -116,8 +116,8 @@ public class Main {
                                                     });
                                     return NotUsed.notUsed();
                                 })
-                        .toMat(Committer.sinkWithOffsetContext(CommitterSettings.create(actorSystem)), Keep.both()) // (11)
-                        .mapMaterializedValue(Consumer::createDrainingControl) // (12)
+                        .toMat(Committer.sinkWithOffsetContext(CommitterSettings.create(actorSystem)), Keep.both()) // (9)
+                        .mapMaterializedValue(Consumer::createDrainingControl) // (10)
                         .run(actorSystem);
         // #flow
         return control;

@@ -55,19 +55,19 @@ object Main extends App with Helper {
     // #flow
     val control: Consumer.DrainingControl[Done] = Consumer
       .sourceWithOffsetContext(kafkaConsumerSettings, Subscriptions.topics(topic)) // (5)
-      .map { consumerRecord => // (7)
+      .map { consumerRecord => // (6)
         val movie = consumerRecord.value().parseJson.convertTo[Movie]
         WriteMessage.createUpsertMessage(movie.id.toString, movie)
       }
-      .via(ElasticsearchFlow.createWithContext(indexName, "_doc")) // (8)
-      .map { writeResult => // (9)
+      .via(ElasticsearchFlow.createWithContext(indexName, "_doc")) // (7)
+      .map { writeResult => // (8)
         writeResult.error.foreach { errorJson =>
           throw new RuntimeException(s"Elasticsearch update failed ${writeResult.errorReason.getOrElse(errorJson)}")
         }
         NotUsed
       }
-      .toMat(Committer.sinkWithOffsetContext(CommitterSettings(actorSystem)))(Keep.both) // (11)
-      .mapMaterializedValue(Consumer.DrainingControl.apply) // (12)
+      .toMat(Committer.sinkWithOffsetContext(CommitterSettings(actorSystem)))(Keep.both) // (9)
+      .mapMaterializedValue(Consumer.DrainingControl.apply) // (10)
       .run()
     // #flow
     control
