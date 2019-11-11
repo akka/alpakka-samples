@@ -1,6 +1,8 @@
 organization := "com.lightbend.akka.samples"
 name := "alpakka-samples-mqtt-http-to-s3-java"
 
+ThisBuild / scalaVersion := "2.13.1"
+
 val AkkaVersion = "2.6.0"
 
 libraryDependencies ++= Seq(
