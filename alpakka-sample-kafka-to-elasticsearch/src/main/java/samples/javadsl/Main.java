@@ -15,8 +15,6 @@ import akka.kafka.ConsumerSettings;
 import akka.kafka.Subscriptions;
 import akka.kafka.javadsl.Committer;
 import akka.kafka.javadsl.Consumer;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import akka.stream.alpakka.elasticsearch.ElasticsearchWriteSettings;
 import akka.stream.alpakka.elasticsearch.WriteMessage;
 import akka.stream.alpakka.elasticsearch.javadsl.ElasticsearchFlow;
@@ -60,7 +58,6 @@ public class Main {
     }
 
     private ActorSystem actorSystem;
-    private Materializer materializer;
     private RestClient elasticsearchClient;
 
     private Consumer.DrainingControl<Done> readFromKafkaToEleasticsearch() {
@@ -103,28 +100,27 @@ public class Main {
                                 })
                         .toMat(Committer.sinkWithOffsetContext(CommitterSettings.create(actorSystem)), Keep.both()) // (9)
                         .mapMaterializedValue(Consumer::createDrainingControl) // (10)
-                        .run(materializer);
+                        .run(actorSystem);
         // #flow
         return control;
     }
 
     private CompletionStage<Terminated> run() throws Exception {
         actorSystem = ActorSystem.create();
-        materializer = ActorMaterializer.create(actorSystem);
         // #es-setup
         // Elasticsearch client setup (4)
         elasticsearchClient = RestClient.builder(HttpHost.create(elasticsearchAddress)).build();
         // #es-setup
 
         List<Movie> movies = Arrays.asList(new Movie(23, "Psycho"), new Movie(423, "Citizen Kane"));
-        CompletionStage<Done> writing = helper.writeToKafka(topic, movies, actorSystem, materializer);
+        CompletionStage<Done> writing = helper.writeToKafka(topic, movies, actorSystem, actorSystem);
         writing.toCompletableFuture().get(10, TimeUnit.SECONDS);
 
         Consumer.DrainingControl<Done> control = readFromKafkaToEleasticsearch();
         TimeUnit.SECONDS.sleep(5);
         CompletionStage<Done> copyingFinished = control.drainAndShutdown(actorSystem.dispatcher());
         copyingFinished.toCompletableFuture().get(10, TimeUnit.SECONDS);
-        CompletionStage<List<Movie>> reading = helper.readFromElasticsearch(elasticsearchClient, indexName, actorSystem, materializer);
+        CompletionStage<List<Movie>> reading = helper.readFromElasticsearch(elasticsearchClient, indexName, actorSystem, actorSystem);
 
         return reading.thenCompose(
                 ms -> {

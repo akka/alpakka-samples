@@ -11,7 +11,6 @@ import akka.kafka.scaladsl.{Committer, Consumer}
 import akka.stream.alpakka.elasticsearch.WriteMessage
 import akka.stream.alpakka.elasticsearch.scaladsl.ElasticsearchFlow
 import akka.stream.scaladsl.Keep
-import akka.stream.{ActorMaterializer, Materializer}
 import akka.{Done, NotUsed}
 import org.apache.http.HttpHost
 import org.apache.kafka.clients.consumer.ConsumerConfig
@@ -28,7 +27,6 @@ object Main extends App with Helper {
   import JsonFormats._
 
   implicit val actorSystem: ActorSystem = ActorSystem()
-  implicit val actorMaterializer: Materializer = ActorMaterializer()
   implicit val executionContext: ExecutionContext = actorSystem.dispatcher
 
   val topic = "movies-to-elasticsearch"
