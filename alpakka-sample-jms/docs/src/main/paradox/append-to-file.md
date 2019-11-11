@@ -5,7 +5,7 @@
 - and appends the data to the file `target/out` (2).
 
 Scala
-: @@snip [snip](/step_001_complete/src/main/scala/samples/scaladsl/JmsToFile.scala) { #sample }
+: @@snip [snip](/src/main/scala/samples/scaladsl/JmsToFile.scala) { #sample }
 
 Java
-: @@snip [snip](/step_001_complete/src/main/java/samples/javadsl/JmsToFile.java) { #sample }
+: @@snip [snip](/src/main/java/samples/javadsl/JmsToFile.java) { #sample }

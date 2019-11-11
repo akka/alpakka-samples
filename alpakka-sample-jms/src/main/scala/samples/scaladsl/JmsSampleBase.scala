@@ -6,7 +6,6 @@ package samples.scaladsl
 
 import akka.Done
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, Materializer}
 import akka.stream.alpakka.jms.JmsProducerSettings
 import akka.stream.alpakka.jms.scaladsl.JmsProducer
 import akka.stream.scaladsl.{Sink, Source}
@@ -18,7 +17,6 @@ import scala.concurrent.duration._
 class JmsSampleBase {
 
   implicit val actorSystem: ActorSystem = ActorSystem()
-  implicit val actorMaterializer: Materializer = ActorMaterializer()
   implicit val executionContext: ExecutionContext = actorSystem.dispatcher
 
   def wait(duration: FiniteDuration): Unit = Thread.sleep(duration.toMillis)

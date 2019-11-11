@@ -7,7 +7,7 @@
 value to create unique file names (4). 
 
 Scala
-: @@snip [snip](/step_001_complete/src/main/scala/samples/scaladsl/JmsToOneFilePerMessage.scala) { #sample }
+: @@snip [snip](/src/main/scala/samples/scaladsl/JmsToOneFilePerMessage.scala) { #sample }
 
 Java
-: @@snip [snip](/step_001_complete/src/main/java/samples/javadsl/JmsToOneFilePerMessage.java) { #sample }
+: @@snip [snip](/src/main/java/samples/javadsl/JmsToOneFilePerMessage.java) { #sample }
