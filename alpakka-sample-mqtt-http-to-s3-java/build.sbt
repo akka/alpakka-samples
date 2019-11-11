@@ -1,13 +1,18 @@
 organization := "com.lightbend.akka.samples"
 name := "alpakka-samples-mqtt-http-to-s3-java"
 
+ThisBuild / scalaVersion := "2.13.1"
+
+val AkkaVersion = "2.6.0"
+
 libraryDependencies ++= Seq(
-  "com.typesafe.akka" %% "akka-slf4j" % "2.5.22",
-  "com.typesafe.akka" %% "akka-http" % "10.1.8",
-  "com.lightbend.akka" %% "akka-stream-alpakka-mqtt" % "1.0.0",
-  "com.lightbend.akka" %% "akka-stream-alpakka-s3" % "1.0.0",
-  "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.9.8",
-  "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.9.8",
+  "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,
+  "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
+  "com.typesafe.akka" %% "akka-http" % "10.1.10",
+  "com.lightbend.akka" %% "akka-stream-alpakka-mqtt" % "1.1.2",
+  "com.lightbend.akka" %% "akka-stream-alpakka-s3" % "1.1.2",
+  "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.10.0",
+  "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.10.0",
   "ch.qos.logback" % "logback-classic" % "1.2.3"
 )
 

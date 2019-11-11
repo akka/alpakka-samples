@@ -3,8 +3,6 @@ package alpakka.sample.triggereddownload;
 import akka.Done;
 import akka.actor.ActorSystem;
 import akka.http.javadsl.Http;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import akka.stream.alpakka.mqtt.MqttConnectionSettings;
 import akka.stream.alpakka.mqtt.MqttMessage;
 import akka.stream.alpakka.mqtt.MqttQoS;
@@ -23,7 +21,6 @@ import java.util.concurrent.CompletionStage;
 
 public class PublishDataToMqtt {
     final ActorSystem system;
-    final Materializer materializer;
     final Http http;
 
     public static void main(String[] args) throws Exception {
@@ -33,7 +30,6 @@ public class PublishDataToMqtt {
 
     public PublishDataToMqtt() {
         system = ActorSystem.create();
-        materializer = ActorMaterializer.create(system);
         http = Http.get(system);
     }
 
@@ -53,6 +49,6 @@ public class PublishDataToMqtt {
         DownloadCommand command = new DownloadCommand(Instant.now(), "https://doc.akka.io/docs/alpakka/current/s3.html");
         MqttMessage message = MqttMessage.create("downloads/trigger", ByteString.fromString(downloadCommandWriter.writeValueAsString(command)));
 
-        Source.tick(Duration.ofSeconds(5), Duration.ofSeconds(30), message).runWith(mqttSink, materializer);
+        Source.tick(Duration.ofSeconds(5), Duration.ofSeconds(30), message).runWith(mqttSink, system);
     }
 }
