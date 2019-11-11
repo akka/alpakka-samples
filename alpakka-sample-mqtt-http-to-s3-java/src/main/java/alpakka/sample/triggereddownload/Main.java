@@ -6,15 +6,11 @@ import akka.http.javadsl.Http;
 import akka.http.javadsl.model.ContentTypes;
 import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.model.Uri;
-import akka.japi.Pair;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import akka.stream.alpakka.mqtt.MqttConnectionSettings;
 import akka.stream.alpakka.mqtt.MqttQoS;
 import akka.stream.alpakka.mqtt.MqttSubscriptions;
 import akka.stream.alpakka.mqtt.javadsl.MqttSource;
 import akka.stream.alpakka.s3.javadsl.S3;
-import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -27,7 +23,6 @@ import java.time.format.DateTimeFormatter;
 public class Main {
 
     final ActorSystem system;
-    final Materializer materializer;
     final Http http;
 
     public static void main(String[] args) throws Exception {
@@ -37,7 +32,6 @@ public class Main {
 
     public Main() {
         system = ActorSystem.create();
-        materializer = ActorMaterializer.create(system);
         http = Http.get(system);
     }
 
@@ -76,10 +70,10 @@ public class Main {
                                     .map(HttpRequest::GET)
                                     .mapAsync(1, http::singleRequest)
                                     .flatMapConcat(httpResponse -> httpResponse.entity().getDataBytes())
-                                    .runWith(S3.multipartUpload(s3Bucket, s3BucketKey, ContentTypes.TEXT_HTML_UTF8), materializer);
+                                    .runWith(S3.multipartUpload(s3Bucket, s3BucketKey, ContentTypes.TEXT_HTML_UTF8), system);
                         }
                 )
-                .runForeach(res -> System.out.println(res), materializer)
+                .runForeach(res -> System.out.println(res), system)
                 .exceptionally(e -> { e.printStackTrace(); return Done.done(); });
     }
 
