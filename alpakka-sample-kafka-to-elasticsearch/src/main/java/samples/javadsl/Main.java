@@ -113,7 +113,7 @@ public class Main {
         // #es-setup
 
         List<Movie> movies = Arrays.asList(new Movie(23, "Psycho"), new Movie(423, "Citizen Kane"));
-        CompletionStage<Done> writing = helper.writeToKafka(topic, movies, actorSystem, actorSystem);
+        CompletionStage<Done> writing = helper.writeToKafka(topic, movies, actorSystem);
         writing.toCompletableFuture().get(10, TimeUnit.SECONDS);
 
         Consumer.DrainingControl<Done> control = readFromKafkaToEleasticsearch();
