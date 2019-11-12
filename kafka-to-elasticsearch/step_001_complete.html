@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-11 10:16:00
+Version 2019-11-12 21:35:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -265,7 +265,7 @@ Version 2019-11-11 10:16:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-11 10:16:00
+Version 2019-11-12 21:35:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -303,19 +303,17 @@ Version 2019-11-11 10:16:00
   <li><span class="group-scala">Spray JSON</span><span class="group-java">Jackson</span> conversion for the data class (3)</li>
   <li>Elasticsearch client setup (4)</li>
   <li>Kafka consumer with committing support (5)</li>
-  <li>Use <code>FlowWithContext</code> to focus on <code>ConsumerRecord</code> (6)</li>
-  <li>Parse message from Kafka to <code>Movie</code> and create Elasticsearch write message (7)</li>
-  <li>Use <code>createWithContext</code> to use an Elasticsearch flow with context-support (so it passes through the Kafka committ offset) (8)</li>
-  <li>React on write errors (9)</li>
-  <li>Make the context visible again and just keep the committable offset (10)</li>
-  <li>Let the <code>Committer.sink</code> aggregate commits to batches and commit to Kafka (11)</li>
-  <li>Combine consumer control and stream completion into <code>DrainingControl</code> (12)</li>
+  <li>Parse message from Kafka to <code>Movie</code> and create Elasticsearch write message (6)</li>
+  <li>Use <code>createWithContext</code> to use an Elasticsearch flow with context-support (so it passes through the Kafka commit offset) (7)</li>
+  <li>React on write errors (8)</li>
+  <li>Let the <code>Committer.sink</code> aggregate commits to batches and commit to Kafka (9)</li>
+  <li>Combine consumer control and stream completion into <code>DrainingControl</code> (10)</li>
 </ul>
 <h3><a href="#data-class-and-json-mapping" name="data-class-and-json-mapping" class="anchor"><span class="anchor-link"></span></a>Data class and JSON mapping</h3>
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/step_001_complete/src/main/java/samples/javadsl/Movie.java" target="_blank" title="Go to snippet source"></a><code class="language-java">package samples.javadsl;
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/java/samples/javadsl/Movie.java" target="_blank" title="Go to snippet source"></a><code class="language-java">package samples.javadsl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -349,7 +347,7 @@ class JsonMappers {
 }</code></pre></dd>
   <dt>Scala</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Movie.scala" target="_blank" title="Go to snippet source"></a><code class="language-scala">package samples.scaladsl
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/scala/samples/scaladsl/Movie.scala" target="_blank" title="Go to snippet source"></a><code class="language-scala">package samples.scaladsl
 
 import spray.json.DefaultJsonProtocol._
 import spray.json._
@@ -366,12 +364,10 @@ object JsonFormats {
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/step_001_complete/src/main/java/samples/javadsl/Main.java#L95-L127" target="_blank" title="Go to snippet source"></a><code class="language-java">Consumer.DrainingControl&lt;Done&gt; control =
-        Consumer.committableSource(kafkaConsumerSettings, Subscriptions.topics(topic)) // (5)
-                .asSourceWithContext(cm -&gt; cm.committableOffset()) // (6)
-                .map(cm -&gt; cm.record())
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L75-L103" target="_blank" title="Go to snippet source"></a><code class="language-java">Consumer.DrainingControl&lt;Done&gt; control =
+        Consumer.sourceWithOffsetContext(kafkaConsumerSettings, Subscriptions.topics(topic)) // (5)
                 .map(
-                        consumerRecord -&gt; { // (7)
+                        consumerRecord -&gt; { // (6)
                             Movie movie = JsonMappers.movieReader.readValue(consumerRecord.value());
                             return WriteMessage.createUpsertMessage(String.valueOf(movie.id), movie);
                         })
@@ -381,9 +377,9 @@ object JsonFormats {
                                 &quot;_doc&quot;,
                                 ElasticsearchWriteSettings.create(),
                                 elasticsearchClient,
-                                JsonMappers.mapper)) // (8)
+                                JsonMappers.mapper)) // (7)
                 .map(
-                        writeResult -&gt; { // (9)
+                        writeResult -&gt; { // (8)
                             writeResult
                                     .getError()
                                     .ifPresent(
@@ -394,42 +390,33 @@ object JsonFormats {
                                             });
                             return NotUsed.notUsed();
                         })
-                .asSource() // (10)
-                .map(pair -&gt; pair.second())
-                .toMat(Committer.sink(CommitterSettings.create(actorSystem)), Keep.both()) // (11)
-                .mapMaterializedValue(Consumer::createDrainingControl) // (12)
-                .run(materializer);</code></pre></dd>
+                .toMat(Committer.sinkWithOffsetContext(CommitterSettings.create(actorSystem)), Keep.both()) // (9)
+                .mapMaterializedValue(Consumer::createDrainingControl) // (10)
+                .run(actorSystem);</code></pre></dd>
   <dt>Scala</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Main.scala#L58-L80" target="_blank" title="Go to snippet source"></a><code class="language-scala">val control: Consumer.DrainingControl[Done] = Consumer
-  .committableSource(kafkaConsumerSettings, Subscriptions.topics(topic)) // (5)
-  .asSourceWithContext(_.committableOffset) // (6)
-  .map(_.record)
-  .map { consumerRecord =&gt; // (7)
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/scala/samples/scaladsl/Main.scala#L56-L71" target="_blank" title="Go to snippet source"></a><code class="language-scala">val control: Consumer.DrainingControl[Done] = Consumer
+  .sourceWithOffsetContext(kafkaConsumerSettings, Subscriptions.topics(topic)) // (5)
+  .map { consumerRecord =&gt; // (6)
     val movie = consumerRecord.value().parseJson.convertTo[Movie]
     WriteMessage.createUpsertMessage(movie.id.toString, movie)
   }
-  .via(ElasticsearchFlow.createWithContext(indexName, &quot;_doc&quot;)) // (8)
-  .map { writeResult =&gt; // (9)
+  .via(ElasticsearchFlow.createWithContext(indexName, &quot;_doc&quot;)) // (7)
+  .map { writeResult =&gt; // (8)
     writeResult.error.foreach { errorJson =&gt;
       throw new RuntimeException(s&quot;Elasticsearch update failed ${writeResult.errorReason.getOrElse(errorJson)}&quot;)
     }
     NotUsed
   }
-  .asSource // (10)
-  .map {
-    case (_, committableOffset) =&gt;
-      committableOffset
-  }
-  .toMat(Committer.sink(CommitterSettings(actorSystem)))(Keep.both) // (11)
-  .mapMaterializedValue(Consumer.DrainingControl.apply) // (12)
+  .toMat(Committer.sinkWithOffsetContext(CommitterSettings(actorSystem)))(Keep.both) // (9)
+  .mapMaterializedValue(Consumer.DrainingControl.apply) // (10)
   .run()</code></pre></dd>
 </dl>
 <h3><a href="#kafka-setup" name="kafka-setup" class="anchor"><span class="anchor-link"></span></a>Kafka setup</h3>
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/step_001_complete/src/main/java/samples/javadsl/Main.java#L85-L91" target="_blank" title="Go to snippet source"></a><code class="language-java">// configure Kafka consumer (1)
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L65-L71" target="_blank" title="Go to snippet source"></a><code class="language-java">// configure Kafka consumer (1)
 ConsumerSettings&lt;Integer, String&gt; kafkaConsumerSettings =
         ConsumerSettings.create(actorSystem, new IntegerDeserializer(), new StringDeserializer())
                 .withBootstrapServers(kafkaBootstrapServers)
@@ -438,7 +425,7 @@ ConsumerSettings&lt;Integer, String&gt; kafkaConsumerSettings =
                 .withStopTimeout(Duration.ofSeconds(5));</code></pre></dd>
   <dt>Scala</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Main.scala#L48-L53" target="_blank" title="Go to snippet source"></a><code class="language-scala">// configure Kafka consumer (1)
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/scala/samples/scaladsl/Main.scala#L46-L51" target="_blank" title="Go to snippet source"></a><code class="language-scala">// configure Kafka consumer (1)
 val kafkaConsumerSettings = ConsumerSettings(actorSystem, new IntegerDeserializer, new StringDeserializer)
   .withBootstrapServers(kafkaBootstrapServers)
   .withGroupId(groupId)
@@ -449,13 +436,13 @@ val kafkaConsumerSettings = ConsumerSettings(actorSystem, new IntegerDeserialize
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/step_001_complete/src/main/java/samples/javadsl/Main.java#L69-L137" target="_blank" title="Go to snippet source"></a><code class="language-java">private final String indexName = &quot;movies&quot;;
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L50-L112" target="_blank" title="Go to snippet source"></a><code class="language-java">private final String indexName = &quot;movies&quot;;
 
     // Elasticsearch client setup (4)
     elasticsearchClient = RestClient.builder(HttpHost.create(elasticsearchAddress)).build();</code></pre></dd>
   <dt>Scala</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Main.scala#L38-L44" target="_blank" title="Go to snippet source"></a><code class="language-scala">// Elasticsearch client setup (4)
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/scala/samples/scaladsl/Main.scala#L36-L42" target="_blank" title="Go to snippet source"></a><code class="language-scala">// Elasticsearch client setup (4)
 implicit val elasticsearchClient: RestClient =
   RestClient
     .builder(HttpHost.create(elasticsearchAddress))

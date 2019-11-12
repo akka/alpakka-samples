@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-11 10:16:00
+Version 2019-11-12 21:35:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -258,7 +258,7 @@ Version 2019-11-11 10:16:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-11 10:16:00
+Version 2019-11-12 21:35:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -283,7 +283,7 @@ Version 2019-11-11 10:16:00
 <div class="small-12 column" id="docs">
 <h1><a href="#alpakka-sample" name="alpakka-sample" class="anchor"><span class="anchor-link"></span></a>Alpakka sample</h1>
 <h2><a href="#read-from-a-kafka-topic-and-publish-to-elasticsearch" name="read-from-a-kafka-topic-and-publish-to-elasticsearch" class="anchor"><span class="anchor-link"></span></a>Read from a Kafka topic and publish to Elasticsearch</h2>
-<p>This example uses <a href="https://doc.akka.io/docs/alpakka-kafka/1.0.4/">Alpakka Kafka</a> to subscribe to a Kafka topic, parses JSON into a data class and stores the object in Elasticsearch. After storing the Kafka offset is committed back to Kafka. This gives at-least-once semantics.</p>
+<p>This example uses <a href="https://doc.akka.io/docs/alpakka-kafka/1.1.0/">Alpakka Kafka</a> to subscribe to a Kafka topic, parses JSON into a data class and stores the object in Elasticsearch. After storing the Kafka offset is committed back to Kafka. This gives at-least-once semantics.</p>
 <p>Browse the sources at <a href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch" title="Github" target="_blank" rel="noopener noreferrer">Github</a>.</p>
 <p>To try out this project clone <a href="https://github.com/akka/alpakka-samples" title="the Alpakka Samples repository" target="_blank" rel="noopener noreferrer">the Alpakka Samples repository</a> and find it in the <code>alpakka-sample-kafka-to-elasticsearch</code> directory.</p>
 <h3><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h3>
@@ -291,17 +291,18 @@ Version 2019-11-11 10:16:00
   <dt>Dependencies (sbt notation)
   </dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/project/Dependencies.scala#L6-L23" target="_blank" title="Go to snippet source"></a><code class="language-scala">val AkkaVersion = &quot;2.5.23&quot;
-val AlpakkaVersion = &quot;1.0.2&quot;
-val AlpakkaKafkaVersion = &quot;1.0.4&quot;
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/project/Dependencies.scala#L6-L24" target="_blank" title="Go to snippet source"></a><code class="language-scala">val AkkaVersion = &quot;2.6.0&quot;
+val AlpakkaVersion = &quot;1.1.2&quot;
+val AlpakkaKafkaVersion = &quot;1.1.0&quot;
 
   &quot;com.lightbend.akka&quot; %% &quot;akka-stream-alpakka-elasticsearch&quot; % AlpakkaVersion,
   &quot;com.typesafe.akka&quot; %% &quot;akka-stream-kafka&quot; % AlpakkaKafkaVersion,
+  &quot;com.typesafe.akka&quot; %% &quot;akka-stream&quot; % AkkaVersion,
   // for JSON in Scala
   &quot;io.spray&quot; %% &quot;spray-json&quot; % &quot;1.3.5&quot;,
   // for JSON in Java
-  &quot;com.fasterxml.jackson.datatype&quot; % &quot;jackson-datatype-jdk8&quot; % &quot;2.9.9&quot;,
-  &quot;com.fasterxml.jackson.datatype&quot; % &quot;jackson-datatype-jsr310&quot; % &quot;2.9.9&quot;,
+  &quot;com.fasterxml.jackson.datatype&quot; % &quot;jackson-datatype-jdk8&quot; % &quot;2.10.0&quot;,
+  &quot;com.fasterxml.jackson.datatype&quot; % &quot;jackson-datatype-jsr310&quot; % &quot;2.10.0&quot;,
   // Logging
   &quot;com.typesafe.akka&quot; %% &quot;akka-slf4j&quot; % AkkaVersion,
   &quot;ch.qos.logback&quot; % &quot;logback-classic&quot; % &quot;1.2.3&quot;,</code></pre></dd>
