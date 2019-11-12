@@ -68,7 +68,7 @@ public class Helper {
         return producing;
     }
 
-    CompletionStage<List<Movie>> readFromElasticsearch(RestClient elasticsearchClient, String indexName, ActorSystem actorSystem, Materializer materializer) {
+    CompletionStage<List<Movie>> readFromElasticsearch(RestClient elasticsearchClient, String indexName, ActorSystem actorSystem) {
         CompletionStage<List<Movie>> reading =
                 ElasticsearchSource.typed(
                         indexName,
@@ -78,7 +78,7 @@ public class Helper {
                         elasticsearchClient,
                         Movie.class)
                         .map(readResult -> readResult.source())
-                        .runWith(Sink.seq(), materializer);
+                        .runWith(Sink.seq(), actorSystem);
         reading.thenAccept(
                 non -> {
                     log.info("Reading finished");

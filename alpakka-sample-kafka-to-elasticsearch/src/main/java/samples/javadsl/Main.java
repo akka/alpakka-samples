@@ -120,7 +120,7 @@ public class Main {
         TimeUnit.SECONDS.sleep(5);
         CompletionStage<Done> copyingFinished = control.drainAndShutdown(actorSystem.dispatcher());
         copyingFinished.toCompletableFuture().get(10, TimeUnit.SECONDS);
-        CompletionStage<List<Movie>> reading = helper.readFromElasticsearch(elasticsearchClient, indexName, actorSystem, actorSystem);
+        CompletionStage<List<Movie>> reading = helper.readFromElasticsearch(elasticsearchClient, indexName, actorSystem);
 
         return reading.thenCompose(
                 ms -> {
