@@ -9,7 +9,7 @@
 - end the stream by writing the values to standard out (7).
 
 Scala
-: @@snip [snip](/step_001_complete/src/main/scala/samples/scaladsl/JmsToWebSocket.scala) { #sample }
+: @@snip [snip](/src/main/scala/samples/scaladsl/JmsToWebSocket.scala) { #sample }
 
 Java
-: @@snip [snip](/step_001_complete/src/main/java/samples/javadsl/JmsToWebSocket.java) { #sample }
+: @@snip [snip](/src/main/java/samples/javadsl/JmsToWebSocket.java) { #sample }

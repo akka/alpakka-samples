@@ -7,7 +7,7 @@
 - prints the `HttpResponse` to standard out (5).
 
 Scala
-: @@snip [snip](/step_001_complete/src/main/scala/samples/scaladsl/JmsToHttpGet.scala) { #sample }
+: @@snip [snip](/src/main/scala/samples/scaladsl/JmsToHttpGet.scala) { #sample }
 
 Java
-: @@snip [snip](/step_001_complete/src/main/java/samples/javadsl/JmsToHttpGet.java) { #sample }
+: @@snip [snip](/src/main/java/samples/javadsl/JmsToHttpGet.java) { #sample }

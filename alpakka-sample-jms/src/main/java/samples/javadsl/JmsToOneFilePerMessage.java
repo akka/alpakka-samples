@@ -9,9 +9,7 @@ package samples.javadsl;
 import akka.Done;
 import akka.actor.ActorSystem;
 import akka.japi.Pair;
-import akka.stream.ActorMaterializer;
 import akka.stream.KillSwitch;
-import akka.stream.Materializer;
 import akka.stream.alpakka.jms.JmsConsumerSettings;
 import akka.stream.alpakka.jms.JmsProducerSettings;
 import akka.stream.alpakka.jms.javadsl.JmsConsumer;
@@ -40,14 +38,13 @@ public class JmsToOneFilePerMessage {
   }
 
   private final ActorSystem system = ActorSystem.create();
-  private final Materializer materializer = ActorMaterializer.create(system);
   private final ExecutionContext ec = system.dispatcher();
 
   private void enqueue(ConnectionFactory connectionFactory, String... msgs) {
     Sink<String, ?> jmsSink =
         JmsProducer.textSink(
             JmsProducerSettings.create(system, connectionFactory).withQueue("test"));
-    Source.from(Arrays.asList(msgs)).runWith(jmsSink, materializer);
+    Source.from(Arrays.asList(msgs)).runWith(jmsSink, system);
   }
 
   private void run() throws Exception {
@@ -75,10 +72,10 @@ public class JmsToOneFilePerMessage {
                   return Source // (4)
                       .single(byteString)
                       .runWith(
-                          FileIO.toPath(Paths.get("target/out-" + number + ".txt")), materializer);
+                          FileIO.toPath(Paths.get("target/out-" + number + ".txt")), system);
                 }) // : IoResult
             .toMat(Sink.ignore(), Keep.both())
-            .run(materializer);
+            .run(system);
 
     // #sample
 

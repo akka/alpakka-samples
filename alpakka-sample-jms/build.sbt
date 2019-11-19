@@ -1,12 +1,6 @@
-
-lazy val base = (project in file("."))
-  .aggregate(
-    common,
-    step_001_complete
- ).settings(CommonSettings.commonSettings: _*)
-
-lazy val common = project.settings(CommonSettings.commonSettings: _*)
-
-lazy val step_001_complete = project
-  .settings(CommonSettings.commonSettings: _*)
-  .dependsOn(common % "test->test;compile->compile")
+organization := "com.lightbend.akka.samples"
+version := "1.3.0"
+scalaVersion := Dependencies.scalaVer
+libraryDependencies ++= Dependencies.dependencies
+// Having JBoss as a first resolver is a workaround for https://github.com/coursier/coursier/issues/200
+externalResolvers := ("jboss" at "http://repository.jboss.org/nexus/content/groups/public") +: externalResolvers.value

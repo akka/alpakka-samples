@@ -15,8 +15,6 @@ import akka.http.javadsl.model.ws.TextMessage;
 import akka.http.javadsl.model.ws.WebSocketRequest;
 import akka.http.javadsl.model.ws.WebSocketUpgradeResponse;
 import akka.japi.Pair;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import akka.stream.alpakka.jms.JmsConsumerSettings;
 import akka.stream.alpakka.jms.JmsProducerSettings;
 import akka.stream.alpakka.jms.javadsl.JmsConsumer;
@@ -46,14 +44,13 @@ public class JmsToWebSocket {
   }
 
   private final ActorSystem system = ActorSystem.create();
-  private final Materializer materializer = ActorMaterializer.create(system);
   private final ExecutionContext ec = system.dispatcher();
 
   private void enqueue(ConnectionFactory connectionFactory, String... msgs) {
     Sink<String, ?> jmsSink =
         JmsProducer.textSink(
             JmsProducerSettings.create(system, connectionFactory).withQueue("test"));
-    Source.from(Arrays.asList(msgs)).runWith(jmsSink, materializer);
+    Source.from(Arrays.asList(msgs)).runWith(jmsSink, system);
   }
 
   private void run() throws Exception {
@@ -91,7 +88,7 @@ public class JmsToWebSocket {
                 .mapAsync(parallelism, this::wsMessageToString) // : String            (5)
                 .map(s -> "client received: " + s) // : String            (6)
                 .toMat(Sink.foreach(System.out::println), Keep.both()) //                    (7)
-                .run(materializer);
+                .run(system);
     // #sample
     JmsConsumerControl runningSource = pair.first().first();
     CompletionStage<WebSocketUpgradeResponse> wsUpgradeResponse = pair.first().second();
@@ -130,7 +127,7 @@ public class JmsToWebSocket {
         return CompletableFuture.completedFuture(tMsg.getStrictText());
       } else {
         CompletionStage<List<String>> strings =
-            tMsg.getStreamedText().runWith(Sink.seq(), materializer);
+            tMsg.getStreamedText().runWith(Sink.seq(), system);
         return strings.thenApply(list -> String.join("", list));
       }
     } else {

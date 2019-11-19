@@ -11,8 +11,6 @@ import akka.actor.ActorSystem;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.model.HttpRequest;
 import akka.japi.Pair;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import akka.stream.alpakka.jms.JmsConsumerSettings;
 import akka.stream.alpakka.jms.JmsProducerSettings;
 import akka.stream.alpakka.jms.javadsl.JmsConsumer;
@@ -40,14 +38,13 @@ public class JmsToHttpGet {
   }
 
   private final ActorSystem system = ActorSystem.create();
-  private final Materializer materializer = ActorMaterializer.create(system);
   private final ExecutionContext ec = system.dispatcher();
 
   private void enqueue(ConnectionFactory connectionFactory, String... msgs) {
     Sink<String, ?> jmsSink =
         JmsProducer.textSink(
             JmsProducerSettings.create(system, connectionFactory).withQueue("test"));
-    Source.from(Arrays.asList(msgs)).runWith(jmsSink, materializer);
+    Source.from(Arrays.asList(msgs)).runWith(jmsSink, system);
   }
 
   private void run() throws Exception {
@@ -77,7 +74,7 @@ public class JmsToHttpGet {
                         .withEntity(bs)) // : HttpRequest  (3)
             .mapAsyncUnordered(parallelism, http::singleRequest) // : HttpResponse (4)
             .toMat(Sink.foreach(System.out::println), Keep.both()) //               (5)
-            .run(materializer);
+            .run(system);
     // #sample
     Thread.sleep(5 * 1000);
     JmsConsumerControl runningSource = pair.first();

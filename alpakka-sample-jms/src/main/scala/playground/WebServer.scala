@@ -11,7 +11,7 @@ import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.{HttpApp, Route}
 import akka.http.scaladsl.settings.ServerSettings
 import akka.stream.scaladsl.{Flow, GraphDSL, Sink, Source}
-import akka.stream.{ActorMaterializer, FlowShape}
+import akka.stream.FlowShape
 import akka.{Done, NotUsed}
 
 import scala.concurrent.duration.DurationInt
@@ -20,7 +20,6 @@ import scala.util.Success
 
 class WebServer extends HttpApp {
   implicit val theSystem = ActorSystem(Logging.simpleName(this).replaceAll("\\$", ""))
-  implicit val materializer = ActorMaterializer()
   implicit val executionContext = theSystem.dispatcher
 
   private val shutdownPromise = Promise[Done]
