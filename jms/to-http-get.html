@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-12 21:35:00
+Version 2019-11-19 15:06:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -261,7 +261,7 @@ Version 2019-11-12 21:35:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-12 21:35:00
+Version 2019-11-19 15:06:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -298,7 +298,7 @@ Version 2019-11-12 21:35:00
 <dl>
   <dt>Scala</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jms/step_001_complete/src/main/scala/samples/scaladsl/JmsToHttpGet.scala#L8-L46" target="_blank" title="Go to snippet source"></a><code class="language-scala">import akka.Done
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jms/src/main/scala/samples/scaladsl/JmsToHttpGet.scala#L8-L46" target="_blank" title="Go to snippet source"></a><code class="language-scala">import akka.Done
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.stream.alpakka.jms.JmsConsumerSettings
@@ -326,13 +326,11 @@ val (runningSource, finished): (JmsConsumerControl, Future[Done]) =
     .run()</code></pre></dd>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jms/step_001_complete/src/main/java/samples/javadsl/JmsToHttpGet.java#L8-L80" target="_blank" title="Go to snippet source"></a><code class="language-java"><br/>import akka.Done;
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jms/src/main/java/samples/javadsl/JmsToHttpGet.java#L8-L77" target="_blank" title="Go to snippet source"></a><code class="language-java"><br/>import akka.Done;
 import akka.actor.ActorSystem;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.model.HttpRequest;
 import akka.japi.Pair;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import akka.stream.alpakka.jms.JmsConsumerSettings;
 import akka.stream.alpakka.jms.JmsProducerSettings;
 import akka.stream.alpakka.jms.javadsl.JmsConsumer;
@@ -367,7 +365,7 @@ Pair&lt;JmsConsumerControl, CompletionStage&lt;Done&gt;&gt; pair =
                     .withEntity(bs)) // : HttpRequest  (3)
         .mapAsyncUnordered(parallelism, http::singleRequest) // : HttpResponse (4)
         .toMat(Sink.foreach(System.out::println), Keep.both()) //               (5)
-        .run(materializer);</code></pre></dd>
+        .run(system);</code></pre></dd>
 </dl>
 </div>
 </article>
