@@ -19,7 +19,7 @@ jobs:
       name: Compile Alpakka Mqtt Http S3 sample
     - script: cd alpakka-sample-sqs-java && sbt compile
       name: Compile Alpakka Sqs Java sample
-    - script: cd rotate-logs-to-ftp && sbt compile
+    - script: cd alpakka-sample-rotate-logs-to-ftp && sbt compile
       name: Compile Rotate logs to FTP sample
     - script: cd docs && sbt makeSite
       name: Build documentation website
