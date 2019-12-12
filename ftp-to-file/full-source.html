@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-19 15:06:00
+Version 2019-12-12 14:25:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -258,7 +258,7 @@ Version 2019-11-19 15:06:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-19 15:06:00
+Version 2019-12-12 14:25:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -288,11 +288,10 @@ Version 2019-11-19 15:06:00
   <dd>
   <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-ftp-to-file/src/main/java/samples/javadsl/Main.java" target="_blank" title="Go to snippet source"></a><code class="language-java">package samples.javadsl;
 
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.Behaviors;
 import akka.japi.Pair;
-import akka.stream.ActorMaterializer;
 import akka.stream.IOResult;
-import akka.stream.Materializer;
 // #imports
 import akka.stream.alpakka.ftp.FtpSettings;
 import akka.stream.alpakka.ftp.javadsl.Ftp;
@@ -315,8 +314,7 @@ import java.util.stream.Collectors;
 
 public class Main {
 
-    final ActorSystem actorSystem = ActorSystem.create();
-    final Materializer materializer = ActorMaterializer.create(actorSystem);
+    final ActorSystem&lt;Void&gt; system = ActorSystem.create(Behaviors.empty(), &quot;FtpToFile&quot;);
 
     private void run() throws UnknownHostException {
         final FileSystemMock ftpFileSystem = new FileSystemMock();
@@ -346,12 +344,12 @@ public class Main {
                                     final Path localPath = targetDir.resolve(&quot;.&quot; + ftpFile.path());
                                     final CompletionStage&lt;IOResult&gt; fetchFile =
                                             Ftp.fromPath(ftpFile.path(), ftpSettings)
-                                                    .runWith(FileIO.toPath(localPath), materializer); // (4)
+                                                    .runWith(FileIO.toPath(localPath), system); // (4)
                                     return fetchFile.thenApply(
                                             ioResult -&gt; // (5)
                                                     Pair.create(ftpFile.path(), ioResult));
                                 }) // : (String, IOResult)
-                        .runWith(Sink.seq(), materializer); // (6)
+                        .runWith(Sink.seq(), system); // (6)
         // #sample
 
         fetchedFiles
@@ -372,8 +370,8 @@ public class Main {
                                 System.out.println(&quot;the stream failed&quot;);
                             }
 
-                            actorSystem.terminate();
-                            actorSystem.getWhenTerminated().thenAccept(t -&gt; ftpServer.stop());
+                            system.terminate();
+                            system.getWhenTerminated().thenAccept(t -&gt; ftpServer.stop());
                         });
     }
 
@@ -388,7 +386,8 @@ public class Main {
 import java.net.InetAddress
 import java.nio.file.Paths
 
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
 // #imports
 import akka.stream.alpakka.ftp.FtpSettings
 import akka.stream.alpakka.ftp.scaladsl.Ftp
@@ -405,14 +404,13 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 object Main extends App {
-  implicit val actorSystem: ActorSystem = ActorSystem()
-  implicit val actorMaterializer: Materializer = ActorMaterializer()
-  implicit val executionContext: ExecutionContext = actorSystem.dispatcher
+  implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, &quot;FtpToFile&quot;)
+  implicit val executionContext: ExecutionContext = system.executionContext
 
-  def wait(duration: FiniteDuration): Unit = Thread.sleep(duration.toMillis)
-
-  def terminateActorSystem(): Unit =
-    Await.result(actorSystem.terminate(), 1.seconds)
+  def terminateActorSystem(): Unit = {
+    system.terminate()
+    Await.result(system.whenTerminated, 1.seconds)
+  }
 
   val ftpFileSystem = new FileSystemMock()
 
@@ -460,7 +458,8 @@ object Main extends App {
         case Failure(exception) =&gt;
           println(&quot;the stream failed&quot;)
       }
-      actorSystem.terminate().onComplete { _ =&gt;
+      system.terminate()
+      system.whenTerminated.onComplete { _ =&gt;
         ftpServer.stop()
       }
     }

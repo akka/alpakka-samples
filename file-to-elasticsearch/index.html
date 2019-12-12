@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Tail files added to a directory and publish to Elasticsearch</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-19 15:06:00
+Version 2019-12-12 14:25:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -260,7 +260,7 @@ Version 2019-11-19 15:06:00
 <h1><a href="index.html">Tail files added to a directory and publish to Elasticsearch</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-19 15:06:00
+Version 2019-12-12 14:25:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -310,10 +310,13 @@ Version 2019-11-19 15:06:00
   <dt>Dependencies (sbt notation)
   </dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-file-to-elasticsearch/project/Dependencies.scala#L6-L20" target="_blank" title="Go to snippet source"></a><code class="language-scala">val AkkaVersion = &quot;2.5.25&quot;
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-file-to-elasticsearch/project/Dependencies.scala#L6-L23" target="_blank" title="Go to snippet source"></a><code class="language-scala">val AkkaVersion = &quot;2.6.1&quot;
 val AlpakkaVersion = &quot;1.1.1&quot;
   &quot;com.lightbend.akka&quot; %% &quot;akka-stream-alpakka-file&quot; % AlpakkaVersion,
   &quot;com.lightbend.akka&quot; %% &quot;akka-stream-alpakka-elasticsearch&quot; % AlpakkaVersion,
+  &quot;com.typesafe.akka&quot; %% &quot;akka-stream&quot; % AkkaVersion,
+  &quot;com.typesafe.akka&quot; %% &quot;akka-actor-typed&quot; % AkkaVersion,
+  &quot;com.typesafe.akka&quot; %% &quot;akka-actor&quot; % AkkaVersion,
   // for JSON in Scala
   &quot;io.spray&quot; %% &quot;spray-json&quot; % &quot;1.3.5&quot;,
   // for JSON in Java
@@ -398,7 +401,7 @@ object JsonFormats {
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-file-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L57-L67" target="_blank" title="Go to snippet source"></a><code class="language-java"><br/>private final static String testDataPath = &quot;./test-data&quot;;
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-file-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L55-L65" target="_blank" title="Go to snippet source"></a><code class="language-java"><br/>private final static String testDataPath = &quot;./test-data&quot;;
 private final static String inputLogsPath = testDataPath + &quot;/input&quot;; // watch directory (4)
 
 private Source&lt;Pair&lt;Path, DirectoryChange&gt;, NotUsed&gt; directoryChangesSource() {
@@ -422,7 +425,7 @@ val directoryChangesSource: Source[(Path, DirectoryChange), NotUsed] =
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-file-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L71-L111" target="_blank" title="Go to snippet source"></a><code class="language-java"><br/>private Flow&lt;Pair&lt;Path, DirectoryChange&gt;, Source&lt;LogLine, NotUsed&gt;, NotUsed&gt; tailNewLogs() {
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-file-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L69-L109" target="_blank" title="Go to snippet source"></a><code class="language-java"><br/>private Flow&lt;Pair&lt;Path, DirectoryChange&gt;, Source&lt;LogLine, NotUsed&gt;, NotUsed&gt; tailNewLogs() {
     return Flow.&lt;Pair&lt;Path, DirectoryChange&gt;&gt;create()
             // only watch for file creation events (5)
             .filter(pair -&gt; pair.second() == DirectoryChange.Creation)
@@ -507,7 +510,7 @@ def fileTailSource(path: Path): Source[LogLine, NotUsed] = {
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-file-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L115-L138" target="_blank" title="Go to snippet source"></a><code class="language-java"><br/>private Flow&lt;LogLine, LogLine, NotUsed&gt; elasticsearchIndexFlow() {
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-file-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L113-L136" target="_blank" title="Go to snippet source"></a><code class="language-java"><br/>private Flow&lt;LogLine, LogLine, NotUsed&gt; elasticsearchIndexFlow() {
     return Flow.&lt;LogLine&gt;create()
             // create an ES index wrapper message for `LogLine` (11)
             .map(WriteMessage::createIndexMessage)
@@ -551,7 +554,7 @@ def fileTailSource(path: Path): Source[LogLine, NotUsed] = {
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-file-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L142-L160" target="_blank" title="Go to snippet source"></a><code class="language-java"><br/>private Flow&lt;LogLine, HashMap&lt;Pair&lt;String, String&gt;, LogFileSummary&gt;, NotUsed&gt; summarizeLogStatsFlow() {
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-file-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L140-L158" target="_blank" title="Go to snippet source"></a><code class="language-java"><br/>private Flow&lt;LogLine, HashMap&lt;Pair&lt;String, String&gt;, LogFileSummary&gt;, NotUsed&gt; summarizeLogStatsFlow() {
     return Flow.&lt;LogLine&gt;create()
             // track statistics per log file (13)
             .scan(new HashMap&lt;&gt;(), (summaries, logLine) -&gt; {
@@ -589,7 +592,7 @@ def fileTailSource(path: Path): Source[LogLine, NotUsed] = {
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-file-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L164-L181" target="_blank" title="Go to snippet source"></a><code class="language-java"><br/>private CompletionStage&lt;List&lt;LogLine&gt;&gt; queryAllRecordsFromElasticsearch(RestClient elasticsearchClient, String indexName, Materializer materializer) {
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-file-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L162-L179" target="_blank" title="Go to snippet source"></a><code class="language-java"><br/>private CompletionStage&lt;List&lt;LogLine&gt;&gt; queryAllRecordsFromElasticsearch(RestClient elasticsearchClient, String indexName, ActorSystem system) {
     CompletionStage&lt;List&lt;LogLine&gt;&gt; reading =
             // use Alpakka Elasticsearch to return all entries from the provided index (14)
             ElasticsearchSource
@@ -601,7 +604,7 @@ def fileTailSource(path: Path): Source[LogLine, NotUsed] = {
                         elasticsearchClient,
                         LogLine.class)
                     .map(ReadResult::source)
-                    .runWith(Sink.seq(), materializer);
+                    .runWith(Sink.seq(), system);
     reading.thenAccept(non -&gt; log.info(&quot;Reading finished&quot;));
     return reading;
 }
@@ -614,7 +617,7 @@ def fileTailSource(path: Path): Source[LogLine, NotUsed] = {
     .typed[LogLine](indexName, &quot;_doc&quot;, &quot;&quot;&quot;{&quot;match_all&quot;: {}}&quot;&quot;&quot;)
     .map(_.source)
     .runWith(Sink.seq)
-  reading.foreach(_ =&gt; log.info(&quot;Reading finished&quot;))(actorSystem.dispatcher)
+  reading.foreach(_ =&gt; log.info(&quot;Reading finished&quot;))
   reading
 }
 </code></pre></dd>
@@ -623,7 +626,7 @@ def fileTailSource(path: Path): Source[LogLine, NotUsed] = {
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-file-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L204-L220" target="_blank" title="Go to snippet source"></a><code class="language-java"><br/>// compose stream together starting with the `DirectoryChangesSource` (15)
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-file-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L201-L217" target="_blank" title="Go to snippet source"></a><code class="language-java"><br/>// compose stream together starting with the `DirectoryChangesSource` (15)
 RunnableGraph&lt;Pair&lt;UniqueKillSwitch, CompletionStage&lt;HashMap&lt;Pair&lt;String, String&gt;, LogFileSummary&gt;&gt;&gt;&gt; graph = directoryChangesSource()
         // create `FileTailSource` sub-streams
         .via(tailNewLogs())
@@ -662,14 +665,14 @@ val graph: RunnableGraph[(UniqueKillSwitch, Future[LogFileSummaries])] = directo
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-file-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L224-L249" target="_blank" title="Go to snippet source"></a><code class="language-java"><br/>RunOps.deleteAllFilesFrom(inputLogsPath, materializer).toCompletableFuture().get(10, TimeUnit.SECONDS);
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-file-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L221-L246" target="_blank" title="Go to snippet source"></a><code class="language-java"><br/>RunOps.deleteAllFilesFrom(inputLogsPath, system).toCompletableFuture().get(10, TimeUnit.SECONDS);
 
 // run the graph and capture the materialized values (16)
-Pair&lt;UniqueKillSwitch, CompletionStage&lt;HashMap&lt;Pair&lt;String, String&gt;, LogFileSummary&gt;&gt;&gt; running = graph.run(materializer);
+Pair&lt;UniqueKillSwitch, CompletionStage&lt;HashMap&lt;Pair&lt;String, String&gt;, LogFileSummary&gt;&gt;&gt; running = graph.run(system);
 UniqueKillSwitch control = running.first();
 CompletionStage&lt;HashMap&lt;Pair&lt;String, String&gt;, LogFileSummary&gt;&gt; stream = running.second();
 
-RunOps.copyTestDataTo(testDataPath, inputLogsPath, materializer).toCompletableFuture().get(10, TimeUnit.SECONDS);
+RunOps.copyTestDataTo(testDataPath, inputLogsPath, system).toCompletableFuture().get(10, TimeUnit.SECONDS);
 
 log.info(&quot;Running index stream for &quot;, streamRuntime.toString());
 Thread.sleep(streamRuntime.toMillis());
@@ -679,13 +682,13 @@ log.info(&quot;Wait for index stream to shutdown&quot;);
 Map&lt;Pair&lt;String, String&gt;, LogFileSummary&gt; summaries = stream.toCompletableFuture().get(10, TimeUnit.SECONDS);
 
 // run a new graph to query all records from Elasticsearch and get the results (17)
-List&lt;LogLine&gt; results = queryAllRecordsFromElasticsearch(elasticsearchClient, indexName, materializer).toCompletableFuture().get(10, TimeUnit.SECONDS);
+List&lt;LogLine&gt; results = queryAllRecordsFromElasticsearch(elasticsearchClient, indexName, system).toCompletableFuture().get(10, TimeUnit.SECONDS);
 
 printResults(results, summaries);
 
-RunOps.deleteAllFilesFrom(inputLogsPath, materializer).toCompletableFuture().get(10, TimeUnit.SECONDS);
+RunOps.deleteAllFilesFrom(inputLogsPath, system).toCompletableFuture().get(10, TimeUnit.SECONDS);
 
-return RunOps.shutdown(actorSystem, elasticsearchClient);
+return RunOps.shutdown(system, elasticsearchClient);
 </code></pre></dd>
   <dt>Scala</dt>
   <dd>

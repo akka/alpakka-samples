@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Tail files added to a directory and publish to Elasticsearch</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-19 15:06:00
+Version 2019-12-12 14:25:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -266,7 +266,7 @@ Version 2019-11-19 15:06:00
 <h1><a href="index.html">Tail files added to a directory and publish to Elasticsearch</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-19 15:06:00
+Version 2019-12-12 14:25:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -305,13 +305,12 @@ Version 2019-11-19 15:06:00
   <dd>
   <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-file-to-elasticsearch/src/main/java/samples/javadsl/Main.java" target="_blank" title="Go to snippet source"></a><code class="language-java">package samples.javadsl;
 
+import akka.Done;
 import akka.NotUsed;
-import akka.actor.ActorSystem;
-import akka.actor.Terminated;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.Behaviors;
 import akka.japi.Pair;
-import akka.stream.ActorMaterializer;
 import akka.stream.KillSwitches;
-import akka.stream.Materializer;
 import akka.stream.UniqueKillSwitch;
 import akka.stream.alpakka.elasticsearch.ElasticsearchSourceSettings;
 import akka.stream.alpakka.elasticsearch.ElasticsearchWriteSettings;
@@ -342,8 +341,7 @@ public class Main {
 
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-    private ActorSystem actorSystem;
-    private Materializer materializer;
+    private ActorSystem system;
     private RestClient elasticsearchClient;
 
     private final String elasticsearchAddress;
@@ -467,7 +465,7 @@ public class Main {
 
     // #query-elasticsearch
 
-    private CompletionStage&lt;List&lt;LogLine&gt;&gt; queryAllRecordsFromElasticsearch(RestClient elasticsearchClient, String indexName, Materializer materializer) {
+    private CompletionStage&lt;List&lt;LogLine&gt;&gt; queryAllRecordsFromElasticsearch(RestClient elasticsearchClient, String indexName, ActorSystem system) {
         CompletionStage&lt;List&lt;LogLine&gt;&gt; reading =
                 // use Alpakka Elasticsearch to return all entries from the provided index (14)
                 ElasticsearchSource
@@ -479,7 +477,7 @@ public class Main {
                             elasticsearchClient,
                             LogLine.class)
                         .map(ReadResult::source)
-                        .runWith(Sink.seq(), materializer);
+                        .runWith(Sink.seq(), system);
         reading.thenAccept(non -&gt; log.info(&quot;Reading finished&quot;));
         return reading;
     }
@@ -500,9 +498,8 @@ public class Main {
         log.info(&quot;LogFileSummaries:\n{}\n{}&quot;, header, summariesStr);
     }
 
-    private CompletionStage&lt;Terminated&gt; run() throws Exception {
-        this.actorSystem = ActorSystem.create();
-        this.materializer = ActorMaterializer.create(actorSystem);
+    private CompletionStage&lt;Done&gt; run() throws Exception {
+        this.system = ActorSystem.create(Behaviors.empty(), &quot;FileToElasticSearch&quot;);
         this.elasticsearchClient = RestClient.builder(HttpHost.create(this.elasticsearchAddress)).build();
 
         // #stream-composing
@@ -527,14 +524,14 @@ public class Main {
 
         // #running-the-app
 
-        RunOps.deleteAllFilesFrom(inputLogsPath, materializer).toCompletableFuture().get(10, TimeUnit.SECONDS);
+        RunOps.deleteAllFilesFrom(inputLogsPath, system).toCompletableFuture().get(10, TimeUnit.SECONDS);
 
         // run the graph and capture the materialized values (16)
-        Pair&lt;UniqueKillSwitch, CompletionStage&lt;HashMap&lt;Pair&lt;String, String&gt;, LogFileSummary&gt;&gt;&gt; running = graph.run(materializer);
+        Pair&lt;UniqueKillSwitch, CompletionStage&lt;HashMap&lt;Pair&lt;String, String&gt;, LogFileSummary&gt;&gt;&gt; running = graph.run(system);
         UniqueKillSwitch control = running.first();
         CompletionStage&lt;HashMap&lt;Pair&lt;String, String&gt;, LogFileSummary&gt;&gt; stream = running.second();
 
-        RunOps.copyTestDataTo(testDataPath, inputLogsPath, materializer).toCompletableFuture().get(10, TimeUnit.SECONDS);
+        RunOps.copyTestDataTo(testDataPath, inputLogsPath, system).toCompletableFuture().get(10, TimeUnit.SECONDS);
 
         log.info(&quot;Running index stream for &quot;, streamRuntime.toString());
         Thread.sleep(streamRuntime.toMillis());
@@ -544,20 +541,20 @@ public class Main {
         Map&lt;Pair&lt;String, String&gt;, LogFileSummary&gt; summaries = stream.toCompletableFuture().get(10, TimeUnit.SECONDS);
 
         // run a new graph to query all records from Elasticsearch and get the results (17)
-        List&lt;LogLine&gt; results = queryAllRecordsFromElasticsearch(elasticsearchClient, indexName, materializer).toCompletableFuture().get(10, TimeUnit.SECONDS);
+        List&lt;LogLine&gt; results = queryAllRecordsFromElasticsearch(elasticsearchClient, indexName, system).toCompletableFuture().get(10, TimeUnit.SECONDS);
 
         printResults(results, summaries);
 
-        RunOps.deleteAllFilesFrom(inputLogsPath, materializer).toCompletableFuture().get(10, TimeUnit.SECONDS);
+        RunOps.deleteAllFilesFrom(inputLogsPath, system).toCompletableFuture().get(10, TimeUnit.SECONDS);
 
-        return RunOps.shutdown(actorSystem, elasticsearchClient);
+        return RunOps.shutdown(system, elasticsearchClient);
 
         // #running-the-app
     }
 
     public static void main(String[] args) throws Exception {
         Main main = new Main();
-        CompletionStage&lt;Terminated&gt; run = main.run();
+        CompletionStage&lt;Done&gt; run = main.run();
 
         run.toCompletableFuture().get(10, TimeUnit.SECONDS);
     }
@@ -573,13 +570,14 @@ package samples.scaladsl
 import java.nio.file._
 
 import akka.NotUsed
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.alpakka.elasticsearch.WriteMessage
 import akka.stream.alpakka.elasticsearch.scaladsl.{ElasticsearchFlow, ElasticsearchSource}
 import akka.stream.alpakka.file.DirectoryChange
 import akka.stream.alpakka.file.scaladsl.{DirectoryChangesSource, FileTailSource}
 import akka.stream.scaladsl.{Flow, Keep, RunnableGraph, Sink, Source}
-import akka.stream.{ActorMaterializer, KillSwitches, Materializer, UniqueKillSwitch}
+import akka.stream.{KillSwitches, Materializer, UniqueKillSwitch}
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import samples.common.DateTimeExtractor
@@ -594,9 +592,8 @@ object Main extends App {
   import RunOps._
   import JsonFormats._
 
-  implicit val actorSystem: ActorSystem = ActorSystem()
-  implicit val actorMaterializer: Materializer = ActorMaterializer()
-  implicit val executionContext: ExecutionContext = actorSystem.dispatcher
+  implicit val actorSystem: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, &quot;FileToElasticSearch&quot;)
+  implicit val executionContext: ExecutionContext = actorSystem.executionContext
 
   val streamRuntime = 10.seconds
   val streamParallelism = 47
@@ -706,7 +703,7 @@ object Main extends App {
       .typed[LogLine](indexName, &quot;_doc&quot;, &quot;&quot;&quot;{&quot;match_all&quot;: {}}&quot;&quot;&quot;)
       .map(_.source)
       .runWith(Sink.seq)
-    reading.foreach(_ =&gt; log.info(&quot;Reading finished&quot;))(actorSystem.dispatcher)
+    reading.foreach(_ =&gt; log.info(&quot;Reading finished&quot;))
     reading
   }
 
@@ -896,7 +893,8 @@ final case class LogFileSummary(directory: String, filename: String, firstSeen: 
 import java.nio.file.Path
 import java.util.concurrent.CompletionStage
 
-import akka.actor.{ActorSystem, Terminated}
+import akka.Done
+import akka.actor.typed.ActorSystem
 import akka.stream.Materializer
 import org.elasticsearch.client.RestClient
 import samples.scaladsl
@@ -914,15 +912,15 @@ object RunOps {
     scaladsl.RunOps.listFiles(path).toJava
   }
 
-  def copyTestDataTo(source: String, destination: String)(implicit mat: Materializer): CompletionStage[Unit] = {
+  def copyTestDataTo(source: String, destination: String)(implicit system: ActorSystem[_]): CompletionStage[Unit] = {
     scaladsl.RunOps.copyTestDataTo(source, destination).toJava
   }
 
-  def deleteAllFilesFrom(path: String)(implicit mat: Materializer): CompletionStage[Unit] = {
+  def deleteAllFilesFrom(path: String)(implicit system: ActorSystem[_]): CompletionStage[Unit] = {
     scaladsl.RunOps.deleteAllFilesFrom(path).toJava
   }
 
-  def shutdown(actorSystem: ActorSystem)(implicit esClient: RestClient): CompletionStage[Terminated] = {
+  def shutdown(actorSystem: ActorSystem[_])(implicit esClient: RestClient): CompletionStage[Done] = {
     scaladsl.RunOps.shutdown(actorSystem).toJava
   }
 }</code></pre></dd>
@@ -932,7 +930,8 @@ object RunOps {
 import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 import java.time.ZonedDateTime
 
-import akka.actor.{ActorSystem, Terminated}
+import akka.Done
+import akka.actor.typed.ActorSystem
 import akka.stream.Materializer
 import akka.stream.alpakka.file.scaladsl.Directory
 import akka.stream.scaladsl.{Keep, Sink}
@@ -981,11 +980,12 @@ object RunOps {
     }
   }
 
-  def shutdown(actorSystem: ActorSystem)(implicit esClient: RestClient): Future[Terminated] = {
+  def shutdown(system: ActorSystem[_])(implicit esClient: RestClient): Future[Done] = {
     log.info(s&quot;Stop containers&quot;)
     stopContainers()
     log.info(s&quot;Kill actor system&quot;)
-    actorSystem.terminate()
+    system.terminate()
+    system.whenTerminated
   }
 }</code></pre></dd>
 </dl>

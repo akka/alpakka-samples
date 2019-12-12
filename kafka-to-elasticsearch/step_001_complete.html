@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-19 15:06:00
+Version 2019-12-12 14:25:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -265,7 +265,7 @@ Version 2019-11-19 15:06:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-19 15:06:00
+Version 2019-12-12 14:25:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -364,7 +364,7 @@ object JsonFormats {
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L75-L103" target="_blank" title="Go to snippet source"></a><code class="language-java">Consumer.DrainingControl&lt;Done&gt; control =
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L76-L104" target="_blank" title="Go to snippet source"></a><code class="language-java">Consumer.DrainingControl&lt;Done&gt; control =
         Consumer.sourceWithOffsetContext(kafkaConsumerSettings, Subscriptions.topics(topic)) // (5)
                 .map(
                         consumerRecord -&gt; { // (6)
@@ -390,12 +390,12 @@ object JsonFormats {
                                             });
                             return NotUsed.notUsed();
                         })
-                .toMat(Committer.sinkWithOffsetContext(CommitterSettings.create(actorSystem)), Keep.both()) // (9)
+                .toMat(Committer.sinkWithOffsetContext(CommitterSettings.create(toClassic(actorSystem))), Keep.both()) // (9)
                 .mapMaterializedValue(Consumer::createDrainingControl) // (10)
                 .run(actorSystem);</code></pre></dd>
   <dt>Scala</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/scala/samples/scaladsl/Main.scala#L56-L71" target="_blank" title="Go to snippet source"></a><code class="language-scala">val control: Consumer.DrainingControl[Done] = Consumer
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/scala/samples/scaladsl/Main.scala#L58-L73" target="_blank" title="Go to snippet source"></a><code class="language-scala">val control: Consumer.DrainingControl[Done] = Consumer
   .sourceWithOffsetContext(kafkaConsumerSettings, Subscriptions.topics(topic)) // (5)
   .map { consumerRecord =&gt; // (6)
     val movie = consumerRecord.value().parseJson.convertTo[Movie]
@@ -408,7 +408,7 @@ object JsonFormats {
     }
     NotUsed
   }
-  .toMat(Committer.sinkWithOffsetContext(CommitterSettings(actorSystem)))(Keep.both) // (9)
+  .toMat(Committer.sinkWithOffsetContext(CommitterSettings(actorSystem.toClassic)))(Keep.both) // (9)
   .mapMaterializedValue(Consumer.DrainingControl.apply) // (10)
   .run()</code></pre></dd>
 </dl>
@@ -416,17 +416,17 @@ object JsonFormats {
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L65-L71" target="_blank" title="Go to snippet source"></a><code class="language-java">// configure Kafka consumer (1)
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L66-L72" target="_blank" title="Go to snippet source"></a><code class="language-java">// configure Kafka consumer (1)
 ConsumerSettings&lt;Integer, String&gt; kafkaConsumerSettings =
-        ConsumerSettings.create(actorSystem, new IntegerDeserializer(), new StringDeserializer())
+        ConsumerSettings.create(toClassic(actorSystem), new IntegerDeserializer(), new StringDeserializer())
                 .withBootstrapServers(kafkaBootstrapServers)
                 .withGroupId(groupId)
                 .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, &quot;earliest&quot;)
                 .withStopTimeout(Duration.ofSeconds(5));</code></pre></dd>
   <dt>Scala</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/scala/samples/scaladsl/Main.scala#L46-L51" target="_blank" title="Go to snippet source"></a><code class="language-scala">// configure Kafka consumer (1)
-val kafkaConsumerSettings = ConsumerSettings(actorSystem, new IntegerDeserializer, new StringDeserializer)
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/scala/samples/scaladsl/Main.scala#L48-L53" target="_blank" title="Go to snippet source"></a><code class="language-scala">// configure Kafka consumer (1)
+val kafkaConsumerSettings = ConsumerSettings(actorSystem.toClassic, new IntegerDeserializer, new StringDeserializer)
   .withBootstrapServers(kafkaBootstrapServers)
   .withGroupId(groupId)
   .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, &quot;earliest&quot;)
@@ -436,13 +436,13 @@ val kafkaConsumerSettings = ConsumerSettings(actorSystem, new IntegerDeserialize
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L50-L112" target="_blank" title="Go to snippet source"></a><code class="language-java">private final String indexName = &quot;movies&quot;;
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/java/samples/javadsl/Main.java#L51-L113" target="_blank" title="Go to snippet source"></a><code class="language-java">private final String indexName = &quot;movies&quot;;
 
     // Elasticsearch client setup (4)
     elasticsearchClient = RestClient.builder(HttpHost.create(elasticsearchAddress)).build();</code></pre></dd>
   <dt>Scala</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/scala/samples/scaladsl/Main.scala#L36-L42" target="_blank" title="Go to snippet source"></a><code class="language-scala">// Elasticsearch client setup (4)
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-kafka-to-elasticsearch/src/main/scala/samples/scaladsl/Main.scala#L38-L44" target="_blank" title="Go to snippet source"></a><code class="language-scala">// Elasticsearch client setup (4)
 implicit val elasticsearchClient: RestClient =
   RestClient
     .builder(HttpHost.create(elasticsearchAddress))

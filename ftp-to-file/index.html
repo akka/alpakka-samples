@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-19 15:06:00
+Version 2019-12-12 14:25:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -258,7 +258,7 @@ Version 2019-11-19 15:06:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-19 15:06:00
+Version 2019-12-12 14:25:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -291,23 +291,26 @@ Version 2019-11-19 15:06:00
   <dt>Dependencies (sbt notation)
   </dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-ftp-to-file/project/Dependencies.scala#L6-L14" target="_blank" title="Go to snippet source"></a><code class="language-scala">val AkkaVersion = &quot;2.5.25&quot;
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-ftp-to-file/project/Dependencies.scala#L6-L17" target="_blank" title="Go to snippet source"></a><code class="language-scala">val AkkaVersion = &quot;2.6.1&quot;
 val AlpakkaVersion = &quot;1.1.1&quot;
 
   &quot;com.typesafe.akka&quot; %% &quot;akka-stream&quot; % AkkaVersion,
-  &quot;com.lightbend.akka&quot; %% &quot;akka-stream-alpakka-ftp&quot; % AlpakkaVersion,</code></pre></dd>
+  &quot;com.lightbend.akka&quot; %% &quot;akka-stream-alpakka-ftp&quot; % AlpakkaVersion,
+  &quot;com.typesafe.akka&quot; %% &quot;akka-stream&quot; % AkkaVersion,
+  &quot;com.typesafe.akka&quot; %% &quot;akka-actor-typed&quot; % AkkaVersion,
+  &quot;com.typesafe.akka&quot; %% &quot;akka-actor&quot; % AkkaVersion,</code></pre></dd>
 </dl>
 <h3><a href="#imports" name="imports" class="anchor"><span class="anchor-link"></span></a>Imports</h3>
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-ftp-to-file/src/main/java/samples/javadsl/Main.java#L9-L12" target="_blank" title="Go to snippet source"></a><code class="language-java">import akka.stream.alpakka.ftp.FtpSettings;
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-ftp-to-file/src/main/java/samples/javadsl/Main.java#L8-L11" target="_blank" title="Go to snippet source"></a><code class="language-java">import akka.stream.alpakka.ftp.FtpSettings;
 import akka.stream.alpakka.ftp.javadsl.Ftp;
 import akka.stream.javadsl.FileIO;
 import akka.stream.javadsl.Sink;</code></pre></dd>
   <dt>Scala</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-ftp-to-file/src/main/scala/samples/scaladsl/Main.scala#L8-L11" target="_blank" title="Go to snippet source"></a><code class="language-scala">import akka.stream.alpakka.ftp.FtpSettings
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-ftp-to-file/src/main/scala/samples/scaladsl/Main.scala#L9-L12" target="_blank" title="Go to snippet source"></a><code class="language-scala">import akka.stream.alpakka.ftp.FtpSettings
 import akka.stream.alpakka.ftp.scaladsl.Ftp
 import akka.stream.scaladsl.{FileIO, Sink}
 import akka.stream.{ActorMaterializer, IOResult, Materializer}</code></pre></dd>
@@ -324,7 +327,7 @@ import akka.stream.{ActorMaterializer, IOResult, Materializer}</code></pre></dd>
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-ftp-to-file/src/main/java/samples/javadsl/Main.java#L44-L66" target="_blank" title="Go to snippet source"></a><code class="language-java">final FtpSettings ftpSettings =
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-ftp-to-file/src/main/java/samples/javadsl/Main.java#L42-L64" target="_blank" title="Go to snippet source"></a><code class="language-java">final FtpSettings ftpSettings =
         FtpSettings.create(InetAddress.getByName(&quot;localhost&quot;)).withPort(port);
 final int parallelism = 5;
 
@@ -337,12 +340,12 @@ final CompletionStage&lt;List&lt;Pair&lt;String, IOResult&gt;&gt;&gt; fetchedFil
                             final Path localPath = targetDir.resolve(&quot;.&quot; + ftpFile.path());
                             final CompletionStage&lt;IOResult&gt; fetchFile =
                                     Ftp.fromPath(ftpFile.path(), ftpSettings)
-                                            .runWith(FileIO.toPath(localPath), materializer); // (4)
+                                            .runWith(FileIO.toPath(localPath), system); // (4)
                             return fetchFile.thenApply(
                                     ioResult -&gt; // (5)
                                             Pair.create(ftpFile.path(), ioResult));
                         }) // : (String, IOResult)
-                .runWith(Sink.seq(), materializer); // (6)</code></pre></dd>
+                .runWith(Sink.seq(), system); // (6)</code></pre></dd>
   <dt>Scala</dt>
   <dd>
   <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-ftp-to-file/src/main/scala/samples/scaladsl/Main.scala#L42-L62" target="_blank" title="Go to snippet source"></a><code class="language-scala">val ftpSettings = FtpSettings(InetAddress.getByName(&quot;localhost&quot;)).withPort(port)

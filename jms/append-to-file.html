@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-19 15:06:00
+Version 2019-12-12 14:25:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -261,7 +261,7 @@ Version 2019-11-19 15:06:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-19 15:06:00
+Version 2019-12-12 14:25:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -296,8 +296,9 @@ Version 2019-11-19 15:06:00
 <dl>
   <dt>Scala</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jms/src/main/scala/samples/scaladsl/JmsToFile.scala#L8-L44" target="_blank" title="Go to snippet source"></a><code class="language-scala">import java.nio.file.Paths
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jms/src/main/scala/samples/scaladsl/JmsToFile.scala#L8-L45" target="_blank" title="Go to snippet source"></a><code class="language-scala">import java.nio.file.Paths
 
+import akka.actor.typed.scaladsl.adapter._
 import akka.stream.IOResult
 import akka.stream.alpakka.jms.JmsConsumerSettings
 import akka.stream.alpakka.jms.scaladsl.{JmsConsumer, JmsConsumerControl}
@@ -309,7 +310,7 @@ import scala.concurrent.duration.DurationInt
 
 val jmsSource: Source[String, JmsConsumerControl] =        // (1)
   JmsConsumer.textSource(
-    JmsConsumerSettings(actorSystem, connectionFactory).withBufferSize(10).withQueue(&quot;test&quot;)
+    JmsConsumerSettings(system.toClassic, connectionFactory).withBufferSize(10).withQueue(&quot;test&quot;)
   )
 
 val fileSink: Sink[ByteString, Future[IOResult]] = // (2)
@@ -323,7 +324,9 @@ val (runningSource, finished): (JmsConsumerControl, Future[IOResult]) =
     .run()</code></pre></dd>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jms/src/main/java/samples/javadsl/JmsToFile.java#L8-L70" target="_blank" title="Go to snippet source"></a><code class="language-java"><br/>import akka.actor.ActorSystem;
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jms/src/main/java/samples/javadsl/JmsToFile.java#L8-L72" target="_blank" title="Go to snippet source"></a><code class="language-java"><br/>import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.Behaviors;
+import static akka.actor.typed.javadsl.Adapter.*;
 import akka.japi.Pair;
 import akka.stream.IOResult;
 import akka.stream.alpakka.jms.JmsConsumerSettings;
@@ -346,7 +349,7 @@ import java.util.concurrent.CompletionStage;
 
 Source&lt;String, JmsConsumerControl&gt; jmsSource = // (1)
     JmsConsumer.textSource(
-        JmsConsumerSettings.create(system, connectionFactory).withQueue(&quot;test&quot;));
+        JmsConsumerSettings.create(toClassic(system), connectionFactory).withQueue(&quot;test&quot;));
 
 Sink&lt;ByteString, CompletionStage&lt;IOResult&gt;&gt; fileSink =
     FileIO.toPath(Paths.get(&quot;target/out.txt&quot;)); // (2)

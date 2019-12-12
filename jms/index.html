@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-19 15:06:00
+Version 2019-12-12 14:25:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -261,7 +261,7 @@ Version 2019-11-19 15:06:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-11-19 15:06:00
+Version 2019-12-12 14:25:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -297,13 +297,15 @@ Version 2019-11-19 15:06:00
   <dt>Dependencies (sbt notation)
   </dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jms/project/Dependencies.scala#L6-L21" target="_blank" title="Go to snippet source"></a><code class="language-scala">val AkkaVersion = &quot;2.6.0&quot;
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jms/project/Dependencies.scala#L6-L23" target="_blank" title="Go to snippet source"></a><code class="language-scala">val AkkaVersion = &quot;2.6.1&quot;
 val AkkaHttpVersion = &quot;10.1.10&quot;
 val AlpakkaVersion = &quot;1.1.0&quot;
 
   &quot;com.lightbend.akka&quot; %% &quot;akka-stream-alpakka-jms&quot; % AlpakkaVersion,
   &quot;com.typesafe.akka&quot; %% &quot;akka-http&quot;   % AkkaHttpVersion,
   &quot;com.typesafe.akka&quot; %% &quot;akka-stream&quot; % AkkaVersion,
+  &quot;com.typesafe.akka&quot; %% &quot;akka-actor-typed&quot; % AkkaVersion,
+  &quot;com.typesafe.akka&quot; %% &quot;akka-actor&quot; % AkkaVersion,
   // https://github.com/javaee/javax.jms
   &quot;javax.jms&quot; % &quot;jms&quot; % &quot;1.1&quot;, // CDDL Version 1.1
   // Logging
