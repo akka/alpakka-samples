@@ -101,6 +101,25 @@ KafkaToElasticsearch / paradoxProperties ++= Map(
 )
 KafkaToElasticsearch / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
 
+val MqttToKafka = config("mqtt-to-kafka")
+ParadoxPlugin.paradoxSettings(MqttToKafka)
+ParadoxSitePlugin.paradoxSettings(MqttToKafka)
+AkkaParadoxPlugin.akkaParadoxSettings(MqttToKafka)
+MqttToKafka / siteSubdirName := MqttToKafka.name
+MqttToKafka / paradox / sourceDirectory := baseDirectory.value / ".." / s"alpakka-sample-${MqttToKafka.name}" / "docs" / "src" / "main" / "paradox"
+MqttToKafka / paradoxProperties ++= Map(
+  "project.url" -> s"${homepage.value.get}/${MqttToKafka.name}",
+  "canonical.base_url" -> s"${homepage.value.get}/${MqttToKafka.name}",
+  "snip.build.base_dir" -> s"${baseDirectory.value}/../alpakka-sample-${MqttToKafka.name}",
+  "github.root.base_dir" -> s"${baseDirectory.value}/..",
+  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.MqttToKafka.AkkaVersion}",
+  "extref.alpakka-kafka.base_url" -> s"https://doc.akka.io/docs/alpakka-kafka/${Dependencies.MqttToKafka.AlpakkaKafkaVersion}/%s",
+  "extref.alpakka.base_url" -> s"https://doc.akka.io/docs/alpakka/${Dependencies.MqttToKafka.AlpakkaVersion}/%s",
+  "extref.akka.base_url" -> s"https://doc.akka.io/docs/akka/${Dependencies.MqttToKafka.AkkaVersion}/%s",
+)
+MqttToKafka / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
+
+
 val FileToElasticsearch = config("file-to-elasticsearch")
 ParadoxPlugin.paradoxSettings(FileToElasticsearch)
 ParadoxSitePlugin.paradoxSettings(FileToElasticsearch)
@@ -138,11 +157,15 @@ RotateLogsToFtp / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
 
 Paradox / siteSubdirName := ""
 paradoxProperties ++= Map(
+  "extref.akka.base_url" -> "https://doc.akka.io/docs/akka/current/",
+  "extref.alpakka.base_url" -> "https://doc.akka.io/docs/alpakka/current/",
+  "extref.alpakka-kafka.base_url" -> "https://doc.akka.io/docs/alpakka-kafka/current/",
   "extref.ftp-to-file.base_url" -> s"${(FtpToFile / siteSubdirName).value}/",
   "extref.http-csv-to-kafka.base_url" -> s"${(HttpCsvToKafka / siteSubdirName).value}/",
   "extref.jdbc-to-elasticsearch.base_url" -> s"${(JdbcToElasticsearch / siteSubdirName).value}/",
   "extref.jms.base_url" -> s"${(Jms / siteSubdirName).value}/",
   "extref.kafka-to-elasticsearch.base_url" -> s"${(KafkaToElasticsearch / siteSubdirName).value}/",
+  "extref.mqtt-to-kafka.base_url" -> s"${(MqttToKafka / siteSubdirName).value}/",
   "extref.file-to-elasticsearch.base_url" -> s"${(FileToElasticsearch / siteSubdirName).value}/",
   "extref.rotate-logs-to-ftp.base_url" -> s"${(RotateLogsToFtp / siteSubdirName).value}/",
 )

@@ -21,6 +21,9 @@ This example uses Alpakka File to watch for new files created in a directory and
 ### @extref:[Rotate logs, zip and write to SFTP server](rotate-logs-to-ftp:index.html)
 Read a stream of data and store it zipped in rotating files on an SFTP server.
 
+### @extref:[Subscribe to MQTT and produce to Kafka](mqtt-to-kafka:index.html)
+Subscribe to an MQTT topic with @extref[Alpakka MQTT](alpakka:/mqtt.html), group a few values and publish the aggregate to a Kafka topic with @extref[Alpakka Kafka](alpakka-kafka:).
+
 ### @link:[Amazon SQS](https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-sqs-java) { open=new }
 Listen to an Amazon SQS topic, enrich the message via calling an actor, publish a new message to SQS and acknowledge/delete the original message. (Java only)
 
