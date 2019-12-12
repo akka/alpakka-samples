@@ -1,9 +1,8 @@
 package alpakka.sample.sqssample;
 
 import akka.Done;
-import akka.actor.ActorSystem;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.Behaviors;
 import akka.stream.alpakka.sqs.SqsPublishSettings;
 import akka.stream.alpakka.sqs.javadsl.SqsPublishFlow;
 import akka.stream.javadsl.Sink;
@@ -24,8 +23,7 @@ public class PublishToSqs {
     final static Logger log = LoggerFactory.getLogger(PublishToSqs.class);
     final static String sourceQueueUrl = Main.sourceQueueUrl;
 
-    final ActorSystem system;
-    final Materializer materializer;
+    final ActorSystem<Void> system;
 
     public static void main(String[] args) throws Exception {
         PublishToSqs me = new PublishToSqs();
@@ -33,8 +31,7 @@ public class PublishToSqs {
     }
 
     public PublishToSqs() {
-        system = ActorSystem.create();
-        materializer = ActorMaterializer.create(system);
+        system = ActorSystem.create(Behaviors.empty(), "PublishToSqs");
     }
 
     void run() throws Exception {
@@ -47,7 +44,7 @@ public class PublishToSqs {
                         .endpointOverride(URI.create(sqsEndpoint))
                         .region(Region.EU_CENTRAL_1)
                         .build();
-        system.registerOnTermination(() -> sqsClient.close());
+        system.getWhenTerminated().thenAccept((notUsed) -> sqsClient.close());
 
         publishMessageToSourceTopic(sqsClient, "{\"id\":423,\"name\":\"Alpakka\"}")
                 .thenAccept(done -> system.terminate());
@@ -57,7 +54,7 @@ public class PublishToSqs {
         return Source.single(msgJson)
                 .map(s -> SendMessageRequest.builder().messageBody(s).build())
                 .via(SqsPublishFlow.create(sourceQueueUrl, SqsPublishSettings.create(), sqsClient))
-                .runWith(Sink.foreach(System.out::println), materializer);
+                .runWith(Sink.foreach(System.out::println), system);
     }
 
 }
