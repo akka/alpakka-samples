@@ -1,7 +1,9 @@
 package alpakka.sample.triggereddownload;
 
 import akka.Done;
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.Behaviors;
+import static akka.actor.typed.javadsl.Adapter.*;
 import akka.http.javadsl.Http;
 import akka.stream.alpakka.mqtt.MqttConnectionSettings;
 import akka.stream.alpakka.mqtt.MqttMessage;
@@ -20,7 +22,7 @@ import java.time.Instant;
 import java.util.concurrent.CompletionStage;
 
 public class PublishDataToMqtt {
-    final ActorSystem system;
+    final ActorSystem<Void> system;
     final Http http;
 
     public static void main(String[] args) throws Exception {
@@ -29,8 +31,8 @@ public class PublishDataToMqtt {
     }
 
     public PublishDataToMqtt() {
-        system = ActorSystem.create();
-        http = Http.get(system);
+        system = ActorSystem.create(Behaviors.empty(), "PublishDataToMqTT");
+        http = Http.get(toClassic(system));
     }
 
     final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());

@@ -1,12 +1,11 @@
 package samples.javadsl;
 
+import akka.Done;
 import akka.NotUsed;
-import akka.actor.ActorSystem;
-import akka.actor.Terminated;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.Behaviors;
 import akka.japi.Pair;
-import akka.stream.ActorMaterializer;
 import akka.stream.KillSwitches;
-import akka.stream.Materializer;
 import akka.stream.UniqueKillSwitch;
 import akka.stream.alpakka.elasticsearch.ElasticsearchSourceSettings;
 import akka.stream.alpakka.elasticsearch.ElasticsearchWriteSettings;
@@ -37,8 +36,7 @@ public class Main {
 
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-    private ActorSystem actorSystem;
-    private Materializer materializer;
+    private ActorSystem system;
     private RestClient elasticsearchClient;
 
     private final String elasticsearchAddress;
@@ -162,7 +160,7 @@ public class Main {
 
     // #query-elasticsearch
 
-    private CompletionStage<List<LogLine>> queryAllRecordsFromElasticsearch(RestClient elasticsearchClient, String indexName, Materializer materializer) {
+    private CompletionStage<List<LogLine>> queryAllRecordsFromElasticsearch(RestClient elasticsearchClient, String indexName, ActorSystem system) {
         CompletionStage<List<LogLine>> reading =
                 // use Alpakka Elasticsearch to return all entries from the provided index (14)
                 ElasticsearchSource
@@ -174,7 +172,7 @@ public class Main {
                             elasticsearchClient,
                             LogLine.class)
                         .map(ReadResult::source)
-                        .runWith(Sink.seq(), materializer);
+                        .runWith(Sink.seq(), system);
         reading.thenAccept(non -> log.info("Reading finished"));
         return reading;
     }
@@ -195,9 +193,8 @@ public class Main {
         log.info("LogFileSummaries:\n{}\n{}", header, summariesStr);
     }
 
-    private CompletionStage<Terminated> run() throws Exception {
-        this.actorSystem = ActorSystem.create();
-        this.materializer = ActorMaterializer.create(actorSystem);
+    private CompletionStage<Done> run() throws Exception {
+        this.system = ActorSystem.create(Behaviors.empty(), "FileToElasticSearch");
         this.elasticsearchClient = RestClient.builder(HttpHost.create(this.elasticsearchAddress)).build();
 
         // #stream-composing
@@ -222,14 +219,14 @@ public class Main {
 
         // #running-the-app
 
-        RunOps.deleteAllFilesFrom(inputLogsPath, materializer).toCompletableFuture().get(10, TimeUnit.SECONDS);
+        RunOps.deleteAllFilesFrom(inputLogsPath, system).toCompletableFuture().get(10, TimeUnit.SECONDS);
 
         // run the graph and capture the materialized values (16)
-        Pair<UniqueKillSwitch, CompletionStage<HashMap<Pair<String, String>, LogFileSummary>>> running = graph.run(materializer);
+        Pair<UniqueKillSwitch, CompletionStage<HashMap<Pair<String, String>, LogFileSummary>>> running = graph.run(system);
         UniqueKillSwitch control = running.first();
         CompletionStage<HashMap<Pair<String, String>, LogFileSummary>> stream = running.second();
 
-        RunOps.copyTestDataTo(testDataPath, inputLogsPath, materializer).toCompletableFuture().get(10, TimeUnit.SECONDS);
+        RunOps.copyTestDataTo(testDataPath, inputLogsPath, system).toCompletableFuture().get(10, TimeUnit.SECONDS);
 
         log.info("Running index stream for ", streamRuntime.toString());
         Thread.sleep(streamRuntime.toMillis());
@@ -239,20 +236,20 @@ public class Main {
         Map<Pair<String, String>, LogFileSummary> summaries = stream.toCompletableFuture().get(10, TimeUnit.SECONDS);
 
         // run a new graph to query all records from Elasticsearch and get the results (17)
-        List<LogLine> results = queryAllRecordsFromElasticsearch(elasticsearchClient, indexName, materializer).toCompletableFuture().get(10, TimeUnit.SECONDS);
+        List<LogLine> results = queryAllRecordsFromElasticsearch(elasticsearchClient, indexName, system).toCompletableFuture().get(10, TimeUnit.SECONDS);
 
         printResults(results, summaries);
 
-        RunOps.deleteAllFilesFrom(inputLogsPath, materializer).toCompletableFuture().get(10, TimeUnit.SECONDS);
+        RunOps.deleteAllFilesFrom(inputLogsPath, system).toCompletableFuture().get(10, TimeUnit.SECONDS);
 
-        return RunOps.shutdown(actorSystem, elasticsearchClient);
+        return RunOps.shutdown(system, elasticsearchClient);
 
         // #running-the-app
     }
 
     public static void main(String[] args) throws Exception {
         Main main = new Main();
-        CompletionStage<Terminated> run = main.run();
+        CompletionStage<Done> run = main.run();
 
         run.toCompletableFuture().get(10, TimeUnit.SECONDS);
     }

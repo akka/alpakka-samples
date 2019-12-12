@@ -7,13 +7,14 @@ package samples.scaladsl
 import java.nio.file._
 
 import akka.NotUsed
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.alpakka.elasticsearch.WriteMessage
 import akka.stream.alpakka.elasticsearch.scaladsl.{ElasticsearchFlow, ElasticsearchSource}
 import akka.stream.alpakka.file.DirectoryChange
 import akka.stream.alpakka.file.scaladsl.{DirectoryChangesSource, FileTailSource}
 import akka.stream.scaladsl.{Flow, Keep, RunnableGraph, Sink, Source}
-import akka.stream.{ActorMaterializer, KillSwitches, Materializer, UniqueKillSwitch}
+import akka.stream.{KillSwitches, Materializer, UniqueKillSwitch}
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import samples.common.DateTimeExtractor
@@ -28,9 +29,8 @@ object Main extends App {
   import RunOps._
   import JsonFormats._
 
-  implicit val actorSystem: ActorSystem = ActorSystem()
-  implicit val actorMaterializer: Materializer = ActorMaterializer()
-  implicit val executionContext: ExecutionContext = actorSystem.dispatcher
+  implicit val actorSystem: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "FileToElasticSearch")
+  implicit val executionContext: ExecutionContext = actorSystem.executionContext
 
   val streamRuntime = 10.seconds
   val streamParallelism = 47
@@ -140,7 +140,7 @@ object Main extends App {
       .typed[LogLine](indexName, "_doc", """{"match_all": {}}""")
       .map(_.source)
       .runWith(Sink.seq)
-    reading.foreach(_ => log.info("Reading finished"))(actorSystem.dispatcher)
+    reading.foreach(_ => log.info("Reading finished"))
     reading
   }
 

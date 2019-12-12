@@ -5,7 +5,9 @@
 package samples.scaladsl
 
 import akka.Done
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.adapter._
+import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.alpakka.jms.JmsProducerSettings
 import akka.stream.alpakka.jms.scaladsl.JmsProducer
 import akka.stream.scaladsl.{Sink, Source}
@@ -16,18 +18,20 @@ import scala.concurrent.duration._
 
 class JmsSampleBase {
 
-  implicit val actorSystem: ActorSystem = ActorSystem()
-  implicit val executionContext: ExecutionContext = actorSystem.dispatcher
+  implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "JmsSample")
+  implicit val executionContext: ExecutionContext = system.executionContext
 
   def wait(duration: FiniteDuration): Unit = Thread.sleep(duration.toMillis)
 
-  def terminateActorSystem(): Unit =
-    Await.result(actorSystem.terminate(), 1.seconds)
+  def terminateActorSystem(): Unit = {
+    system.terminate()
+    Await.result(system.whenTerminated, 1.seconds)
+  }
 
   def enqueue(connectionFactory: ConnectionFactory)(msgs: String*): Unit = {
     val jmsSink: Sink[String, Future[Done]] =
       JmsProducer.textSink(
-        JmsProducerSettings(actorSystem, connectionFactory).withQueue("test")
+        JmsProducerSettings(system.toClassic, connectionFactory).withQueue("test")
       )
     Source(msgs.toList).runWith(jmsSink)
   }

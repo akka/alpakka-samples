@@ -4,19 +4,15 @@
 
 package samples.scaladsl
 
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
 import akka.kafka._
-import akka.kafka.scaladsl.{Committer, Consumer, Producer}
-import akka.stream.alpakka.elasticsearch.WriteMessage
-import akka.stream.alpakka.elasticsearch.scaladsl.{ElasticsearchFlow, ElasticsearchSource}
-import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.{ActorMaterializer, Materializer}
-import akka.{Done, NotUsed}
-import org.apache.http.HttpHost
-import org.apache.kafka.clients.consumer.ConsumerConfig
+import akka.kafka.scaladsl.Producer
+import akka.actor.typed.scaladsl.adapter._
+import akka.stream.alpakka.elasticsearch.scaladsl.ElasticsearchSource
+import akka.stream.scaladsl.{Sink, Source}
+import akka.Done
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization._
-import org.elasticsearch.client.RestClient
 import org.slf4j.LoggerFactory
 import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.elasticsearch.ElasticsearchContainer
@@ -27,6 +23,7 @@ import scala.collection.immutable
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import JsonFormats._
+import akka.stream.Materializer
 import samples.scaladsl.Main.{elasticsearchClient, elasticsearchContainer, kafka}
 
 trait Helper {
@@ -45,8 +42,8 @@ trait Helper {
   kafka.start()
   val kafkaBootstrapServers = kafka.getBootstrapServers
 
-  def writeToKafka(topic: String, movies: immutable.Iterable[Movie])(implicit actorSystem: ActorSystem, materializer: Materializer) = {
-    val kafkaProducerSettings = ProducerSettings(actorSystem, new IntegerSerializer, new StringSerializer)
+  def writeToKafka(topic: String, movies: immutable.Iterable[Movie])(implicit actorSystem: ActorSystem[_], materializer: Materializer) = {
+    val kafkaProducerSettings = ProducerSettings(actorSystem.toClassic, new IntegerSerializer, new StringSerializer)
       .withBootstrapServers(kafkaBootstrapServers)
 
     val producing: Future[Done] = Source(movies)
@@ -55,16 +52,16 @@ trait Helper {
         new ProducerRecord(topic, Int.box(movie.id), movie.toJson.compactPrint)
       }
       .runWith(Producer.plainSink(kafkaProducerSettings))
-    producing.foreach(_ => log.info("Producing finished"))(actorSystem.dispatcher)
+    producing.foreach(_ => log.info("Producing finished"))(actorSystem.executionContext)
     producing
   }
 
-  def readFromElasticsearch(indexName: String)(implicit actorSystem: ActorSystem, materializer: Materializer): Future[immutable.Seq[Movie]] = {
+  def readFromElasticsearch(indexName: String)(implicit actorSystem: ActorSystem[_], materializer: Materializer): Future[immutable.Seq[Movie]] = {
     val reading = ElasticsearchSource
       .typed[Movie](indexName, "_doc", """{"match_all": {}}""")
       .map(_.source)
       .runWith(Sink.seq)
-    reading.foreach(_ => log.info("Reading finished"))(actorSystem.dispatcher)
+    reading.foreach(_ => log.info("Reading finished"))(actorSystem.executionContext)
     reading
   }
 

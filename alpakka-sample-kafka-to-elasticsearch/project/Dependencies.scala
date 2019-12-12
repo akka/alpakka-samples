@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
   val scalaVer = "2.13.1"
   // #deps
-  val AkkaVersion = "2.6.0"
+  val AkkaVersion = "2.6.1"
   val AlpakkaVersion = "1.1.2"
   val AlpakkaKafkaVersion = "1.1.0"
 
@@ -14,6 +14,8 @@ object Dependencies {
     "com.lightbend.akka" %% "akka-stream-alpakka-elasticsearch" % AlpakkaVersion,
     "com.typesafe.akka" %% "akka-stream-kafka" % AlpakkaKafkaVersion,
     "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
+    "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
+    "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
     // for JSON in Scala
     "io.spray" %% "spray-json" % "1.3.5",
     // for JSON in Java

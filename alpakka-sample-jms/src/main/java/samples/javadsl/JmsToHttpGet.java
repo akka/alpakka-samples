@@ -7,7 +7,9 @@ package samples.javadsl;
 // #sample
 
 import akka.Done;
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.Behaviors;
+import static akka.actor.typed.javadsl.Adapter.*;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.model.HttpRequest;
 import akka.japi.Pair;
@@ -37,13 +39,13 @@ public class JmsToHttpGet {
     me.run();
   }
 
-  private final ActorSystem system = ActorSystem.create();
-  private final ExecutionContext ec = system.dispatcher();
+  private final ActorSystem<Void> system = ActorSystem.create(Behaviors.empty(), "JmsToHttpGet");
+  private final ExecutionContext ec = system.executionContext();
 
   private void enqueue(ConnectionFactory connectionFactory, String... msgs) {
     Sink<String, ?> jmsSink =
         JmsProducer.textSink(
-            JmsProducerSettings.create(system, connectionFactory).withQueue("test"));
+            JmsProducerSettings.create(toClassic(system), connectionFactory).withQueue("test"));
     Source.from(Arrays.asList(msgs)).runWith(jmsSink, system);
   }
 
@@ -58,11 +60,11 @@ public class JmsToHttpGet {
     enqueue(connectionFactory, "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k");
     // #sample
 
-    final Http http = Http.get(system);
+    final Http http = Http.get(toClassic(system));
 
     Source<String, JmsConsumerControl> jmsSource = // (1)
         JmsConsumer.textSource(
-            JmsConsumerSettings.create(system, connectionFactory).withQueue("test"));
+            JmsConsumerSettings.create(toClassic(system), connectionFactory).withQueue("test"));
 
     int parallelism = 4;
     Pair<JmsConsumerControl, CompletionStage<Done>> pair =

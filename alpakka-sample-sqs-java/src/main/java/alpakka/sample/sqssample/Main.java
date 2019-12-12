@@ -2,13 +2,9 @@ package alpakka.sample.sqssample;
 
 import akka.Done;
 import akka.NotUsed;
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.Props;
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
+import akka.actor.typed.ActorRef;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.AskPattern;
 import akka.stream.alpakka.sqs.*;
 import akka.stream.alpakka.sqs.javadsl.SqsAckSink;
 import akka.stream.alpakka.sqs.javadsl.SqsPublishFlow;
@@ -19,6 +15,8 @@ import akka.stream.javadsl.Source;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -42,10 +40,8 @@ public class Main {
     final static String sourceQueueUrl = "http://localhost:9324/queue/reading-from-this";
     final static String publishUrl = "http://localhost:9324/queue/publishing-to-this";
 
-    final ActorSystem system;
-    final Materializer materializer;
-    final ActorRef enrichingActor;
-    final LoggingAdapter log;
+    final Logger log = LoggerFactory.getLogger(Main.class);
+    final ActorSystem<EnrichActor.Enrich> system;
 
     public static void main(String[] args) throws Exception {
         Main me = new Main();
@@ -53,10 +49,7 @@ public class Main {
     }
 
     public Main() {
-        system = ActorSystem.create();
-        log = Logging.getLogger(system, this);
-        materializer = ActorMaterializer.create(system);
-        enrichingActor = system.actorOf(Props.create(EnrichActor.class, EnrichActor::new));
+        system = ActorSystem.create(EnrichActor.create(), "SqsSample");
     }
 
     void run() throws Exception {
@@ -69,7 +62,7 @@ public class Main {
                         .endpointOverride(URI.create(sqsEndpoint))
                         .region(Region.EU_CENTRAL_1)
                         .build();
-        system.registerOnTermination(() -> sqsClient.close());
+        system.getWhenTerminated().thenAccept(notUsed -> sqsClient.close());
 
         // configure SQS
         SqsSourceSettings settings = SqsSourceSettings.create().withCloseOnEmptyReceive(true);
@@ -77,7 +70,7 @@ public class Main {
 
         // create running stream
         CompletionStage<Done> streamCompletion = SqsSource.create(sourceQueueUrl, settings, sqsClient)
-                .log("read from SQS", log)
+                .log("read from SQS")
                 .mapAsync(8, (Message msg) -> {
                     return enrichAndPublish(sqsClient, msg)
                             // upon completion ignore the result and pass on the original message
@@ -86,7 +79,7 @@ public class Main {
                 .map(msg -> MessageAction.delete(msg))
                 .runWith(
                         SqsAckSink.create(sourceQueueUrl, ackSettings, sqsClient),
-                        materializer
+                        system
                 );
 
         // terminate the actor system when the stream completes (see withCloseOnEmptyReceive)
@@ -99,22 +92,17 @@ public class Main {
         return Source.<Message>single(sqsMsg)
                 .map(Main::transform)
                 .mapAsync(1, (MessageFromSqs msg) -> {
-                    return ask(enrichingActor, msg.id, Duration.ofSeconds(2))
-                            .thenApply(response -> {
-                                log.debug("ask received '{}'", response);
-                                if (response instanceof ActorResponseMsg) {
-                                    // combine msg and response
-                                    ActorResponseMsg resp = (ActorResponseMsg) response;
-                                    return new EnrichedMessage(msg.id, msg.name, msg.url, resp.data);
-                                } else {
-                                    throw new RuntimeException("received unexpected response");
-                                }
+                    CompletionStage<EnrichActor.Enriched> response =
+                        AskPattern.ask(system, ref -> new EnrichActor.Enrich(msg.id, ref), Duration.ofSeconds(2), system.scheduler());
+                    return response.thenApply(res -> {
+                                log.debug("ask received '{}'", res);
+                                return new EnrichedMessage(msg.id, msg.name, msg.url, res.data);
                             });
                 })
                 .map(amsg -> SendMessageRequest.builder().messageBody(enrichedMessageWriter.writeValueAsString(amsg)).build())
-                .log("sending to publish queue", log)
+                .log("sending to publish queue")
                 .via(publishFlow)
-                .runWith(Sink.head(), materializer);
+                .runWith(Sink.head(), system);
     }
 
     private static MessageFromSqs transform(Message message) throws IOException {

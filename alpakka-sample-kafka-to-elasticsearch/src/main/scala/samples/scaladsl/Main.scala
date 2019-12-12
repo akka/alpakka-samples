@@ -5,7 +5,9 @@
 package samples.scaladsl
 
 // #imports
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter._
 import akka.kafka._
 import akka.kafka.scaladsl.{Committer, Consumer}
 import akka.stream.alpakka.elasticsearch.WriteMessage
@@ -26,8 +28,8 @@ object Main extends App with Helper {
 
   import JsonFormats._
 
-  implicit val actorSystem: ActorSystem = ActorSystem()
-  implicit val executionContext: ExecutionContext = actorSystem.dispatcher
+  implicit val actorSystem: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "KafkaToElasticSearch")
+  implicit val executionContext: ExecutionContext = actorSystem.executionContext
 
   val topic = "movies-to-elasticsearch"
   private val groupId = "docs-group"
@@ -44,7 +46,7 @@ object Main extends App with Helper {
 
   // #kafka-setup
   // configure Kafka consumer (1)
-  val kafkaConsumerSettings = ConsumerSettings(actorSystem, new IntegerDeserializer, new StringDeserializer)
+  val kafkaConsumerSettings = ConsumerSettings(actorSystem.toClassic, new IntegerDeserializer, new StringDeserializer)
     .withBootstrapServers(kafkaBootstrapServers)
     .withGroupId(groupId)
     .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
@@ -66,7 +68,7 @@ object Main extends App with Helper {
         }
         NotUsed
       }
-      .toMat(Committer.sinkWithOffsetContext(CommitterSettings(actorSystem)))(Keep.both) // (9)
+      .toMat(Committer.sinkWithOffsetContext(CommitterSettings(actorSystem.toClassic)))(Keep.both) // (9)
       .mapMaterializedValue(Consumer.DrainingControl.apply) // (10)
       .run()
     // #flow

@@ -1,10 +1,9 @@
 package samples.javadsl;
 
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.Behaviors;
 import akka.japi.Pair;
-import akka.stream.ActorMaterializer;
 import akka.stream.IOResult;
-import akka.stream.Materializer;
 // #imports
 import akka.stream.alpakka.ftp.FtpSettings;
 import akka.stream.alpakka.ftp.javadsl.Ftp;
@@ -27,8 +26,7 @@ import java.util.stream.Collectors;
 
 public class Main {
 
-    final ActorSystem actorSystem = ActorSystem.create();
-    final Materializer materializer = ActorMaterializer.create(actorSystem);
+    final ActorSystem<Void> system = ActorSystem.create(Behaviors.empty(), "FtpToFile");
 
     private void run() throws UnknownHostException {
         final FileSystemMock ftpFileSystem = new FileSystemMock();
@@ -58,12 +56,12 @@ public class Main {
                                     final Path localPath = targetDir.resolve("." + ftpFile.path());
                                     final CompletionStage<IOResult> fetchFile =
                                             Ftp.fromPath(ftpFile.path(), ftpSettings)
-                                                    .runWith(FileIO.toPath(localPath), materializer); // (4)
+                                                    .runWith(FileIO.toPath(localPath), system); // (4)
                                     return fetchFile.thenApply(
                                             ioResult -> // (5)
                                                     Pair.create(ftpFile.path(), ioResult));
                                 }) // : (String, IOResult)
-                        .runWith(Sink.seq(), materializer); // (6)
+                        .runWith(Sink.seq(), system); // (6)
         // #sample
 
         fetchedFiles
@@ -84,8 +82,8 @@ public class Main {
                                 System.out.println("the stream failed");
                             }
 
-                            actorSystem.terminate();
-                            actorSystem.getWhenTerminated().thenAccept(t -> ftpServer.stop());
+                            system.terminate();
+                            system.getWhenTerminated().thenAccept(t -> ftpServer.stop());
                         });
     }
 

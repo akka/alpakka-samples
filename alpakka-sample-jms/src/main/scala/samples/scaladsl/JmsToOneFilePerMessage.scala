@@ -8,6 +8,7 @@ package samples.scaladsl
 import java.nio.file.Paths
 
 import akka.stream.alpakka.jms.JmsConsumerSettings
+import akka.actor.typed.scaladsl.adapter._
 import akka.stream.alpakka.jms.scaladsl.{JmsConsumer, JmsConsumerControl}
 import akka.stream.scaladsl.{FileIO, Keep, Sink, Source}
 import akka.util.ByteString
@@ -28,7 +29,7 @@ object JmsToOneFilePerMessage extends JmsSampleBase with App {
 
   val jmsSource: Source[String, JmsConsumerControl] =                                   // (1)
     JmsConsumer.textSource(
-      JmsConsumerSettings(actorSystem, connectionFactory).withBufferSize(10).withQueue("test")
+      JmsConsumerSettings(system.toClassic, connectionFactory).withBufferSize(10).withQueue("test")
     )
                                                             // stream element type
   val runningSource = jmsSource                             //: String
@@ -45,8 +46,9 @@ object JmsToOneFilePerMessage extends JmsSampleBase with App {
   // format: on
   wait(1.second)
   runningSource.shutdown()
+  system.terminate()
   for {
-    _ <- actorSystem.terminate()
+    _ <- system.whenTerminated
     _ <- ActiveMqBroker.stop()
   } ()
 

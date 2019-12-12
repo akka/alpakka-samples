@@ -6,6 +6,7 @@ package samples.scaladsl
 
 // #sample
 import akka.Done
+import akka.actor.typed.scaladsl.adapter._
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.stream.alpakka.jms.JmsConsumerSettings
@@ -31,7 +32,7 @@ object JmsToHttpGet extends JmsSampleBase with App {
   // #sample
   val jmsSource: Source[String, JmsConsumerControl] =                                 // (1)
   JmsConsumer.textSource(
-    JmsConsumerSettings(actorSystem,connectionFactory).withBufferSize(10).withQueue("test")
+    JmsConsumerSettings(system.toClassic,connectionFactory).withBufferSize(10).withQueue("test")
   )
 
   val (runningSource, finished): (JmsConsumerControl, Future[Done]) =
@@ -41,7 +42,7 @@ object JmsToHttpGet extends JmsSampleBase with App {
       HttpRequest(uri = Uri("http://localhost:8080/hello"),   //: HttpRequest  (3)
         entity = HttpEntity(bs))
     }
-      .mapAsyncUnordered(4)(Http().singleRequest(_))            //: HttpResponse (4)
+      .mapAsyncUnordered(4)(Http(system).singleRequest(_))            //: HttpResponse (4)
       .toMat(Sink.foreach(println))(Keep.both)                  //               (5)
       .run()
   // #sample
@@ -50,8 +51,9 @@ object JmsToHttpGet extends JmsSampleBase with App {
 
   wait(5.seconds)
   runningSource.shutdown()
+  system.terminate()
   for {
-    _ <- actorSystem.terminate()
+    _ <- system.whenTerminated
     _ <- WebServer.stop()
     _ <- ActiveMqBroker.stop()
   } ()
