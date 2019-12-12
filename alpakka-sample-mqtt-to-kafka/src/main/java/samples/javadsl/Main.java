@@ -5,7 +5,8 @@
 package samples.javadsl;
 
 import akka.Done;
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.Behaviors;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.Creator;
@@ -15,11 +16,19 @@ import akka.kafka.ProducerSettings;
 import akka.kafka.Subscriptions;
 import akka.kafka.javadsl.Consumer;
 import akka.kafka.javadsl.Producer;
-import akka.stream.*;
-import akka.stream.alpakka.mqtt.*;
+import akka.stream.KillSwitch;
+import akka.stream.KillSwitches;
+import akka.stream.UniqueKillSwitch;
+import akka.stream.alpakka.mqtt.MqttConnectionSettings;
+import akka.stream.alpakka.mqtt.MqttMessage;
+import akka.stream.alpakka.mqtt.MqttQoS;
+import akka.stream.alpakka.mqtt.MqttSubscriptions;
 import akka.stream.alpakka.mqtt.javadsl.MqttSink;
 import akka.stream.alpakka.mqtt.javadsl.MqttSource;
-import akka.stream.javadsl.*;
+import akka.stream.javadsl.Keep;
+import akka.stream.javadsl.RestartSource;
+import akka.stream.javadsl.Sink;
+import akka.stream.javadsl.Source;
 import akka.util.ByteString;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -47,6 +56,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import static akka.actor.typed.javadsl.Adapter.toClassic;
+
 public class Main {
 
     public static void main(String[] args) throws Exception {
@@ -60,7 +71,7 @@ public class Main {
         }
     }
 
-    final ActorSystem system = ActorSystem.create("integration");
+    final ActorSystem<Void> system = ActorSystem.create(Behaviors.empty(), "MqttToKafka");
     final Logger log = LoggerFactory.getLogger(Main.class);
 
     // #json-mechanics
@@ -130,7 +141,7 @@ public class Main {
     // #restarting
 
     void run(String kafkaServer) throws Exception {
-        final LoggingAdapter logAdapter = Logging.getLogger(system, getClass().getSimpleName());
+        final LoggingAdapter logAdapter = Logging.getLogger(system.classicSystem(), getClass().getName());
         // #flow
         final MqttConnectionSettings connectionSettings =
                 MqttConnectionSettings.create(
@@ -151,7 +162,7 @@ public class Main {
         // Set up Kafka producer sink
         ProducerSettings<String, String> producerSettings =
                 ProducerSettings
-                        .create(system, new StringSerializer(), new StringSerializer())
+                        .create(toClassic(system), new StringSerializer(), new StringSerializer())
                         .withBootstrapServers(kafkaServer);
         Sink<ProducerRecord<String, String>, CompletionStage<Done>> kafkaProducer =
                 Producer.plainSink(producerSettings);
@@ -195,7 +206,7 @@ public class Main {
         Consumer.Control consumerControl =
                 Consumer
                         .plainSource(
-                                ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
+                                ConsumerSettings.create(toClassic(system), new StringDeserializer(), new StringDeserializer())
                                         .withBootstrapServers(kafkaServer).withGroupId("sample"),
                                 Subscriptions.topics(kafkaTopic)
                         )

@@ -15,6 +15,8 @@ object Dependencies {
     "com.lightbend.akka" %% "akka-stream-alpakka-mqtt" % AlpakkaVersion,
     "com.typesafe.akka" %% "akka-stream-kafka" % AlpakkaKafkaVersion,
     "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
+    "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
+    "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
     // JSON
     "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % JacksonDatabindVersion,
     "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % JacksonDatabindVersion,
