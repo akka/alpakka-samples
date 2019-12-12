@@ -8,8 +8,9 @@ package samples.javadsl;
 
 import akka.Done;
 import akka.NotUsed;
-import akka.actor.ActorSystem;
-import akka.actor.Terminated;
+import akka.actor.typed.ActorSystem;
+import static akka.actor.typed.javadsl.Adapter.*;
+import akka.actor.typed.javadsl.Behaviors;
 import akka.kafka.CommitterSettings;
 import akka.kafka.ConsumerSettings;
 import akka.kafka.Subscriptions;
@@ -57,14 +58,14 @@ public class Main {
         this.helper = helper;
     }
 
-    private ActorSystem actorSystem;
+    private ActorSystem<Void> actorSystem;
     private RestClient elasticsearchClient;
 
     private Consumer.DrainingControl<Done> readFromKafkaToEleasticsearch() {
         // #kafka-setup
         // configure Kafka consumer (1)
         ConsumerSettings<Integer, String> kafkaConsumerSettings =
-                ConsumerSettings.create(actorSystem, new IntegerDeserializer(), new StringDeserializer())
+                ConsumerSettings.create(toClassic(actorSystem), new IntegerDeserializer(), new StringDeserializer())
                         .withBootstrapServers(kafkaBootstrapServers)
                         .withGroupId(groupId)
                         .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
@@ -98,15 +99,15 @@ public class Main {
                                                     });
                                     return NotUsed.notUsed();
                                 })
-                        .toMat(Committer.sinkWithOffsetContext(CommitterSettings.create(actorSystem)), Keep.both()) // (9)
+                        .toMat(Committer.sinkWithOffsetContext(CommitterSettings.create(toClassic(actorSystem))), Keep.both()) // (9)
                         .mapMaterializedValue(Consumer::createDrainingControl) // (10)
                         .run(actorSystem);
         // #flow
         return control;
     }
 
-    private CompletionStage<Terminated> run() throws Exception {
-        actorSystem = ActorSystem.create();
+    private CompletionStage<Done> run() throws Exception {
+        actorSystem = ActorSystem.create(Behaviors.empty(), "KafkaToElasticSearch");
         // #es-setup
         // Elasticsearch client setup (4)
         elasticsearchClient = RestClient.builder(HttpHost.create(elasticsearchAddress)).build();
@@ -118,7 +119,7 @@ public class Main {
 
         Consumer.DrainingControl<Done> control = readFromKafkaToEleasticsearch();
         TimeUnit.SECONDS.sleep(5);
-        CompletionStage<Done> copyingFinished = control.drainAndShutdown(actorSystem.dispatcher());
+        CompletionStage<Done> copyingFinished = control.drainAndShutdown(actorSystem.executionContext());
         copyingFinished.toCompletableFuture().get(10, TimeUnit.SECONDS);
         CompletionStage<List<Movie>> reading = helper.readFromElasticsearch(elasticsearchClient, indexName, actorSystem);
 
@@ -139,7 +140,7 @@ public class Main {
         Helper helper = new Helper();
         helper.startContainers();
         Main main = new Main(helper);
-        CompletionStage<Terminated> run = main.run();
+        CompletionStage<Done> run = main.run();
         run.thenAccept(res -> {
             helper.stopContainers();
         });

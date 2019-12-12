@@ -1,10 +1,10 @@
 package samples.javadsl;
 
 import akka.Done;
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
+import static akka.actor.typed.javadsl.Adapter.*;
 import akka.kafka.ProducerSettings;
 import akka.kafka.javadsl.Producer;
-import akka.stream.Materializer;
 import akka.stream.alpakka.elasticsearch.ElasticsearchSourceSettings;
 import akka.stream.alpakka.elasticsearch.javadsl.ElasticsearchSource;
 import akka.stream.javadsl.Sink;
@@ -50,9 +50,9 @@ public class Helper {
         elasticsearchContainer.stop();
     }
 
-    CompletionStage<Done> writeToKafka(String topic, List<Movie> movies, ActorSystem actorSystem) {
+    CompletionStage<Done> writeToKafka(String topic, List<Movie> movies, ActorSystem<?> actorSystem) {
         ProducerSettings<Integer, String> kafkaProducerSettings =
-                ProducerSettings.create(actorSystem, new IntegerSerializer(), new StringSerializer())
+                ProducerSettings.create(toClassic(actorSystem), new IntegerSerializer(), new StringSerializer())
                         .withBootstrapServers(kafkaBootstrapServers);
 
         CompletionStage<Done> producing =
