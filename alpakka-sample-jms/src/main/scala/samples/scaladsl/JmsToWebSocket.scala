@@ -8,6 +8,7 @@ package samples.scaladsl
 import akka.Done
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
+import akka.actor.typed.scaladsl.adapter._
 import akka.http.scaladsl.model.ws.{WebSocketRequest, WebSocketUpgradeResponse}
 import akka.stream.alpakka.jms.JmsConsumerSettings
 import akka.stream.alpakka.jms.scaladsl.{JmsConsumer, JmsConsumerControl}
@@ -32,11 +33,11 @@ object JmsToWebSocket extends JmsSampleBase with App {
 
   val jmsSource: Source[String, JmsConsumerControl] =
     JmsConsumer.textSource(                                                           // (1)
-      JmsConsumerSettings(actorSystem, connectionFactory).withBufferSize(10).withQueue("test")
+      JmsConsumerSettings(system.toClassic, connectionFactory).withBufferSize(10).withQueue("test")
     )
 
   val webSocketFlow: Flow[ws.Message, ws.Message, Future[WebSocketUpgradeResponse]] = // (2)
-    Http().webSocketClientFlow(WebSocketRequest("ws://localhost:8080/webSocket/ping"))
+    Http(system.toClassic).webSocketClientFlow(WebSocketRequest("ws://localhost:8080/webSocket/ping"))
 
   val ((runningSource, wsUpgradeResponse), streamCompletion): ((JmsConsumerControl, Future[WebSocketUpgradeResponse]), Future[Done]) =
                                                      // stream element type
@@ -65,7 +66,10 @@ object JmsToWebSocket extends JmsSampleBase with App {
 
   for {
     _ <- streamCompletion
-    _ <- actorSystem.terminate()
+    _ <- {
+      system.terminate()
+      system.whenTerminated
+    }
     _ <- WebServer.stop()
     _ <- ActiveMqBroker.stop()
   } ()
