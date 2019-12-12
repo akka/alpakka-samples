@@ -11,6 +11,8 @@ object Dependencies {
   val dependencies = List(
   // #deps
     "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
+    "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
+    "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
     "com.lightbend.akka" %% "akka-stream-alpakka-file" % AlpakkaVersion,
     "com.lightbend.akka" %% "akka-stream-alpakka-ftp" % AlpakkaVersion,
     // #deps

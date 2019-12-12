@@ -1,10 +1,12 @@
 package samples.scaladsl
 
 // #imports
+
 import java.net.InetAddress
 import java.nio.file.{Files, Path}
 
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.alpakka.file.scaladsl.{Directory, LogRotatorSink}
 import akka.stream.alpakka.ftp.scaladsl.Sftp
 import akka.stream.alpakka.ftp.{FtpCredentials, SftpIdentity, SftpSettings}
@@ -19,13 +21,11 @@ import scala.concurrent.{Await, ExecutionContext}
 // #imports
 
 object Main extends App {
-  implicit val actorSystem: ActorSystem = ActorSystem()
-  implicit val executionContext: ExecutionContext = actorSystem.dispatcher
+  implicit val actorSystem: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "RotateLogsToFtp")
+  implicit val executionContext: ExecutionContext = actorSystem.executionContext
 
   def wait(duration: FiniteDuration): Unit = Thread.sleep(duration.toMillis)
 
-  def terminateActorSystem(): Unit =
-    Await.result(actorSystem.terminate(), 1.seconds)
 
   private val ftpFileSystem = new FileSystemMock().fileSystem
   private val privateKeyPassphrase = SftpServerEmbedded.clientPrivateKeyPassphrase
@@ -85,7 +85,7 @@ object Main extends App {
         f.printStackTrace()
     }
     .onComplete { _ =>
-      SftpServerEmbedded.stopServer()
-      terminateActorSystem()
+      actorSystem.terminate()
+      actorSystem.getWhenTerminated.thenAccept(_ => SftpServerEmbedded.stopServer());
     }
 }

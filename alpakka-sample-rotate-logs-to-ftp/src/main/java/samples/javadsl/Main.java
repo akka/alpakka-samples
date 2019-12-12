@@ -13,7 +13,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
 import akka.Done;
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.Behaviors;
+import akka.japi.Pair;
 import akka.japi.function.Creator;
 import akka.japi.function.Function;
 import akka.stream.IOResult;
@@ -41,7 +43,7 @@ import akka.stream.javadsl.Sink;
 public class Main {
 
     private void run() throws IOException {
-        final ActorSystem actorSystem = ActorSystem.create();
+        final ActorSystem<Void> actorSystem = ActorSystem.create(Behaviors.empty(), "RotateLogsToFtp");
 
         final FileSystem ftpFileSystem = new FileSystemMock().fileSystem;
 
@@ -95,10 +97,12 @@ public class Main {
                         .withCredentials(FtpCredentials.create(username, password));
 
         Function<String, Sink<ByteString, CompletionStage<IOResult>>> sink =
-                path ->
-                        Flow.<ByteString>create()
-                                .via(Compression.gzip()) // (4)
-                                .toMat(Sftp.toPath("tmp/" + path, settings), Keep.right());
+                path -> {
+                    Sink<ByteString, CompletionStage<IOResult>> ftpSink = Sftp.toPath("tmp/" + path, settings);
+                    return Flow.<ByteString>create()
+                            .via(Compression.gzip()) // (4)
+                            .toMat(ftpSink, Keep.right());
+                };
 
         CompletionStage<Done> completion =
                 Source.fromIterator(() -> data)
