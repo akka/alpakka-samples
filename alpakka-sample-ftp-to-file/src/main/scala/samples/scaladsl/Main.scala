@@ -3,7 +3,8 @@ package samples.scaladsl
 import java.net.InetAddress
 import java.nio.file.Paths
 
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
 // #imports
 import akka.stream.alpakka.ftp.FtpSettings
 import akka.stream.alpakka.ftp.scaladsl.Ftp
@@ -20,14 +21,13 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 object Main extends App {
-  implicit val actorSystem: ActorSystem = ActorSystem()
-  implicit val actorMaterializer: Materializer = ActorMaterializer()
-  implicit val executionContext: ExecutionContext = actorSystem.dispatcher
+  implicit val system: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "FtpToFile")
+  implicit val executionContext: ExecutionContext = system.executionContext
 
-  def wait(duration: FiniteDuration): Unit = Thread.sleep(duration.toMillis)
-
-  def terminateActorSystem(): Unit =
-    Await.result(actorSystem.terminate(), 1.seconds)
+  def terminateActorSystem(): Unit = {
+    system.terminate()
+    Await.result(system.whenTerminated, 1.seconds)
+  }
 
   val ftpFileSystem = new FileSystemMock()
 
@@ -75,7 +75,8 @@ object Main extends App {
         case Failure(exception) =>
           println("the stream failed")
       }
-      actorSystem.terminate().onComplete { _ =>
+      system.terminate()
+      system.whenTerminated.onComplete { _ =>
         ftpServer.stop()
       }
     }

@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
   val scalaVer = "2.12.10"
   // #deps
-  val AkkaVersion = "2.5.25"
+  val AkkaVersion = "2.6.1"
   val AlpakkaVersion = "1.1.1"
 
   // #deps
@@ -12,6 +12,9 @@ object Dependencies {
   // #deps
     "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
     "com.lightbend.akka" %% "akka-stream-alpakka-ftp" % AlpakkaVersion,
+    "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
+    "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
+    "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
     // #deps
     // Playground file system and FTP server
     // https://mina.apache.org/ftpserver-project/downloads.html
