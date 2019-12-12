@@ -118,6 +118,24 @@ FileToElasticsearch / paradoxProperties ++= Map(
 )
 FileToElasticsearch / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
 
+val RotateLogsToFtp = config("rotate-logs-to-ftp")
+ParadoxPlugin.paradoxSettings(RotateLogsToFtp)
+ParadoxSitePlugin.paradoxSettings(RotateLogsToFtp)
+AkkaParadoxPlugin.akkaParadoxSettings(RotateLogsToFtp)
+RotateLogsToFtp / siteSubdirName := RotateLogsToFtp.name
+RotateLogsToFtp / paradox / sourceDirectory := baseDirectory.value / ".." / s"alpakka-sample-${RotateLogsToFtp.name}" / "docs" / "src" / "main" / "paradox"
+RotateLogsToFtp / paradoxProperties ++= Map(
+  "project.url" -> s"${homepage.value.get}/${RotateLogsToFtp.name}",
+  "canonical.base_url" -> s"${homepage.value.get}/${RotateLogsToFtp.name}",
+  "snip.build.base_dir" -> s"${baseDirectory.value}/../alpakka-sample-${RotateLogsToFtp.name}",
+  "github.root.base_dir" -> s"${baseDirectory.value}/..",
+  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.RotateLogsToFtp.AkkaVersion}",
+  "extref.alpakka.base_url" -> s"https://doc.akka.io/docs/alpakka/${Dependencies.RotateLogsToFtp.AlpakkaVersion}/%s",
+  "extref.akka.base_url" -> s"https://doc.akka.io/docs/akka/${Dependencies.RotateLogsToFtp.AkkaVersion}/%s",
+)
+RotateLogsToFtp / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
+
+
 Paradox / siteSubdirName := ""
 paradoxProperties ++= Map(
   "extref.ftp-to-file.base_url" -> s"${(FtpToFile / siteSubdirName).value}/",
@@ -126,6 +144,7 @@ paradoxProperties ++= Map(
   "extref.jms.base_url" -> s"${(Jms / siteSubdirName).value}/",
   "extref.kafka-to-elasticsearch.base_url" -> s"${(KafkaToElasticsearch / siteSubdirName).value}/",
   "extref.file-to-elasticsearch.base_url" -> s"${(FileToElasticsearch / siteSubdirName).value}/",
+  "extref.rotate-logs-to-ftp.base_url" -> s"${(RotateLogsToFtp / siteSubdirName).value}/",
 )
 
 resolvers += Resolver.jcenterRepo

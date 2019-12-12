@@ -1,0 +1,20 @@
+<configuration>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%highlight(%date{HH:mm:ss.SSS} %-5level %-50.50([%logger{50}]))  %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="akka" level="INFO"/>
+    <logger name="akka.stream.alpakka.file" level="INFO"/>
+    <logger name="akka.stream.alpakka.ftp" level="INFO"/>
+    <logger name="org.apache.sshd" level="INFO"/>
+    <logger name="net.schmizz" level="INFO"/>
+
+    <root level="debug">
+        <appender-ref ref="console"/>
+    </root>
+
+</configuration>
