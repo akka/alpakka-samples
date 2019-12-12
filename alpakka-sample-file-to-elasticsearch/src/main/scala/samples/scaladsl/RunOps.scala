@@ -2,7 +2,8 @@ package samples.scaladsl
 import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 import java.time.ZonedDateTime
 
-import akka.actor.{ActorSystem, Terminated}
+import akka.Done
+import akka.actor.typed.ActorSystem
 import akka.stream.Materializer
 import akka.stream.alpakka.file.scaladsl.Directory
 import akka.stream.scaladsl.{Keep, Sink}
@@ -51,10 +52,11 @@ object RunOps {
     }
   }
 
-  def shutdown(actorSystem: ActorSystem)(implicit esClient: RestClient): Future[Terminated] = {
+  def shutdown(system: ActorSystem[_])(implicit esClient: RestClient): Future[Done] = {
     log.info(s"Stop containers")
     stopContainers()
     log.info(s"Kill actor system")
-    actorSystem.terminate()
+    system.terminate()
+    system.whenTerminated
   }
 }
