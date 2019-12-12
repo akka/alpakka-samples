@@ -1,7 +1,9 @@
 package alpakka.sample.triggereddownload;
 
 import akka.Done;
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.Behaviors;
+import static akka.actor.typed.javadsl.Adapter.*;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.model.ContentTypes;
 import akka.http.javadsl.model.HttpRequest;
@@ -22,7 +24,7 @@ import java.time.format.DateTimeFormatter;
 
 public class Main {
 
-    final ActorSystem system;
+    final ActorSystem<Void> system;
     final Http http;
 
     public static void main(String[] args) throws Exception {
@@ -31,8 +33,8 @@ public class Main {
     }
 
     public Main() {
-        system = ActorSystem.create();
-        http = Http.get(system);
+        system = ActorSystem.create(Behaviors.empty(), "MqttHttpToS3");
+        http = Http.get(toClassic(system));
     }
 
     final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
