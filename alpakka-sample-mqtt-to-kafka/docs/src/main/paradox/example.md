@@ -18,6 +18,9 @@ The MQTT source gets wrapped by a `RestartSource` to mitigate the
 Java
 : @@snip [snip](/src/main/java/samples/javadsl/Main.java) { #restarting }
 
+Scala
+: @@snip [snip](/src/main/scala/samples/scaladsl/Main.scala) { #restarting }
+
 ### Json helper code
 
 To use Java 8 time types (`Instant`) with Jackson, extra dependencies are required.
@@ -29,11 +32,17 @@ To use Java 8 time types (`Instant`) with Jackson, extra dependencies are requir
   group2=com.fasterxml.jackson.datatype
   artifact2=jackson-datatype-jsr310
   version2=2.10.0
+  group3=com.fasterxml.jackson.module
+  artifact3=jackson-module-scala_$scala.binary.version$
+  version3=2.10.0
 }
 ### Data class and JSON mapping
 
 Java
 : @@snip [snip](/src/main/java/samples/javadsl/Main.java) { #json-mechanics }
+
+Scala
+: @@snip [snip](/src/main/scala/samples/scaladsl/Main.scala) { #json-mechanics }
 
 
 ### Flow
@@ -52,3 +61,6 @@ Java
 
 Java
 : @@snip [snip](/src/main/java/samples/javadsl/Main.java) { #flow }
+
+Scala
+: @@snip [snip](/src/main/scala/samples/scaladsl/Main.scala) { #flow }

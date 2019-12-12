@@ -202,7 +202,7 @@ public class Main {
                         })
                 .thenRun(system::terminate);
 
-
+        // read the messages from the Kafka topic
         Consumer.Control consumerControl =
                 Consumer
                         .plainSource(

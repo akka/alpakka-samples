@@ -1,3 +1,5 @@
+ThisBuild / scalaVersion := "2.13.1"
+
 enablePlugins(AkkaParadoxPlugin, ParadoxSitePlugin, GhpagesPlugin)
 
 name := "Alpakka Samples"

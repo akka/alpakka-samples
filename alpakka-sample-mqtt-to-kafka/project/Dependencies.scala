@@ -17,9 +17,11 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
     "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
     "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
+    "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.2",
     // JSON
     "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % JacksonDatabindVersion,
     "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % JacksonDatabindVersion,
+    "com.fasterxml.jackson.module" %% "jackson-module-scala" % JacksonDatabindVersion,
     // Logging
     "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,
     "ch.qos.logback" % "logback-classic" % "1.2.3",
