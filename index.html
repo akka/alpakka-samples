@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka Samples</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-12-13 16:20:00
+Version 2019-12-13 18:12:00
 </div>
 <div class="nav-header-groups">
 </div>
@@ -251,6 +251,7 @@ Version 2019-12-13 16:20:00
   <li><a href="index.html#" class="header"><a href="kafka-to-elasticsearch/">Read from Kafka and write to Elasticsearch</a></a></li>
   <li><a href="index.html#" class="header"><a href="file-to-elasticsearch/">Read files from a directory and write to Elasticsearch</a></a></li>
   <li><a href="index.html#" class="header"><a href="rotate-logs-to-ftp/">Rotate logs, zip and write to SFTP server</a></a></li>
+  <li><a href="index.html#" class="header"><a href="mqtt-to-kafka/">Subscribe to MQTT and produce to Kafka</a></a></li>
   <li><a href="index.html#" class="header"><a href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-sqs-java" title="Amazon SQS" target="_blank" rel="noopener noreferrer">Amazon SQS</a></a></li>
   <li><a href="index.html#" class="header"><a href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-mqtt-http-to-s3-java" title="MQTT topic triggers file download which is uploaded to AWS S3" target="_blank" rel="noopener noreferrer">MQTT topic triggers file download which is uploaded to AWS S3</a></a></li>
 </ul>
@@ -264,7 +265,7 @@ Version 2019-12-13 16:20:00
 <h1><a href="index.html">Alpakka Samples</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-12-13 16:20:00
+Version 2019-12-13 18:12:00
 </div>
 <div class="nav-header-groups">
 </div>
@@ -279,6 +280,7 @@ Version 2019-12-13 16:20:00
   <li><a href="index.html#" class="header"><a href="kafka-to-elasticsearch/">Read from Kafka and write to Elasticsearch</a></a></li>
   <li><a href="index.html#" class="header"><a href="file-to-elasticsearch/">Read files from a directory and write to Elasticsearch</a></a></li>
   <li><a href="index.html#" class="header"><a href="rotate-logs-to-ftp/">Rotate logs, zip and write to SFTP server</a></a></li>
+  <li><a href="index.html#" class="header"><a href="mqtt-to-kafka/">Subscribe to MQTT and produce to Kafka</a></a></li>
   <li><a href="index.html#" class="header"><a href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-sqs-java" title="Amazon SQS" target="_blank" rel="noopener noreferrer">Amazon SQS</a></a></li>
   <li><a href="index.html#" class="header"><a href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-mqtt-http-to-s3-java" title="MQTT topic triggers file download which is uploaded to AWS S3" target="_blank" rel="noopener noreferrer">MQTT topic triggers file download which is uploaded to AWS S3</a></a></li>
 </ul>
@@ -308,6 +310,8 @@ Version 2019-12-13 16:20:00
 <p>This example uses Alpakka File to watch for new files created in a directory and then tails them (similar to Elasticsearch&rsquo;s <code>logstash</code> utility). The tailed logs are parsed and indexed in Elasticsearch using Alpakka Elasticsearch.</p>
 <h3><a href="#" name="" class="anchor"><span class="anchor-link"></span></a><a href="rotate-logs-to-ftp/">Rotate logs, zip and write to SFTP server</a></h3>
 <p>Read a stream of data and store it zipped in rotating files on an SFTP server.</p>
+<h3><a href="#" name="" class="anchor"><span class="anchor-link"></span></a><a href="mqtt-to-kafka/">Subscribe to MQTT and produce to Kafka</a></h3>
+<p>Subscribe to an MQTT topic with <a href="https://doc.akka.io/docs/alpakka/current/">Alpakka MQTT</a>, group a few values and publish the aggregate to a Kafka topic with <a href="https://doc.akka.io/docs/alpakka-kafka/current/">Alpakka Kafka</a>.</p>
 <h3><a href="#" name="" class="anchor"><span class="anchor-link"></span></a><a href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-sqs-java" title="Amazon SQS" target="_blank" rel="noopener noreferrer">Amazon SQS</a></h3>
 <p>Listen to an Amazon SQS topic, enrich the message via calling an actor, publish a new message to SQS and acknowledge/delete the original message. (Java only)</p>
 <h3><a href="#" name="" class="anchor"><span class="anchor-link"></span></a><a href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-mqtt-http-to-s3-java" title="MQTT topic triggers file download which is uploaded to AWS S3" target="_blank" rel="noopener noreferrer">MQTT topic triggers file download which is uploaded to AWS S3</a></h3>
