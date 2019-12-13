@@ -18,6 +18,9 @@ This example uses Alpakka Kafka to read from an Apache Kafka topic, parse the me
 ### @extref:[Read files from a directory and write to Elasticsearch](file-to-elasticsearch:index.html)
 This example uses Alpakka File to watch for new files created in a directory and then tails them (similar to Elasticsearch's `logstash` utility). The tailed logs are parsed and indexed in Elasticsearch using Alpakka Elasticsearch.
 
+### @extref:[Rotate logs, zip and write to SFTP server](rotate-logs-to-ftp:index.html)
+Read a stream of data and store it zipped in rotating files on an SFTP server.
+
 ### @link:[Amazon SQS](https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-sqs-java) { open=new }
 Listen to an Amazon SQS topic, enrich the message via calling an actor, publish a new message to SQS and acknowledge/delete the original message. (Java only)
 
