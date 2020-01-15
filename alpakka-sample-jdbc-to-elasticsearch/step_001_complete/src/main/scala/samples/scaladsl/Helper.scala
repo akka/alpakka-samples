@@ -4,13 +4,12 @@
 
 package samples.scaladsl
 
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
 import akka.stream.alpakka.elasticsearch.WriteMessage
 import akka.stream.alpakka.elasticsearch.scaladsl.{ElasticsearchFlow, ElasticsearchSource}
 import akka.stream.alpakka.slick.javadsl.SlickSession
 import akka.stream.alpakka.slick.scaladsl.Slick
 import akka.stream.scaladsl.{Keep, Sink, Source}
-import akka.stream.{ActorMaterializer, Materializer}
 import akka.{Done, NotUsed}
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
@@ -49,7 +48,7 @@ trait Helper {
 }
 
 object Helper {
-  def populateDataForTable()(implicit session: SlickSession, materializer: Materializer) = {
+  def populateDataForTable()(implicit session: SlickSession, actorSystem: ActorSystem[_]) = {
 
     import session.profile.api._
 

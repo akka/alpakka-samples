@@ -6,9 +6,8 @@ package samples.javadsl;
 
 // #imports
 import akka.Done;
-import akka.actor.ActorSystem;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.Behaviors;
 import akka.stream.alpakka.elasticsearch.ElasticsearchWriteSettings;
 import akka.stream.alpakka.elasticsearch.WriteMessage;
 import akka.stream.alpakka.elasticsearch.javadsl.ElasticsearchSink;
@@ -25,6 +24,8 @@ import samples.scaladsl.Helper;
 
 import java.io.IOException;
 import java.util.concurrent.CompletionStage;
+
+import static akka.actor.typed.javadsl.Adapter.toClassic;
 
 // #imports
 
@@ -64,16 +65,15 @@ public class Main {
         String elasticsearchAddress = elasticsearchContainer.getHttpHostAddress();
 
         // #sample
-        ActorSystem system = ActorSystem.create();
-        Materializer materializer = ActorMaterializer.create(system);
+        ActorSystem<Void> system = ActorSystem.create(Behaviors.empty(), "alpakka-sample");
 
         // #sample
         // #slick-setup
         SlickSession session = SlickSession.forConfig("slick-h2-mem");
-        system.registerOnTermination(session::close);
+        system.getWhenTerminated().thenAccept(done -> session.close());
         // #slick-setup
 
-        Helper.populateDataForTable(session, materializer);
+        Helper.populateDataForTable(session, system);
 
         // #es-setup
         RestClient elasticSearchClient = RestClient.builder(HttpHost.create(elasticsearchAddress)).build();
@@ -98,7 +98,7 @@ public class Main {
                                         ElasticsearchWriteSettings.Default(),
                                         elasticSearchClient,
                                         objectToJsonMapper),
-                                materializer);
+                                toClassic(system));
 
         done.thenRunAsync(
                 () -> {
@@ -108,7 +108,7 @@ public class Main {
                         ignored.printStackTrace();
                     }
                 },
-                system.dispatcher())
+                system.executionContext())
                 // #sample
                 .thenRunAsync(
                         () -> {
