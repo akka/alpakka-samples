@@ -7,8 +7,10 @@ package samples
 import java.util.concurrent.TimeUnit
 
 import akka.Done
-import akka.actor._
-import akka.stream._
+import akka.actor.{ CoordinatedShutdown, Cancellable }
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter._
 import akka.http.scaladsl._
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Accept
@@ -25,15 +27,15 @@ import org.testcontainers.containers.KafkaContainer
 import spray.json.{ DefaultJsonProtocol, JsValue, JsonWriter }
 
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration._
 
 object Main
   extends App
     with DefaultJsonProtocol {
 
-  implicit val actorSystem = ActorSystem("alpakka-samples")
+  implicit val actorSystem: ActorSystem[Nothing] = ActorSystem[Nothing](Behaviors.empty, "alpakka-samples")
 
-  import actorSystem.dispatcher
+  import actorSystem.executionContext
 
   val httpRequest = HttpRequest(uri = "https://www.nasdaq.com/screening/companies-by-name.aspx?exchange=NASDAQ&render=download")
     .withHeaders(Accept(MediaRanges.`text/*`))
@@ -60,13 +62,13 @@ object Main
 
   private val bootstrapServers: String = kafkaBroker.getBootstrapServers()
 
-  val kafkaProducerSettings = ProducerSettings(actorSystem, new StringSerializer, new StringSerializer)
+  val kafkaProducerSettings = ProducerSettings(actorSystem.toClassic, new StringSerializer, new StringSerializer)
     .withBootstrapServers(bootstrapServers)
 
   val (ticks, future): (Cancellable, Future[Done]) =
     Source
       .tick(1.seconds, 7.seconds, httpRequest) //: HttpRequest
-      .mapAsync(1)(Http().singleRequest(_)) //: HttpResponse
+      .mapAsync(1)(Http()(actorSystem.toClassic).singleRequest(_)) //: HttpResponse
       .flatMapConcat(extractEntityData) //: ByteString
       .via(CsvParsing.lineScanner()) //: List[ByteString]
       .via(CsvToMap.toMap()) //: Map[String, ByteString]
@@ -81,10 +83,10 @@ object Main
 
   val cs: CoordinatedShutdown = CoordinatedShutdown(actorSystem)
   cs.addTask(CoordinatedShutdown.PhaseServiceStop, "shut-down-client-http-pool")( () =>
-    Http().shutdownAllConnectionPools().map(_ => Done)
+    Http()(actorSystem.toClassic).shutdownAllConnectionPools().map(_ => Done)
   )
 
-  val kafkaConsumerSettings = ConsumerSettings(actorSystem, new StringDeserializer, new StringDeserializer)
+  val kafkaConsumerSettings = ConsumerSettings(actorSystem.toClassic, new StringDeserializer, new StringDeserializer)
     .withBootstrapServers(bootstrapServers)
     .withGroupId("topic1")
     .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")

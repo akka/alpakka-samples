@@ -5,12 +5,13 @@
 package samples
 
 import akka.Done
-import akka.actor._
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter._
 import akka.http.scaladsl._
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Accept
 import akka.http.scaladsl.model.{ HttpRequest, HttpResponse, MediaRanges }
-import akka.stream._
 import akka.stream.scaladsl.{ Sink, Source }
 import akka.util.ByteString
 
@@ -18,9 +19,9 @@ import scala.concurrent.Future
 
 object Main extends App {
 
-  implicit val actorSystem = ActorSystem("alpakka-samples")
+  implicit val actorSystem: ActorSystem[Nothing] = ActorSystem[Nothing](Behaviors.empty, "alpakka-samples")
 
-  import actorSystem.dispatcher
+  import actorSystem.executionContext
 
   val httpRequest = HttpRequest(uri = "https://www.nasdaq.com/screening/companies-by-name.aspx?exchange=NASDAQ&render=download")
     .withHeaders(Accept(MediaRanges.`text/*`))
@@ -35,11 +36,11 @@ object Main extends App {
   val future: Future[Done] =
     Source
       .single(httpRequest) //: HttpRequest
-      .mapAsync(1)(Http().singleRequest(_)) //: HttpResponse
+      .mapAsync(1)(Http()(actorSystem.toClassic).singleRequest(_)) //: HttpResponse
       .flatMapConcat(extractEntityData) //: ByteString
       .runWith(Sink.foreach(println))
 
-  future.map { _ =>
+  future.onComplete { _ =>
     println("Done!")
     actorSystem.terminate()
   }
