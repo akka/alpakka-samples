@@ -48,7 +48,9 @@ object Main
   def cleanseCsvData(csvData: Map[String, ByteString]): Map[String, String] =
     csvData
       .filterNot { case (key, _) => key.isEmpty }
+      .view
       .mapValues(_.utf8String)
+      .toMap
 
   def toJson(map: Map[String, String])(
     implicit jsWriter: JsonWriter[Map[String, String]]): JsValue = jsWriter.write(map)
