@@ -6,12 +6,13 @@ package samples.scaladsl
 
 // #imports
 import akka.Done
-import akka.actor.ActorSystem
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter._
 import akka.stream.alpakka.elasticsearch.WriteMessage.createIndexMessage
 import akka.stream.alpakka.elasticsearch.scaladsl.ElasticsearchSink
 import akka.stream.alpakka.slick.javadsl.SlickSession
 import akka.stream.alpakka.slick.scaladsl.Slick
-import akka.stream.{ActorMaterializer, Materializer}
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import spray.json.DefaultJsonProtocol.{jsonFormat4, _}
@@ -22,19 +23,20 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 // #imports
 
 object Main extends App with Helper {
-  implicit val actorSystem: ActorSystem = ActorSystem()
-  implicit val actorMaterializer: Materializer = ActorMaterializer()
-  implicit val executionContext: ExecutionContext = actorSystem.dispatcher
+  implicit val actorSystem: ActorSystem[Nothing] = ActorSystem(Behaviors.empty, "alpakka-sample")
+  implicit val executionContext: ExecutionContext = actorSystem.executionContext
 
   def wait(duration: FiniteDuration): Unit = Thread.sleep(duration.toMillis)
 
-  def terminateActorSystem(): Unit =
-    Await.result(actorSystem.terminate(), 1.seconds)
+  def terminateActorSystem(): Unit = {
+    actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, 1.seconds)
+  }
 
   // #slick-setup
 
   implicit val session = SlickSession.forConfig("slick-h2-mem")                         // (1)
-  actorSystem.registerOnTermination(session.close())
+  actorSystem.whenTerminated.map(_ => session.close())
 
   import session.profile.api._
   class Movies(tag: Tag) extends Table[(Int, String, String, Double)](tag, "MOVIE") {   // (2)

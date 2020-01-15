@@ -1,10 +1,9 @@
 import sbt.Keys._
 import sbt._
-import sbtstudent.AdditionalSettings
 
 object CommonSettings {
   lazy val commonSettings = Seq(
-    organization := "com.lightbend.training",
+    organization := "com.lightbend.akka",
     version := "1.3.0",
     scalaVersion := Dependencies.scalaVer,
     scalacOptions ++= CompileOptions.compileOptions,
@@ -17,8 +16,5 @@ object CommonSettings {
     parallelExecution in GlobalScope := false,
     fork in Test := true,
     libraryDependencies ++= Dependencies.dependencies
-  ) ++
-    AdditionalSettings.initialCmdsConsole ++
-    AdditionalSettings.initialCmdsTestConsole ++
-    AdditionalSettings.cmdAliases
+  )
 }
