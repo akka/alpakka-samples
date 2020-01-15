@@ -5,9 +5,10 @@
 package samples.javadsl;
 
 import akka.Done;
-import akka.actor.ActorSystem;
 import akka.actor.Cancellable;
 import akka.actor.CoordinatedShutdown;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.Behaviors;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.model.HttpResponse;
@@ -43,6 +44,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
+
+import static akka.actor.typed.javadsl.Adapter.toClassic;
 
 public class Main {
 
@@ -97,11 +100,11 @@ public class Main {
         kafkaBroker.start();
         final String bootstrapServers = kafkaBroker.getBootstrapServers();
 
-        ActorSystem system = ActorSystem.create();
-        Http http = Http.get(system);
+        ActorSystem<Void> system = ActorSystem.create(Behaviors.empty(), "alpakka-samples");
+        Http http = Http.get(toClassic(system));
 
         ProducerSettings<String, String> kafkaProducerSettings =
-                ProducerSettings.create(system, new StringSerializer(), new StringSerializer())
+                ProducerSettings.create(toClassic(system), new StringSerializer(), new StringSerializer())
                         .withBootstrapServers(bootstrapServers);
 
         Pair<Cancellable, CompletionStage<Done>> stagePair =
@@ -128,7 +131,7 @@ public class Main {
         );
 
         ConsumerSettings<String, String> kafkaConsumerSettings =
-                ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
+                ConsumerSettings.create(toClassic(system), new StringDeserializer(), new StringDeserializer())
                         .withBootstrapServers(bootstrapServers)
                         .withGroupId("topic1")
                         .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
@@ -147,7 +150,7 @@ public class Main {
         tick.cancel();
 
         streamCompletion
-                .thenApplyAsync(done -> control.drainAndShutdown(system.dispatcher()))
+                .thenApplyAsync(done -> control.drainAndShutdown(system.executionContext()))
                 .thenAccept(
                         done -> {
                             kafkaBroker.stop();

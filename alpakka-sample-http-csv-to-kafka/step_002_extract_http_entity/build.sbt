@@ -1,1 +1,0 @@
-EclipseKeys.skipProject := false

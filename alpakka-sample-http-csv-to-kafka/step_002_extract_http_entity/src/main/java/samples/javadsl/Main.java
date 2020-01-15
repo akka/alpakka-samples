@@ -5,7 +5,8 @@
 package samples.javadsl;
 
 import akka.Done;
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.Behaviors;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.model.HttpResponse;
@@ -18,6 +19,8 @@ import akka.util.ByteString;
 
 import java.util.Collections;
 import java.util.concurrent.CompletionStage;
+
+import static akka.actor.typed.javadsl.Adapter.toClassic;
 
 public class Main {
 
@@ -40,8 +43,8 @@ public class Main {
     }
 
     private void run() throws Exception {
-        ActorSystem system = ActorSystem.create();
-        Http http = Http.get(system);
+        ActorSystem<Void> system = ActorSystem.create(Behaviors.empty(), "alpakka-samples");
+        Http http = Http.get(toClassic(system));
 
         CompletionStage<Done> completion =
                 Source.single(httpRequest) // : HttpRequest
