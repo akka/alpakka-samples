@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-12-13 18:12:00
+Version 2020-01-15 16:49:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -269,7 +269,7 @@ Version 2019-12-13 18:12:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-12-13 18:12:00
+Version 2020-01-15 16:49:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -305,7 +305,7 @@ Version 2019-12-13 18:12:00
 <div class="small-12 column" id="docs">
 <h1><a href="#step-6-adding-coordinated-shutdown" name="step-6-adding-coordinated-shutdown" class="anchor"><span class="anchor-link"></span></a>Step 6: Adding Coordinated Shutdown</h1>
 <h3><a href="#description" name="description" class="anchor"><span class="anchor-link"></span></a>Description</h3>
-<p>To make sure Akka HTTP is shut down in a proper way it is added to Akka&rsquo;s <a href="https://doc.akka.io/docs/akka/2.6.0/actors.html#coordinated-shutdown">Coordinated shutdown</a>.</p>
+<p>To make sure Akka HTTP is shut down in a proper way it is added to Akka&rsquo;s <a href="https://doc.akka.io/docs/akka/2.6.1/actors.html#coordinated-shutdown">Coordinated shutdown</a>.</p>
 <h3><a href="#code" name="code" class="anchor"><span class="anchor-link"></span></a>Code</h3>
 <dl>
   <dt>Java</dt>
@@ -317,7 +317,8 @@ Version 2019-12-13 18:12:00
 package samples.javadsl;
 
 import akka.Done;
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.CoordinatedShutdown;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.model.HttpRequest;
@@ -339,6 +340,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
+
+import static akka.actor.typed.javadsl.Adapter.toClassic;
 
 public class Main {
 
@@ -389,8 +392,8 @@ public class Main {
     }
 
     private void run() throws Exception {
-        ActorSystem system = ActorSystem.create();
-        Http http = Http.get(system);
+        ActorSystem&lt;Void&gt; system = ActorSystem.create(Behaviors.empty(), &quot;alpakka-samples&quot;);
+        Http http = Http.get(toClassic(system));
 
         CompletionStage&lt;Done&gt; completion =
                 Source.single(httpRequest) // : HttpRequest
@@ -424,12 +427,14 @@ public class Main {
 package samples
 
 import akka.Done
-import akka.actor._
+import akka.actor.CoordinatedShutdown
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter._
 import akka.http.scaladsl._
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Accept
 import akka.http.scaladsl.model.{ HttpRequest, HttpResponse, MediaRanges }
-import akka.stream._
 import akka.stream.alpakka.csv.scaladsl.{ CsvParsing, CsvToMap }
 import akka.stream.scaladsl.{ Sink, Source }
 import akka.util.ByteString
@@ -441,9 +446,9 @@ object Main
   extends App
     with DefaultJsonProtocol {
 
-  implicit val actorSystem = ActorSystem(&quot;alpakka-samples&quot;)
+  implicit val actorSystem: ActorSystem[Nothing] = ActorSystem[Nothing](Behaviors.empty, &quot;alpakka-samples&quot;)
 
-  import actorSystem.dispatcher
+  import actorSystem.executionContext
 
   val httpRequest = HttpRequest(uri = &quot;https://www.nasdaq.com/screening/companies-by-name.aspx?exchange=NASDAQ&amp;render=download&quot;)
     .withHeaders(Accept(MediaRanges.`text/*`))
@@ -458,7 +463,9 @@ object Main
   def cleanseCsvData(csvData: Map[String, ByteString]): Map[String, String] =
     csvData
       .filterNot { case (key, _) =&gt; key.isEmpty }
+      .view
       .mapValues(_.utf8String)
+      .toMap
 
   def toJson(map: Map[String, String])(
     implicit jsWriter: JsonWriter[Map[String, String]]): JsValue = jsWriter.write(map)
@@ -466,7 +473,7 @@ object Main
   val future: Future[Done] =
     Source
       .single(httpRequest) //: HttpRequest
-      .mapAsync(1)(Http().singleRequest(_)) //: HttpResponse
+      .mapAsync(1)(Http()(actorSystem.toClassic).singleRequest(_)) //: HttpResponse
       .flatMapConcat(extractEntityData) //: ByteString
       .via(CsvParsing.lineScanner()) //: List[ByteString]
       .via(CsvToMap.toMap()) //: Map[String, ByteString]
@@ -477,10 +484,10 @@ object Main
 
   val cs: CoordinatedShutdown = CoordinatedShutdown(actorSystem)
   cs.addTask(CoordinatedShutdown.PhaseServiceStop, &quot;shut-down-client-http-pool&quot;)( () =&gt;
-    Http().shutdownAllConnectionPools().map(_ =&gt; Done)
+    Http()(actorSystem.toClassic).shutdownAllConnectionPools().map(_ =&gt; Done)
   )
 
-  future.map { _ =&gt;
+  future.onComplete { _ =&gt;
     println(&quot;Done!&quot;)
     cs.run(CoordinatedShutdown.UnknownReason)
   }
@@ -510,7 +517,7 @@ Please feel free to edit and contribute a pull request.
 <img class="akka-icon float-left show-for-medium" src="images/akka-icon.svg" />
 <section class="copyright">
 <p class="legal">
-&copy; 2011-2019 <a href="https://www.lightbend.com" target="_blank">Lightbend, Inc.</a> |
+&copy; 2011-2020 <a href="https://www.lightbend.com" target="_blank">Lightbend, Inc.</a> |
 <a href="https://www.lightbend.com/legal/licenses" target="_blank">Licenses</a> |
 <a href="https://www.lightbend.com/legal/terms" target="_blank">Terms</a> |
 <a href="https://www.lightbend.com/legal/privacy" target="_blank">Privacy Policy</a> |

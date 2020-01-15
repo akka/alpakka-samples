@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-12-13 18:12:00
+Version 2020-01-15 16:49:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -269,7 +269,7 @@ Version 2019-12-13 18:12:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-12-13 18:12:00
+Version 2020-01-15 16:49:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -305,7 +305,7 @@ Version 2019-12-13 18:12:00
 <div class="small-12 column" id="docs">
 <h2><a href="#step-2-extract-http-entity" name="step-2-extract-http-entity" class="anchor"><span class="anchor-link"></span></a>Step 2: extract HTTP entity</h2>
 <h3><a href="#description" name="description" class="anchor"><span class="anchor-link"></span></a>Description</h3>
-<p>The HTTP response with status OK is expected and the contained HTTP entity is extracted. Instead of the HTTP response, the contained entity (page content) continues in the stream in the form of <a href="https://doc.akka.io/api/akka/2.6.0/akka/util/ByteString.html">ByteString</a> elements.</p>
+<p>The HTTP response with status OK is expected and the contained HTTP entity is extracted. Instead of the HTTP response, the contained entity (page content) continues in the stream in the form of <a href="https://doc.akka.io/api/akka/2.6.1/akka/util/ByteString.html">ByteString</a> elements.</p>
 <h3><a href="#code" name="code" class="anchor"><span class="anchor-link"></span></a>Code</h3>
 <dl>
   <dt>Java</dt>
@@ -317,7 +317,8 @@ Version 2019-12-13 18:12:00
 package samples.javadsl;
 
 import akka.Done;
-import akka.actor.ActorSystem;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.Behaviors;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.model.HttpResponse;
@@ -330,6 +331,8 @@ import akka.util.ByteString;
 
 import java.util.Collections;
 import java.util.concurrent.CompletionStage;
+
+import static akka.actor.typed.javadsl.Adapter.toClassic;
 
 public class Main {
 
@@ -352,8 +355,8 @@ public class Main {
     }
 
     private void run() throws Exception {
-        ActorSystem system = ActorSystem.create();
-        Http http = Http.get(system);
+        ActorSystem&lt;Void&gt; system = ActorSystem.create(Behaviors.empty(), &quot;alpakka-samples&quot;);
+        Http http = Http.get(toClassic(system));
 
         CompletionStage&lt;Done&gt; completion =
                 Source.single(httpRequest) // : HttpRequest
@@ -378,12 +381,13 @@ public class Main {
 package samples
 
 import akka.Done
-import akka.actor._
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter._
 import akka.http.scaladsl._
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Accept
 import akka.http.scaladsl.model.{ HttpRequest, HttpResponse, MediaRanges }
-import akka.stream._
 import akka.stream.scaladsl.{ Sink, Source }
 import akka.util.ByteString
 
@@ -391,9 +395,9 @@ import scala.concurrent.Future
 
 object Main extends App {
 
-  implicit val actorSystem = ActorSystem(&quot;alpakka-samples&quot;)
+  implicit val actorSystem: ActorSystem[Nothing] = ActorSystem[Nothing](Behaviors.empty, &quot;alpakka-samples&quot;)
 
-  import actorSystem.dispatcher
+  import actorSystem.executionContext
 
   val httpRequest = HttpRequest(uri = &quot;https://www.nasdaq.com/screening/companies-by-name.aspx?exchange=NASDAQ&amp;render=download&quot;)
     .withHeaders(Accept(MediaRanges.`text/*`))
@@ -408,11 +412,11 @@ object Main extends App {
   val future: Future[Done] =
     Source
       .single(httpRequest) //: HttpRequest
-      .mapAsync(1)(Http().singleRequest(_)) //: HttpResponse
+      .mapAsync(1)(Http()(actorSystem.toClassic).singleRequest(_)) //: HttpResponse
       .flatMapConcat(extractEntityData) //: ByteString
       .runWith(Sink.foreach(println))
 
-  future.map { _ =&gt;
+  future.onComplete { _ =&gt;
     println(&quot;Done!&quot;)
     actorSystem.terminate()
   }
@@ -442,7 +446,7 @@ Please feel free to edit and contribute a pull request.
 <img class="akka-icon float-left show-for-medium" src="images/akka-icon.svg" />
 <section class="copyright">
 <p class="legal">
-&copy; 2011-2019 <a href="https://www.lightbend.com" target="_blank">Lightbend, Inc.</a> |
+&copy; 2011-2020 <a href="https://www.lightbend.com" target="_blank">Lightbend, Inc.</a> |
 <a href="https://www.lightbend.com/legal/licenses" target="_blank">Licenses</a> |
 <a href="https://www.lightbend.com/legal/terms" target="_blank">Terms</a> |
 <a href="https://www.lightbend.com/legal/privacy" target="_blank">Privacy Policy</a> |

@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-12-13 18:12:00
+Version 2020-01-15 16:49:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -269,7 +269,7 @@ Version 2019-12-13 18:12:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2019-12-13 18:12:00
+Version 2020-01-15 16:49:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -318,9 +318,10 @@ Version 2019-12-13 18:12:00
 package samples.javadsl;
 
 import akka.Done;
-import akka.actor.ActorSystem;
 import akka.actor.Cancellable;
 import akka.actor.CoordinatedShutdown;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.Behaviors;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.model.HttpRequest;
 import akka.http.javadsl.model.HttpResponse;
@@ -356,6 +357,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
+
+import static akka.actor.typed.javadsl.Adapter.toClassic;
 
 public class Main {
 
@@ -410,11 +413,11 @@ public class Main {
         kafkaBroker.start();
         final String bootstrapServers = kafkaBroker.getBootstrapServers();
 
-        ActorSystem system = ActorSystem.create();
-        Http http = Http.get(system);
+        ActorSystem&lt;Void&gt; system = ActorSystem.create(Behaviors.empty(), &quot;alpakka-samples&quot;);
+        Http http = Http.get(toClassic(system));
 
         ProducerSettings&lt;String, String&gt; kafkaProducerSettings =
-                ProducerSettings.create(system, new StringSerializer(), new StringSerializer())
+                ProducerSettings.create(toClassic(system), new StringSerializer(), new StringSerializer())
                         .withBootstrapServers(bootstrapServers);
 
         Pair&lt;Cancellable, CompletionStage&lt;Done&gt;&gt; stagePair =
@@ -441,7 +444,7 @@ public class Main {
         );
 
         ConsumerSettings&lt;String, String&gt; kafkaConsumerSettings =
-                ConsumerSettings.create(system, new StringDeserializer(), new StringDeserializer())
+                ConsumerSettings.create(toClassic(system), new StringDeserializer(), new StringDeserializer())
                         .withBootstrapServers(bootstrapServers)
                         .withGroupId(&quot;topic1&quot;)
                         .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, &quot;earliest&quot;);
@@ -460,7 +463,7 @@ public class Main {
         tick.cancel();
 
         streamCompletion
-                .thenApplyAsync(done -&gt; control.drainAndShutdown(system.dispatcher()))
+                .thenApplyAsync(done -&gt; control.drainAndShutdown(system.executionContext()))
                 .thenAccept(
                         done -&gt; {
                             kafkaBroker.stop();
@@ -479,8 +482,10 @@ package samples
 import java.util.concurrent.TimeUnit
 
 import akka.Done
-import akka.actor._
-import akka.stream._
+import akka.actor.{ CoordinatedShutdown, Cancellable }
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter._
 import akka.http.scaladsl._
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Accept
@@ -497,15 +502,15 @@ import org.testcontainers.containers.KafkaContainer
 import spray.json.{ DefaultJsonProtocol, JsValue, JsonWriter }
 
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration._
 
 object Main
   extends App
     with DefaultJsonProtocol {
 
-  implicit val actorSystem = ActorSystem(&quot;alpakka-samples&quot;)
+  implicit val actorSystem: ActorSystem[Nothing] = ActorSystem[Nothing](Behaviors.empty, &quot;alpakka-samples&quot;)
 
-  import actorSystem.dispatcher
+  import actorSystem.executionContext
 
   val httpRequest = HttpRequest(uri = &quot;https://www.nasdaq.com/screening/companies-by-name.aspx?exchange=NASDAQ&amp;render=download&quot;)
     .withHeaders(Accept(MediaRanges.`text/*`))
@@ -520,7 +525,9 @@ object Main
   def cleanseCsvData(csvData: Map[String, ByteString]): Map[String, String] =
     csvData
       .filterNot { case (key, _) =&gt; key.isEmpty }
+      .view
       .mapValues(_.utf8String)
+      .toMap
 
   def toJson(map: Map[String, String])(
     implicit jsWriter: JsonWriter[Map[String, String]]): JsValue = jsWriter.write(map)
@@ -530,13 +537,13 @@ object Main
 
   private val bootstrapServers: String = kafkaBroker.getBootstrapServers()
 
-  val kafkaProducerSettings = ProducerSettings(actorSystem, new StringSerializer, new StringSerializer)
+  val kafkaProducerSettings = ProducerSettings(actorSystem.toClassic, new StringSerializer, new StringSerializer)
     .withBootstrapServers(bootstrapServers)
 
   val (ticks, future): (Cancellable, Future[Done]) =
     Source
       .tick(1.seconds, 7.seconds, httpRequest) //: HttpRequest
-      .mapAsync(1)(Http().singleRequest(_)) //: HttpResponse
+      .mapAsync(1)(Http()(actorSystem.toClassic).singleRequest(_)) //: HttpResponse
       .flatMapConcat(extractEntityData) //: ByteString
       .via(CsvParsing.lineScanner()) //: List[ByteString]
       .via(CsvToMap.toMap()) //: Map[String, ByteString]
@@ -551,10 +558,10 @@ object Main
 
   val cs: CoordinatedShutdown = CoordinatedShutdown(actorSystem)
   cs.addTask(CoordinatedShutdown.PhaseServiceStop, &quot;shut-down-client-http-pool&quot;)( () =&gt;
-    Http().shutdownAllConnectionPools().map(_ =&gt; Done)
+    Http()(actorSystem.toClassic).shutdownAllConnectionPools().map(_ =&gt; Done)
   )
 
-  val kafkaConsumerSettings = ConsumerSettings(actorSystem, new StringDeserializer, new StringDeserializer)
+  val kafkaConsumerSettings = ConsumerSettings(actorSystem.toClassic, new StringDeserializer, new StringDeserializer)
     .withBootstrapServers(bootstrapServers)
     .withGroupId(&quot;topic1&quot;)
     .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, &quot;earliest&quot;)
@@ -600,7 +607,7 @@ Please feel free to edit and contribute a pull request.
 <img class="akka-icon float-left show-for-medium" src="images/akka-icon.svg" />
 <section class="copyright">
 <p class="legal">
-&copy; 2011-2019 <a href="https://www.lightbend.com" target="_blank">Lightbend, Inc.</a> |
+&copy; 2011-2020 <a href="https://www.lightbend.com" target="_blank">Lightbend, Inc.</a> |
 <a href="https://www.lightbend.com/legal/licenses" target="_blank">Licenses</a> |
 <a href="https://www.lightbend.com/legal/terms" target="_blank">Terms</a> |
 <a href="https://www.lightbend.com/legal/privacy" target="_blank">Privacy Policy</a> |
