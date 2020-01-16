@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2020-01-15 16:49:00
+Version 2020-01-16 00:15:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -266,7 +266,7 @@ Version 2020-01-15 16:49:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2020-01-15 16:49:00
+Version 2020-01-16 00:15:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -304,10 +304,9 @@ Version 2020-01-15 16:49:00
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/java/samples/javadsl/Main.java#L8-L28" target="_blank" title="Go to snippet source"></a><code class="language-java">import akka.Done;
-import akka.actor.ActorSystem;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/java/samples/javadsl/Main.java#L8-L29" target="_blank" title="Go to snippet source"></a><code class="language-java">import akka.Done;
+import akka.actor.typed.ActorSystem;
+import akka.actor.typed.javadsl.Behaviors;
 import akka.stream.alpakka.elasticsearch.ElasticsearchWriteSettings;
 import akka.stream.alpakka.elasticsearch.WriteMessage;
 import akka.stream.alpakka.elasticsearch.javadsl.ElasticsearchSink;
@@ -324,16 +323,19 @@ import samples.scaladsl.Helper;
 
 import java.io.IOException;
 import java.util.concurrent.CompletionStage;
+
+import static akka.actor.typed.javadsl.Adapter.toClassic;
 </code></pre></dd>
   <dt>Scala</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Main.scala#L8-L21" target="_blank" title="Go to snippet source"></a><code class="language-scala">import akka.Done
-import akka.actor.ActorSystem
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Main.scala#L8-L22" target="_blank" title="Go to snippet source"></a><code class="language-scala">import akka.Done
+import akka.actor.typed.ActorSystem
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.scaladsl.adapter._
 import akka.stream.alpakka.elasticsearch.WriteMessage.createIndexMessage
 import akka.stream.alpakka.elasticsearch.scaladsl.ElasticsearchSink
 import akka.stream.alpakka.slick.javadsl.SlickSession
 import akka.stream.alpakka.slick.scaladsl.Slick
-import akka.stream.{ActorMaterializer, Materializer}
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import spray.json.DefaultJsonProtocol.{jsonFormat4, _}
@@ -352,8 +354,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}</code></pre></dd>
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/java/samples/javadsl/Main.java#L67-L111" target="_blank" title="Go to snippet source"></a><code class="language-java">ActorSystem system = ActorSystem.create();
-Materializer materializer = ActorMaterializer.create(system);
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/java/samples/javadsl/Main.java#L68-L111" target="_blank" title="Go to snippet source"></a><code class="language-java">ActorSystem&lt;Void&gt; system = ActorSystem.create(Behaviors.empty(), &quot;alpakka-sample&quot;);
 
 final CompletionStage&lt;Done&gt; done =
         Slick.source(
@@ -369,7 +370,7 @@ final CompletionStage&lt;Done&gt; done =
                                 ElasticsearchWriteSettings.Default(),
                                 elasticSearchClient,
                                 objectToJsonMapper),
-                        materializer);
+                        toClassic(system));
 
 done.thenRunAsync(
         () -&gt; {
@@ -379,10 +380,10 @@ done.thenRunAsync(
                 ignored.printStackTrace();
             }
         },
-        system.dispatcher())</code></pre></dd>
+        system.executionContext())</code></pre></dd>
   <dt>Scala</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Main.scala#L64-L76" target="_blank" title="Go to snippet source"></a><code class="language-scala">val done: Future[Done] =
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Main.scala#L66-L78" target="_blank" title="Go to snippet source"></a><code class="language-scala">val done: Future[Done] =
   Slick
     .source(TableQuery[Movies].result)
     .map {
@@ -404,11 +405,11 @@ done.onComplete {
   <dt>Java</dt>
   <dd>
   <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/java/samples/javadsl/Main.java#L72-L73" target="_blank" title="Go to snippet source"></a><code class="language-java">SlickSession session = SlickSession.forConfig(&quot;slick-h2-mem&quot;);
-system.registerOnTermination(session::close);</code></pre></dd>
+system.getWhenTerminated().thenAccept(done -&gt; session.close());</code></pre></dd>
   <dt>Scala</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Main.scala#L35-L47" target="_blank" title="Go to snippet source"></a><code class="language-scala"><br/>implicit val session = SlickSession.forConfig(&quot;slick-h2-mem&quot;)                         // (1)
-actorSystem.registerOnTermination(session.close())
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Main.scala#L37-L49" target="_blank" title="Go to snippet source"></a><code class="language-scala"><br/>implicit val session = SlickSession.forConfig(&quot;slick-h2-mem&quot;)                         // (1)
+actorSystem.whenTerminated.map(_ =&gt; session.close())
 
 import session.profile.api._
 class Movies(tag: Tag) extends Table[(Int, String, String, Double)](tag, &quot;MOVIE&quot;) {   // (2)
@@ -428,7 +429,7 @@ class Movies(tag: Tag) extends Table[(Int, String, String, Double)](tag, &quot;M
 <dl>
   <dt>Java</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/java/samples/javadsl/Main.java#L39-L83" target="_blank" title="Go to snippet source"></a><code class="language-java">public static class Movie {
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/java/samples/javadsl/Main.java#L40-L83" target="_blank" title="Go to snippet source"></a><code class="language-java">public static class Movie {
     public final int id;
     public final String title;
     public final String genre;
@@ -450,7 +451,7 @@ class Movies(tag: Tag) extends Table[(Int, String, String, Double)](tag, &quot;M
     final ObjectMapper objectToJsonMapper = new ObjectMapper();</code></pre></dd>
   <dt>Scala</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Main.scala#L53-L55" target="_blank" title="Go to snippet source"></a><code class="language-scala">case class Movie(id: Int, title: String, genre: String, gross: Double)
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Main.scala#L55-L57" target="_blank" title="Go to snippet source"></a><code class="language-scala">case class Movie(id: Int, title: String, genre: String, gross: Double)
 
 implicit val format: JsonFormat[Movie] = jsonFormat4(Movie)</code></pre></dd>
 </dl>
@@ -464,7 +465,7 @@ implicit val format: JsonFormat[Movie] = jsonFormat4(Movie)</code></pre></dd>
   <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/java/samples/javadsl/Main.java#L79" target="_blank" title="Go to snippet source"></a><code class="language-java">RestClient elasticSearchClient = RestClient.builder(HttpHost.create(elasticsearchAddress)).build();</code></pre></dd>
   <dt>Scala</dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Main.scala#L59-L60" target="_blank" title="Go to snippet source"></a><code class="language-scala">implicit val elasticSearchClient: RestClient =
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/step_001_complete/src/main/scala/samples/scaladsl/Main.scala#L61-L62" target="_blank" title="Go to snippet source"></a><code class="language-scala">implicit val elasticSearchClient: RestClient =
   RestClient.builder(HttpHost.create(elasticsearchAddress)).build()</code></pre></dd>
 </dl>
 </div>

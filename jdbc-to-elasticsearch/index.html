@@ -237,7 +237,7 @@ C18.354,14.614,14.613,18.354,10,18.354z" />
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2020-01-15 16:49:00
+Version 2020-01-16 00:15:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -258,7 +258,7 @@ Version 2020-01-15 16:49:00
 <h1><a href="index.html">Alpakka sample</a></h1>
 </div>
 <div class="nav-header-version">
-Version 2020-01-15 16:49:00
+Version 2020-01-16 00:15:00
 </div>
 <div class="nav-header-groups">
 <select class="supergroup" name="Language"><option class="group" value="group-java">Java</option><option class="group" value="group-scala">Scala</option></select>
@@ -283,7 +283,7 @@ Version 2020-01-15 16:49:00
 <div class="small-12 column" id="docs">
 <h1><a href="#alpakka-sample" name="alpakka-sample" class="anchor"><span class="anchor-link"></span></a>Alpakka sample</h1>
 <h2><a href="#read-from-a-database-and-publish-to-elasticsearch" name="read-from-a-database-and-publish-to-elasticsearch" class="anchor"><span class="anchor-link"></span></a>Read from a database and publish to Elasticsearch</h2>
-<p>This example uses <a href="https://doc.akka.io/docs/alpakka/1.0.2/slick.html">Alpakka Slick</a> to read from a database, and stores the data in Elasticsearch.</p>
+<p>This example uses <a href="https://doc.akka.io/docs/alpakka/1.1.2/slick.html">Alpakka Slick</a> to read from a database, and stores the data in Elasticsearch.</p>
 <p>Browse the sources at <a href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch" title="Github" target="_blank" rel="noopener noreferrer">Github</a>.</p>
 <p>To try out this project clone <a href="https://github.com/akka/alpakka-samples" title="the Alpakka Samples repository" target="_blank" rel="noopener noreferrer">the Alpakka Samples repository</a> and find it in the <code>alpakka-sample-jdbc-to-elasticsearch</code> directory.</p>
 <h3><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h3>
@@ -291,10 +291,11 @@ Version 2020-01-15 16:49:00
   <dt>Dependencies (sbt notation)
   </dt>
   <dd>
-  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/project/Dependencies.scala#L6-L20" target="_blank" title="Go to snippet source"></a><code class="language-scala">val AkkaVersion = &quot;2.5.23&quot;
-val AlpakkaVersion = &quot;1.0.2&quot;
+  <pre class="prettyprint"><a class="icon go-to-source" href="https://github.com/akka/alpakka-samples/tree/master/alpakka-sample-jdbc-to-elasticsearch/project/Dependencies.scala#L6-L21" target="_blank" title="Go to snippet source"></a><code class="language-scala">val AkkaVersion = &quot;2.6.1&quot;
+val AlpakkaVersion = &quot;1.1.2&quot;
 
   &quot;com.typesafe.akka&quot; %% &quot;akka-stream&quot; % AkkaVersion,
+  &quot;com.typesafe.akka&quot; %% &quot;akka-actor-typed&quot; % AkkaVersion,
   &quot;com.lightbend.akka&quot; %% &quot;akka-stream-alpakka-elasticsearch&quot; % AlpakkaVersion,
   &quot;com.lightbend.akka&quot; %% &quot;akka-stream-alpakka-slick&quot; % AlpakkaVersion,
   // for JSON in Scala
