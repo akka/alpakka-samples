@@ -23,6 +23,7 @@ import akka.kafka.Subscriptions;
 import akka.kafka.javadsl.Consumer;
 import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
+import akka.stream.OverflowStrategy;
 import akka.stream.javadsl.BroadcastHub;
 import akka.stream.javadsl.Flow;
 import akka.stream.javadsl.Sink;
@@ -72,7 +73,11 @@ public class WebsocketExampleMain extends AllDirectives {
         Flow<Message, Message, ?> webSocketHandler =
             Flow.fromSinkAndSource(
                 Sink.ignore(),
-                topicSource().map(TextMessage::create));
+                topicSource()
+                    // decouple clients from each other: if a client is too slow and more than 1000 elements to be sent to
+                    // to the client queue up here, we fail this client
+                    .buffer(1000, OverflowStrategy.fail())
+                    .map(TextMessage::create));
 
         final Flow<HttpRequest, HttpResponse, ?> routeFlow = createRoute(webSocketHandler).flow(actorSystem.classicSystem(), materializer);
         final CompletionStage<ServerBinding> binding = http.bindAndHandle(routeFlow,
