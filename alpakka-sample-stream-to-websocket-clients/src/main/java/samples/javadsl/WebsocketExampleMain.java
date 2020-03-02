@@ -8,7 +8,6 @@ package samples.javadsl;
 
 import akka.Done;
 import akka.actor.ActorSystem;
-import akka.actor.typed.javadsl.Behaviors;
 import akka.http.javadsl.ConnectHttp;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.ServerBinding;
@@ -67,8 +66,8 @@ public class WebsocketExampleMain extends AllDirectives {
 
     private void run() throws Exception {
         actorSystem = ActorSystem.create("KafkaToWebSocket");
-        materializer = ActorMaterializer.create(actorSystem.classicSystem());
-        Http http = Http.get(actorSystem.classicSystem());
+        materializer = ActorMaterializer.create(actorSystem);
+        Http http = Http.get(actorSystem);
 
         Flow<Message, Message, ?> webSocketHandler =
             Flow.fromSinkAndSource(
@@ -79,7 +78,7 @@ public class WebsocketExampleMain extends AllDirectives {
                     .buffer(1000, OverflowStrategy.fail())
                     .map(TextMessage::create));
 
-        final Flow<HttpRequest, HttpResponse, ?> routeFlow = createRoute(webSocketHandler).flow(actorSystem.classicSystem(), materializer);
+        final Flow<HttpRequest, HttpResponse, ?> routeFlow = createRoute(webSocketHandler).flow(actorSystem, materializer);
         final CompletionStage<ServerBinding> binding = http.bindAndHandle(routeFlow,
                 ConnectHttp.toHost("localhost", 8081), materializer);
 
@@ -101,7 +100,7 @@ public class WebsocketExampleMain extends AllDirectives {
 
     private Source<String, ?> topicSource() {
         ConsumerSettings<Integer, String> kafkaConsumerSettings =
-        ConsumerSettings.create(actorSystem.classicSystem(), new IntegerDeserializer(), new StringDeserializer())
+        ConsumerSettings.create(actorSystem, new IntegerDeserializer(), new StringDeserializer())
                 .withBootstrapServers(kafkaBootstrapServers)
                 .withGroupId(groupId)
                 .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
