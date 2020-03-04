@@ -9,7 +9,6 @@ object Dependencies {
   // #deps
   val dependencies = List(
     // #deps
-    "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
     "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
     "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion,
     "com.typesafe.akka" %% "akka-stream-kafka" % AlpakkaKafkaVersion,
