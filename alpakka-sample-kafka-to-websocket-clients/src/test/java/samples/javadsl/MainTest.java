@@ -14,22 +14,16 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.junit.Assert.assertTrue;
 
-public class WebsocketExampleMainTest {
+public class MainTest {
     static ActorSystem system;
     static Materializer materializer;
 
@@ -48,7 +42,7 @@ public class WebsocketExampleMainTest {
 
     @Test
     public void addIndexFlow_Test() throws Exception {
-        final WebsocketExampleMain example = new WebsocketExampleMain(new Helper());
+        final Main example = new Main(new Helper());
 
         List<String> messages = Arrays.asList(
                 "I say high, you say low",

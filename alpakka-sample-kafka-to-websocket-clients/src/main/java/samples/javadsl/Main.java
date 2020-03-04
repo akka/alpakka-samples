@@ -40,9 +40,9 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 // #imports
 
-public class WebsocketExampleMain extends AllDirectives {
+public class Main extends AllDirectives {
 
-    private static final Logger log = LoggerFactory.getLogger(WebsocketExampleMain.class);
+    private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     private final Helper helper;
     private final String kafkaBootstrapServers;
@@ -53,7 +53,7 @@ public class WebsocketExampleMain extends AllDirectives {
     private ActorSystem actorSystem;
     private Materializer materializer;
 
-    public WebsocketExampleMain(Helper helper) {
+    public Main(Helper helper) {
         this.kafkaBootstrapServers = helper.kafkaBootstrapServers;
         this.helper = helper;
     }
@@ -61,7 +61,7 @@ public class WebsocketExampleMain extends AllDirectives {
     public static void main(String[] args) throws Exception {
         Helper helper = new Helper();
         helper.startContainers();
-        WebsocketExampleMain main = new WebsocketExampleMain(helper);
+        Main main = new Main(helper);
         main.run();
         helper.stopContainers();
     }
@@ -71,6 +71,7 @@ public class WebsocketExampleMain extends AllDirectives {
         materializer = ActorMaterializer.create(actorSystem);
         Http http = Http.get(actorSystem);
 
+        // #websocket-handler
         Flow<Message, Message, ?> webSocketHandler =
             Flow.fromSinkAndSource(
                 Sink.ignore(),
@@ -80,6 +81,7 @@ public class WebsocketExampleMain extends AllDirectives {
                     .buffer(1000, OverflowStrategy.fail())
                     .via(addIndexFlow())
                     .map(TextMessage::create));
+        // #websocket-handler
 
         final Flow<HttpRequest, HttpResponse, ?> routeFlow = createRoute(webSocketHandler).flow(actorSystem, materializer);
         final CompletionStage<ServerBinding> binding = http.bindAndHandle(routeFlow,
@@ -112,6 +114,7 @@ public class WebsocketExampleMain extends AllDirectives {
         );
     }
 
+    // #kafka-to-broadcast
     private Source<String, ?> topicSource() {
         ConsumerSettings<Integer, String> kafkaConsumerSettings =
         ConsumerSettings.create(actorSystem, new IntegerDeserializer(), new StringDeserializer())
@@ -127,4 +130,5 @@ public class WebsocketExampleMain extends AllDirectives {
                     // consumer
                     .runWith(BroadcastHub.of(String.class), materializer);
     }
+    // #kafka-to-broadcast
 }
