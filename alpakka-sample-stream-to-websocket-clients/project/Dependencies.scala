@@ -5,7 +5,7 @@ object Dependencies {
   // #deps
   val AkkaVersion = "2.5.29"
   val AkkaHttpVersion = "10.1.11"
-  val AlpakkaKafkaVersion = "1.1.0"
+  val AlpakkaKafkaVersion = "2.0.2"
   // #deps
   val dependencies = List(
     // #deps
@@ -24,6 +24,11 @@ object Dependencies {
     "ch.qos.logback" % "logback-classic" % "1.2.3",
     // #deps
 
-    "org.testcontainers" % "kafka" % "1.12.2"
+    "org.testcontainers" % "kafka" % "1.12.2",
+
+    "com.typesafe.akka" %% "akka-stream-testkit" % AkkaVersion % Test,
+    "com.google.guava" % "guava" % "28.2-jre" % Test,
+    "junit" % "junit" % "4.12" % Test,
+
   )
 }

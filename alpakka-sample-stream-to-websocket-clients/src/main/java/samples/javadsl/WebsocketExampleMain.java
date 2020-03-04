@@ -7,6 +7,7 @@ package samples.javadsl;
 // #imports
 
 import akka.Done;
+import akka.NotUsed;
 import akka.actor.ActorSystem;
 import akka.http.javadsl.ConnectHttp;
 import akka.http.javadsl.Http;
@@ -17,6 +18,7 @@ import akka.http.javadsl.model.ws.Message;
 import akka.http.javadsl.model.ws.TextMessage;
 import akka.http.javadsl.server.AllDirectives;
 import akka.http.javadsl.server.Route;
+import akka.japi.Pair;
 import akka.kafka.ConsumerSettings;
 import akka.kafka.Subscriptions;
 import akka.kafka.javadsl.Consumer;
@@ -52,13 +54,13 @@ public class WebsocketExampleMain extends AllDirectives {
     private Materializer materializer;
 
     public WebsocketExampleMain(Helper helper) {
-        helper.startContainers();
         this.kafkaBootstrapServers = helper.kafkaBootstrapServers;
         this.helper = helper;
     }
 
     public static void main(String[] args) throws Exception {
         Helper helper = new Helper();
+        helper.startContainers();
         WebsocketExampleMain main = new WebsocketExampleMain(helper);
         main.run();
         helper.stopContainers();
@@ -76,6 +78,7 @@ public class WebsocketExampleMain extends AllDirectives {
                     // decouple clients from each other: if a client is too slow and more than 1000 elements to be sent to
                     // to the client queue up here, we fail this client
                     .buffer(1000, OverflowStrategy.fail())
+                    .via(addIndexFlow())
                     .map(TextMessage::create));
 
         final Flow<HttpRequest, HttpResponse, ?> routeFlow = createRoute(webSocketHandler).flow(actorSystem, materializer);
@@ -88,11 +91,22 @@ public class WebsocketExampleMain extends AllDirectives {
         System.in.read(); // let it run until user presses return
     }
 
+    public Flow<String, String, NotUsed> addIndexFlow() {
+        final Pair<Integer, String> seed = Pair.create(0, "start");
+        return Flow.of(String.class)
+                   .scan(seed, (acc, message) -> {
+                       Integer index = acc.first();
+                       return Pair.create(index + 1, String.format("index: %s, message: %s", index, message));
+                   })
+                .filterNot(p -> p == seed)
+                .map(Pair::second);
+    }
+
     private Route createRoute(Flow<Message, Message, ?> webSocketHandler) {
         return concat(
                 path("events", () -> handleWebSocketMessages(webSocketHandler)),
                 path("push", () -> parameter("value", v -> {
-                    CompletionStage<Done> written = helper.writeToKafka(topic, v, actorSystem);
+                    CompletionStage<Done> written = helper.writeToKafka(topic, v, actorSystem, materializer);
                     return onSuccess(written, done -> complete("Ok"));
                 }))
         );
