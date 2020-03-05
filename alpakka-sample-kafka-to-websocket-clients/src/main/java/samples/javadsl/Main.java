@@ -5,7 +5,6 @@
 package samples.javadsl;
 
 // #imports
-
 import akka.Done;
 import akka.NotUsed;
 import akka.actor.ActorSystem;
@@ -104,6 +103,7 @@ public class Main extends AllDirectives {
                 .map(Pair::second);
     }
 
+    // #routes
     private Route createRoute(Flow<Message, Message, ?> webSocketHandler) {
         return concat(
                 path("events", () -> handleWebSocketMessages(webSocketHandler)),
@@ -113,6 +113,7 @@ public class Main extends AllDirectives {
                 }))
         );
     }
+    // #routes
 
     // #kafka-to-broadcast
     private Source<String, ?> topicSource() {
