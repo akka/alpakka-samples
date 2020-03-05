@@ -78,6 +78,20 @@ object Dependencies {
     val AlpakkaKafkaVersion = versions("AlpakkaKafkaVersion")
   }
   
+  object KafkaToWebsocketClients {
+    val versions = {
+      val source = IO.read(file(".") / ".." / "alpakka-sample-kafka-to-websocket-clients" / "project" / "Dependencies.scala")
+      val tree = source.parse[Source].get
+      tree.collect {
+        case q"val ${v: Pat.Var} = ${s: Lit.String}" => v.name.value -> s.value
+      }.toMap
+    }
+
+    val ScalaVersion = versions("scalaVer")
+    val AkkaVersion = versions("AkkaVersion")
+    val AlpakkaKafkaVersion = versions("AlpakkaKafkaVersion")
+  }
+
   object MqttToKafka {
     val versions = {
       val source = IO.read(file(".") / ".." / "alpakka-sample-mqtt-to-kafka" / "project" / "Dependencies.scala")

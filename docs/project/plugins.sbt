@@ -1,4 +1,4 @@
-addSbtPlugin("com.lightbend.akka" % "sbt-paradox-akka" % "0.23")
+addSbtPlugin("com.lightbend.akka" % "sbt-paradox-akka" % "0.31")
 addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.4.0")
 addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.6.3")
 resolvers += Resolver.jcenterRepo
