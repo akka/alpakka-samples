@@ -38,7 +38,7 @@ trait Helper {
   // Testcontainers: start Kafka in Docker
   // [[https://hub.docker.com/r/confluentinc/cp-kafka/tags Available Docker images]]
   // [[https://docs.confluent.io/current/installation/versions-interoperability.html Kafka versions in Confluent Platform]]
-  val kafka = new KafkaContainer("5.1.2") // contains Kafka 2.1.x
+  val kafka = new KafkaContainer("5.4.1") // contains Kafka 2.4.x
   kafka.start()
   val kafkaBootstrapServers = kafka.getBootstrapServers
 

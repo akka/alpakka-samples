@@ -40,7 +40,7 @@ public class Helper {
         elasticsearchContainer.start();
         elasticsearchAddress = elasticsearchContainer.getHttpHostAddress();
 
-        kafka = new KafkaContainer("5.1.2"); // contains Kafka 2.1.x
+        kafka = new KafkaContainer("5.4.1"); // contains Kafka 2.4.x
         kafka.start();
         kafkaBootstrapServers = kafka.getBootstrapServers();
     }
