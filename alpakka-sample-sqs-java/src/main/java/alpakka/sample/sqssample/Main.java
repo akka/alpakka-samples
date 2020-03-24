@@ -15,6 +15,7 @@ import akka.stream.javadsl.Source;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.github.matsluni.akkahttpspi.AkkaHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -54,13 +55,14 @@ public class Main {
 
     void run() throws Exception {
         // create SQS client
-        String sqsEndpoint = "this-uses-ElasticMQ";
+        String sqsEndpoint = "http://localhost:9324";
         SqsAsyncClient sqsClient =
                 SqsAsyncClient.builder()
                         .credentialsProvider(
                                 StaticCredentialsProvider.create(AwsBasicCredentials.create("x", "x")))
                         .endpointOverride(URI.create(sqsEndpoint))
                         .region(Region.EU_CENTRAL_1)
+                        .httpClient(AkkaHttpClient.builder().withActorSystem(system.classicSystem()).build())
                         .build();
         system.getWhenTerminated().thenAccept(notUsed -> sqsClient.close());
 
@@ -86,9 +88,9 @@ public class Main {
         streamCompletion.thenAccept(done -> system.terminate());
     }
 
-    CompletionStage<SqsPublishResult<SendMessageResponse>> enrichAndPublish(SqsAsyncClient sqsClient, Message sqsMsg) {
+    CompletionStage<SqsPublishResult> enrichAndPublish(SqsAsyncClient sqsClient, Message sqsMsg) {
         SqsPublishSettings publishSettings = SqsPublishSettings.create();
-        final Flow<SendMessageRequest, SqsPublishResult<SendMessageResponse>, NotUsed> publishFlow = SqsPublishFlow.create(publishUrl, publishSettings, sqsClient);
+        final Flow<SendMessageRequest, SqsPublishResult, NotUsed> publishFlow = SqsPublishFlow.create(publishUrl, publishSettings, sqsClient);
         return Source.<Message>single(sqsMsg)
                 .map(Main::transform)
                 .mapAsync(1, (MessageFromSqs msg) -> {
