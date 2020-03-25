@@ -7,6 +7,7 @@ import akka.stream.alpakka.sqs.SqsPublishSettings;
 import akka.stream.alpakka.sqs.javadsl.SqsPublishFlow;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
+import com.github.matsluni.akkahttpspi.AkkaHttpClient;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -36,13 +37,14 @@ public class PublishToSqs {
 
     void run() throws Exception {
         // create SQS client
-        String sqsEndpoint = "this-uses-ElasticMQ";
+        String sqsEndpoint = "http://localhost:9324";
         SqsAsyncClient sqsClient =
                 SqsAsyncClient.builder()
                         .credentialsProvider(
                                 StaticCredentialsProvider.create(AwsBasicCredentials.create("x", "x")))
                         .endpointOverride(URI.create(sqsEndpoint))
                         .region(Region.EU_CENTRAL_1)
+                        .httpClient(AkkaHttpClient.builder().withActorSystem(system.classicSystem()).build())
                         .build();
         system.getWhenTerminated().thenAccept((notUsed) -> sqsClient.close());
 
