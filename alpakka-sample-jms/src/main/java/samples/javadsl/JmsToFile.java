@@ -8,7 +8,6 @@ package samples.javadsl;
 
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.javadsl.Behaviors;
-import static akka.actor.typed.javadsl.Adapter.*;
 import akka.japi.Pair;
 import akka.stream.IOResult;
 import akka.stream.alpakka.jms.JmsConsumerSettings;
@@ -46,7 +45,7 @@ public class JmsToFile {
   private void enqueue(ConnectionFactory connectionFactory, String... msgs) {
     Sink<String, ?> jmsSink =
         JmsProducer.textSink(
-            JmsProducerSettings.create(toClassic(system), connectionFactory).withQueue("test"));
+            JmsProducerSettings.create(system, connectionFactory).withQueue("test"));
     Source.from(Arrays.asList(msgs)).runWith(jmsSink, system);
   }
 
@@ -60,7 +59,7 @@ public class JmsToFile {
 
     Source<String, JmsConsumerControl> jmsSource = // (1)
         JmsConsumer.textSource(
-            JmsConsumerSettings.create(toClassic(system), connectionFactory).withQueue("test"));
+            JmsConsumerSettings.create(system, connectionFactory).withQueue("test"));
 
     Sink<ByteString, CompletionStage<IOResult>> fileSink =
         FileIO.toPath(Paths.get("target/out.txt")); // (2)

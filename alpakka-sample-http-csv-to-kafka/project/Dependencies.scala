@@ -6,7 +6,7 @@ object Dependencies {
   val ScalaTestVersion = "3.1.0"
   val AkkaVersion = "2.6.4"
   val AkkaHttpVersion = "10.1.11"
-  val AlpakkaVersion = "2.0.0-RC1"
+  val AlpakkaVersion = "2.0.0-RC2"
   val AlpakkaKafkaVersion = "2.0.2"
 
   val dependencies = List(

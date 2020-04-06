@@ -12,8 +12,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
   "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
   "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion,
-  "com.lightbend.akka" %% "akka-stream-alpakka-mqtt" % "2.0.0-RC1",
-  "com.lightbend.akka" %% "akka-stream-alpakka-s3" % "2.0.0-RC1",
+  "com.lightbend.akka" %% "akka-stream-alpakka-mqtt" % "2.0.0-RC2",
+  "com.lightbend.akka" %% "akka-stream-alpakka-s3" % "2.0.0-RC2",
   "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.10.3",
   "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.10.3",
   "ch.qos.logback" % "logback-classic" % "1.2.3"

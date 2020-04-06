@@ -36,7 +36,7 @@ public class Main {
 
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-    private ActorSystem system;
+    private ActorSystem<?> system;
     private RestClient elasticsearchClient;
 
     private final String elasticsearchAddress;

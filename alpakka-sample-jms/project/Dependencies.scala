@@ -5,7 +5,7 @@ object Dependencies {
   // #deps
   val AkkaVersion = "2.6.4"
   val AkkaHttpVersion = "10.1.11"
-  val AlpakkaVersion = "2.0.0-RC1"
+  val AlpakkaVersion = "2.0.0-RC2"
 
   // #deps
 
