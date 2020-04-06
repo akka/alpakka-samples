@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.TimeUnit;
 
 // #sample
 
@@ -112,11 +113,11 @@ public class JmsToWebSocket {
     streamCompletion.thenAccept(res -> system.terminate());
     system
         .getWhenTerminated()
-        .thenAccept(
+        .thenCompose(
             t -> {
               webserver.stop();
-              activeMqBroker.stop(ec);
-            });
+              return activeMqBroker.stopCs(ec);
+            }).toCompletableFuture().get(5, TimeUnit.SECONDS);
   }
 
   // #sample

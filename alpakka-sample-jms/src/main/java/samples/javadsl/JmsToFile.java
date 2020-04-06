@@ -27,6 +27,7 @@ import javax.jms.ConnectionFactory;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.TimeUnit;
 
 // #sample
 
@@ -75,8 +76,10 @@ public class JmsToFile {
     JmsConsumerControl runningSource = pair.first();
     CompletionStage<IOResult> streamCompletion = pair.second();
 
+    Thread.sleep(4000);
+
     runningSource.shutdown();
     streamCompletion.thenAccept(res -> system.terminate());
-    system.getWhenTerminated().thenAccept(t -> activeMqBroker.stop(ec));
+    system.getWhenTerminated().thenCompose(t -> activeMqBroker.stopCs(ec)).toCompletableFuture().get(5, TimeUnit.SECONDS);
   }
 }

@@ -4,12 +4,15 @@
 
 package playground
 
+import java.util.concurrent.CompletionStage
+
 import akka.Done
 import javax.jms.ConnectionFactory
 import org.apache.activemq.ActiveMQConnectionFactory
 import org.apache.activemq.broker.BrokerService
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.compat.java8.FutureConverters._
 
 /**
   * To start an ActiveMQ broker be sure to include these dependencies:
@@ -29,6 +32,8 @@ class ActiveMqBroker {
     brokerService = Some(broker)
     broker
   }
+
+  def stopCs(ec: ExecutionContext): CompletionStage[Done] = stop()(ec).toJava
 
   def stop()(implicit ec: ExecutionContext): Future[Done] =
     brokerService.fold(Future.successful(Done)) { broker =>
