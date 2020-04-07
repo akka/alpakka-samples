@@ -52,7 +52,7 @@ public class JmsToWebSocket {
   private void enqueue(ConnectionFactory connectionFactory, String... msgs) {
     Sink<String, ?> jmsSink =
         JmsProducer.textSink(
-            JmsProducerSettings.create(toClassic(system), connectionFactory).withQueue("test"));
+            JmsProducerSettings.create(system, connectionFactory).withQueue("test"));
     Source.from(Arrays.asList(msgs)).runWith(jmsSink, system);
   }
 
@@ -71,7 +71,7 @@ public class JmsToWebSocket {
 
     Source<String, JmsConsumerControl> jmsSource = // (1)
         JmsConsumer.textSource(
-            JmsConsumerSettings.create(toClassic(system), connectionFactory)
+            JmsConsumerSettings.create(system, connectionFactory)
                 .withBufferSize(10)
                 .withQueue("test"));
 
