@@ -1,12 +1,12 @@
 import sbt._
 
 object Dependencies {
-  val scalaVer = "2.13.1"
+  val scalaVer = "2.13.2"
   // #dependencies
-  val ScalaTestVersion = "3.1.0"
+  val ScalaTestVersion = "3.1.1"
   val AkkaVersion = "2.6.4"
   val AkkaHttpVersion = "10.1.11"
-  val AlpakkaVersion = "2.0.0-RC2"
+  val AlpakkaVersion = "2.0.0"
   val AlpakkaKafkaVersion = "2.0.2"
 
   val dependencies = List(
@@ -21,7 +21,7 @@ object Dependencies {
     "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.10.3",
     "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.10.3",
 
-    "org.testcontainers" % "kafka" % "1.13.0",
+    "org.testcontainers" % "kafka" % "1.14.1",
     
     "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,
     "ch.qos.logback" % "logback-classic" % "1.2.3"
