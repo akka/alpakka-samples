@@ -1,5 +1,5 @@
 
-ThisBuild / scalaVersion := "2.13.1"
+ThisBuild / scalaVersion := "2.13.2"
 
 enablePlugins(AkkaParadoxPlugin, ParadoxSitePlugin, PublishRsyncPlugin)
 
@@ -175,5 +175,5 @@ paradoxProperties ++= Map(
 
 resolvers += Resolver.jcenterRepo
 
-publishRsyncArtifact := makeSite.value -> "akka.io/alpakka-samples/"
+publishRsyncArtifacts += makeSite.value -> "akka.io/alpakka-samples/"
 publishRsyncHost := "akkarepo@gustav.akka.io"
