@@ -21,7 +21,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
-import java.util.stream.Collectors;
 
 
 public class Main {
@@ -65,11 +64,6 @@ public class Main {
         // #sample
 
         fetchedFiles
-                .thenApply(
-                        files ->
-                                files.stream()
-                                        .filter(pathResult -> !pathResult.second().wasSuccessful())
-                                        .collect(Collectors.toList()))
                 .whenComplete(
                         (res, ex) -> {
                             if (res != null) {
