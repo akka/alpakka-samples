@@ -9,7 +9,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.alpakka.ftp.FtpSettings
 import akka.stream.alpakka.ftp.scaladsl.Ftp
 import akka.stream.scaladsl.{FileIO, Sink}
-import akka.stream.{ActorMaterializer, IOResult, Materializer}
+import akka.stream.IOResult
 // #imports
 import org.apache.mina.util.AvailablePortFinder
 import playground.FtpServerEmbedded
@@ -63,9 +63,6 @@ object Main extends App {
   // #sample
   // format: on
   fetchedFiles
-    .map { files =>
-      files.filter { case (_, r) => !r.wasSuccessful }
-    }
     .onComplete { res =>
       res match {
         case Success(errors) if errors.isEmpty =>
