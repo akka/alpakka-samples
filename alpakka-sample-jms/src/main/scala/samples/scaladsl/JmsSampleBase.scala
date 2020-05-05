@@ -6,7 +6,6 @@ package samples.scaladsl
 
 import akka.Done
 import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.alpakka.jms.JmsProducerSettings
 import akka.stream.alpakka.jms.scaladsl.JmsProducer
@@ -31,7 +30,7 @@ class JmsSampleBase {
   def enqueue(connectionFactory: ConnectionFactory)(msgs: String*): Unit = {
     val jmsSink: Sink[String, Future[Done]] =
       JmsProducer.textSink(
-        JmsProducerSettings(system.toClassic, connectionFactory).withQueue("test")
+        JmsProducerSettings(system, connectionFactory).withQueue("test")
       )
     Source(msgs.toList).runWith(jmsSink)
   }

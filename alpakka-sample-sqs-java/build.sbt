@@ -1,9 +1,11 @@
 organization := "com.lightbend.alpakka.samples"
 name := "alpakka-samples-sqs-java"
 
-val akkaVersion = "2.6.1"
-val alpakkaVersion = "1.0.0"
-val jacksonVersion = "2.9.8"
+ThisBuild / scalaVersion := "2.13.1"
+
+val akkaVersion = "2.6.4"
+val alpakkaVersion = "2.0.0-RC2"
+val jacksonVersion = "2.10.3"
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,

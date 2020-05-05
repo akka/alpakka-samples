@@ -32,7 +32,7 @@ object JmsToHttpGet extends JmsSampleBase with App {
   // #sample
   val jmsSource: Source[String, JmsConsumerControl] =                                 // (1)
   JmsConsumer.textSource(
-    JmsConsumerSettings(system.toClassic,connectionFactory).withBufferSize(10).withQueue("test")
+    JmsConsumerSettings(system, connectionFactory).withBufferSize(10).withQueue("test")
   )
 
   val (runningSource, finished): (JmsConsumerControl, Future[Done]) =

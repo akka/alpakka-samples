@@ -9,7 +9,6 @@ package samples.javadsl;
 import akka.Done;
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.javadsl.Behaviors;
-import static akka.actor.typed.javadsl.Adapter.*;
 import akka.japi.Pair;
 import akka.stream.KillSwitch;
 import akka.stream.alpakka.jms.JmsConsumerSettings;
@@ -29,6 +28,7 @@ import javax.jms.ConnectionFactory;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.TimeUnit;
 
 // #sample
 
@@ -45,7 +45,7 @@ public class JmsToOneFilePerMessage {
   private void enqueue(ConnectionFactory connectionFactory, String... msgs) {
     Sink<String, ?> jmsSink =
         JmsProducer.textSink(
-            JmsProducerSettings.create(toClassic(system), connectionFactory).withQueue("test"));
+            JmsProducerSettings.create(system, connectionFactory).withQueue("test"));
     Source.from(Arrays.asList(msgs)).runWith(jmsSink, system);
   }
 
@@ -59,7 +59,7 @@ public class JmsToOneFilePerMessage {
 
     Source<String, JmsConsumerControl> jmsConsumer = // (1)
         JmsConsumer.textSource(
-            JmsConsumerSettings.create(toClassic(system), connectionFactory).withQueue("test"));
+            JmsConsumerSettings.create(system, connectionFactory).withQueue("test"));
 
     int parallelism = 5;
     Pair<JmsConsumerControl, CompletionStage<Done>> pair =
@@ -88,6 +88,6 @@ public class JmsToOneFilePerMessage {
 
     runningSource.shutdown();
     streamCompletion.thenAccept(res -> system.terminate());
-    system.getWhenTerminated().thenAccept(t -> activeMqBroker.stop(ec));
+    system.getWhenTerminated().thenCompose(t -> activeMqBroker.stopCs(ec)).toCompletableFuture().get(5, TimeUnit.SECONDS);
   }
 }

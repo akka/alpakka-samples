@@ -1,10 +1,10 @@
 import sbt._
 
 object Dependencies {
-  val scalaVer = "2.12.10"
+  val scalaVer = "2.13.1"
   // #deps
-  val AkkaVersion = "2.6.1"
-  val AlpakkaVersion = "1.1.2"
+  val AkkaVersion = "2.6.4"
+  val AlpakkaVersion = "2.0.0-RC2"
 
   // #deps
 
@@ -19,8 +19,8 @@ object Dependencies {
     // Playground file system and FTP server
     // https://mina.apache.org/ftpserver-project/downloads.html
     "org.apache.ftpserver" % "ftpserver-core" % "1.1.1", // ApacheV2
-    "org.apache.sshd" % "sshd-scp" % "2.3.0", // ApacheV2
-    "org.apache.sshd" % "sshd-sftp" % "2.3.0", // ApacheV2
+    "org.apache.sshd" % "sshd-scp" % "2.4.0", // ApacheV2
+    "org.apache.sshd" % "sshd-sftp" % "2.4.0", // ApacheV2
     "com.google.jimfs" % "jimfs" % "1.1", // ApacheV2
     // Logging
     "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,

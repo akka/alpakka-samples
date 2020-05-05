@@ -1,6 +1,7 @@
 addSbtPlugin("com.lightbend.akka" % "sbt-paradox-akka" % "0.31")
+addSbtPlugin("com.lightbend.akka" % "sbt-paradox-akka" % "0.32")
 addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.4.0")
-addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.6.3")
+addSbtPlugin("com.lightbend.sbt" % "sbt-publish-rsync" % "0.1")
 resolvers += Resolver.jcenterRepo
 
-libraryDependencies += "org.scalameta" %% "scalameta" % "4.1.0"
+libraryDependencies += "org.scalameta" %% "scalameta" % "4.3.7"

@@ -1,6 +1,7 @@
+
 ThisBuild / scalaVersion := "2.13.1"
 
-enablePlugins(AkkaParadoxPlugin, ParadoxSitePlugin, GhpagesPlugin)
+enablePlugins(AkkaParadoxPlugin, ParadoxSitePlugin, PublishRsyncPlugin)
 
 name := "Alpakka Samples"
 previewFixedPort := Some(8085)
@@ -192,6 +193,6 @@ paradoxProperties ++= Map(
 )
 
 resolvers += Resolver.jcenterRepo
-git.remoteRepo := "git@github.com:akka/alpakka-samples.git"
-ghpagesNoJekyll := true
 
+publishRsyncArtifact := makeSite.value -> "akka.io/alpakka-samples/"
+publishRsyncHost := "akkarepo@gustav.akka.io"

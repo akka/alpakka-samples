@@ -33,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.jdk.CollectionConverters._
 
 object Main extends App {
-  val kafkaContainer = new KafkaContainer("5.2.1")
+  val kafkaContainer = new KafkaContainer("5.4.1")
   kafkaContainer.start()
   try {
     val me = new Main

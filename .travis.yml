@@ -29,7 +29,7 @@ jobs:
       name: Build documentation website
 
     - stage: publish
-      script: eval "$(ssh-agent -s)" && cp .travis/id_rsa /tmp/id_rsa && chmod 600 /tmp/id_rsa && ssh-keygen -p -P "$DEPLOY_PASSPHRASE" -N "" -f /tmp/id_rsa && ssh-add /tmp/id_rsa && cd docs && sbt ghpagesPushSite
+      script: eval "$(ssh-agent -s)" && echo $RSYNC_SECRET | base64 -d > /tmp/id_rsa && chmod 600 /tmp/id_rsa && ssh-add /tmp/id_rsa && cd docs && sbt publishRsync
 
 stages:
   - name: test
@@ -48,7 +48,9 @@ cache:
     - $HOME/.sbt/boot
     - $HOME/.sbt/launchers
 
-env:
-  global:
-    # travis encrypt DEPLOY_PASSPHRASE=...
-    - secure: "uoQV67/O+vpfM2P5E4WGVTkl/8c76p2SCIXkFXoiO0LhwAOju/xzDyqAIav6UeA+0LvlPmlKybcU8pM3qUF4zYG/Xk5ByFj6OHCZJcAj3sXZItfSjet38BV9D8KbpitAykMk2q01cazs3LVHFsCh5qbjwK8FFsPNlR5njN8Z/KKr1UMBBDMtoDsLnEu+/ylbHSHDYdfQKiDQwWGbLmmShWyunxygyX1VNFETqqpVMvM5yWcDyW+IqdBmENycm72NuPdTHLlhPFOMSgMCfSuctSZgA32xHNGhw12AAfsKe2pOGNjh5UMLGJXZALK/T0uUDlpP+KCAq8JaU4krygievRAtGndJm3rrFzm7Q5ftxgIrhwXvyGUC3S3cXMufLughgNnc88VagsBb3jIsGE+LQrGuDscLVF4T1oZoxGsEYsO8jXiJw9268M7HPA3poUXCi5x6unGPaNvIPYVNihp1oCZz13VrCIDZYqlf7jLVmvElHLNZPTWhBkXncmoSmZBkN0dV8144iY/BOXYkPePa+4qx+7882HjO0IHgETllZFALL37JiLs3FNWdfLkdzEo24gkz1iUIFjesReMC5ifeTH87kq7WJlsDskgdhOsCDYRYJM26xUsHkmoL5C9grIigsYl+icuAQcCOWecw17sxlbxxQSbMVrkSGGrIy6YN8cA="
+notifications:
+  email:
+    recipients:
+      secure: bI/vcEafDtOhEceKW640zeaiLKQvvjYjua+IPr41J0VWBOHIgPhjiGjU3Kjt/fJjzfRKNefwCnCov43ZhTZirO9lxwhOWfKQ2YrGmvwpkUfzLWa0rqrYw1vBoiLH/ZNxLU92ql07RUCzGdJ6D/DlOMZfJaMZVx3NYUMfYRyql0pdThquNSSHgeCVRssjMLlIXe5LLgoRrD43RZZ1PQV1JwG2x9XPc5lzoLlO0DsEnclrgRwsc8daJohKjZjjAMpoqU7CXA04kAKGBJvjx44fZiHT8muIf+FR+i6MJYIuhy8hsKmSGU+aMhSVlOu6LCw6/HwpKRoB4wbe7jeNS653IkPOch+lY7THeHu6ucLrWjoQI7idtk22xn7YuUAb8TVf6i21VlzLhplHHfHDFLC6fdSUTsJTWVZ6YQikUnNdmwQeBHbxpLtzyyvplOLFROSePegsMLnkoEdYrOWPjfOIRKrJakRP7/gNK/Eg7mMS0QSH+SR4Dgi52XUPSKmLF5odSthpCQj3dSSgxsBL6gFd3ClQHytqVwk4A26Yh6G3WSvIzrVtTCQ37auF3+9GLuR4nR84DrpWMQAhvVlnxgB64v2XvGjQvXWzdT3TLVTvwieTVEHnJrbQdrCgiUYGQknkBmmmq9Ld8g3PXxqln5szKN+FXhEL9ZUdIph/gBccI/I=
+    on_success: never
+    on_failure: always

@@ -35,6 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.TimeUnit;
 
 // #sample
 
@@ -51,7 +52,7 @@ public class JmsToWebSocket {
   private void enqueue(ConnectionFactory connectionFactory, String... msgs) {
     Sink<String, ?> jmsSink =
         JmsProducer.textSink(
-            JmsProducerSettings.create(toClassic(system), connectionFactory).withQueue("test"));
+            JmsProducerSettings.create(system, connectionFactory).withQueue("test"));
     Source.from(Arrays.asList(msgs)).runWith(jmsSink, system);
   }
 
@@ -70,7 +71,7 @@ public class JmsToWebSocket {
 
     Source<String, JmsConsumerControl> jmsSource = // (1)
         JmsConsumer.textSource(
-            JmsConsumerSettings.create(toClassic(system), connectionFactory)
+            JmsConsumerSettings.create(system, connectionFactory)
                 .withBufferSize(10)
                 .withQueue("test"));
 
@@ -112,11 +113,11 @@ public class JmsToWebSocket {
     streamCompletion.thenAccept(res -> system.terminate());
     system
         .getWhenTerminated()
-        .thenAccept(
+        .thenCompose(
             t -> {
               webserver.stop();
-              activeMqBroker.stop(ec);
-            });
+              return activeMqBroker.stopCs(ec);
+            }).toCompletableFuture().get(5, TimeUnit.SECONDS);
   }
 
   // #sample

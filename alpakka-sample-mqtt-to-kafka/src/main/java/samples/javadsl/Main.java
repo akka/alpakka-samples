@@ -61,7 +61,7 @@ import static akka.actor.typed.javadsl.Adapter.toClassic;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        KafkaContainer kafkaContainer = new KafkaContainer("5.2.1");
+        KafkaContainer kafkaContainer = new KafkaContainer("5.4.1");
         kafkaContainer.start();
         try {
             Main me = new Main();
