@@ -16,15 +16,15 @@ The sample spawns a test Kafka server with docker.
 sbt "runMain samples.javadsl.Main"
 ```
 
-You can connect to ws://127.0.0.1/events to receive messages over websockets. E.g. Using [websocat](https://github.com/vi/websocat) as a simple WS client.
+You can connect to ws://127.0.0.1/events to receive messages over websockets. E.g. Using [`websocat`](https://github.com/vi/websocat) as a simple WS client.
 
-To listen to events coming in on the websocket use websocat to connect to the `/events` endpoint.
+To listen to events coming in on the websocket use `websocat` to connect to the `/events` endpoint.
 
 ```
 websocat -v ws://127.0.0.1:8081/events 
 ```
 
-You can use `curl` http://127.0.0.1:8081/push?value=message to post messages to the topic.
+You can use `curl` to post messages to the topic.
 
 ```
 curl http://127.0.0.1:8081/push?value=message
