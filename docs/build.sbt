@@ -104,6 +104,24 @@ KafkaToElasticsearch / paradoxProperties ++= Map(
 )
 KafkaToElasticsearch / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
 
+val KafkaToWebsocketClients = config("kafka-to-websocket-clients")
+ParadoxPlugin.paradoxSettings(KafkaToWebsocketClients)
+ParadoxSitePlugin.paradoxSettings(KafkaToWebsocketClients)
+AkkaParadoxPlugin.akkaParadoxSettings(KafkaToWebsocketClients)
+KafkaToWebsocketClients / siteSubdirName := KafkaToWebsocketClients.name
+KafkaToWebsocketClients / paradox / sourceDirectory := baseDirectory.value / ".." / s"alpakka-sample-${KafkaToWebsocketClients.name}" / "docs" / "src" / "main" / "paradox"
+KafkaToWebsocketClients / paradoxProperties ++= Map(
+  "project.url" -> s"${homepage.value.get}/${KafkaToWebsocketClients.name}",
+  "canonical.base_url" -> s"${homepage.value.get}/${KafkaToWebsocketClients.name}",
+  "snip.build.base_dir" -> s"${baseDirectory.value}/../alpakka-sample-${KafkaToWebsocketClients.name}",
+  "github.root.base_dir" -> s"${baseDirectory.value}/..",
+  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.KafkaToWebsocketClients.AkkaVersion}",
+  "extref.akka-http.base_url" -> s"https://doc.akka.io/docs/akka-http/${Dependencies.HttpCsvToKafka.AkkaHttpVersion}/%s",
+  "extref.alpakka-kafka.base_url" -> s"https://doc.akka.io/docs/alpakka-kafka/${Dependencies.KafkaToWebsocketClients.AlpakkaKafkaVersion}/%s",
+  "extref.akka.base_url" -> s"https://doc.akka.io/docs/akka/${Dependencies.KafkaToWebsocketClients.AkkaVersion}/%s",
+)
+KafkaToWebsocketClients / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
+
 val MqttToKafka = config("mqtt-to-kafka")
 ParadoxPlugin.paradoxSettings(MqttToKafka)
 ParadoxSitePlugin.paradoxSettings(MqttToKafka)
@@ -168,6 +186,7 @@ paradoxProperties ++= Map(
   "extref.jdbc-to-elasticsearch.base_url" -> s"${(JdbcToElasticsearch / siteSubdirName).value}/",
   "extref.jms.base_url" -> s"${(Jms / siteSubdirName).value}/",
   "extref.kafka-to-elasticsearch.base_url" -> s"${(KafkaToElasticsearch / siteSubdirName).value}/",
+  "extref.kafka-to-websocket-clients.base_url" -> s"${(KafkaToWebsocketClients / siteSubdirName).value}/",
   "extref.mqtt-to-kafka.base_url" -> s"${(MqttToKafka / siteSubdirName).value}/",
   "extref.file-to-elasticsearch.base_url" -> s"${(FileToElasticsearch / siteSubdirName).value}/",
   "extref.rotate-logs-to-ftp.base_url" -> s"${(RotateLogsToFtp / siteSubdirName).value}/",
