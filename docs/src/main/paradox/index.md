@@ -16,7 +16,7 @@ This example uses Alpakka Slick to read from a relational database and write the
 This example uses Alpakka Kafka to read from an Apache Kafka topic, parse the messages as JSON and write the data to Elasticsearch, committing offsets to Kafka after successfully updating Elasticsearch.
 
 ### @extref:[Read from Kafka and publish to websockets](kafka-to-websocket-clients:index.html)
-.
+Clients may connect via websockets and will receive data read from a Kafka topic.
 
 ### @extref:[Read files from a directory and write to Elasticsearch](file-to-elasticsearch:index.html)
 This example uses Alpakka File to watch for new files created in a directory and then tails them (similar to Elasticsearch's `logstash` utility). The tailed logs are parsed and indexed in Elasticsearch using Alpakka Elasticsearch.
