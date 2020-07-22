@@ -7,7 +7,7 @@ object Dependencies {
   val AkkaVersion = "2.6.4"
   val AkkaHttpVersion = "10.1.11"
   val AlpakkaVersion = "2.0.0"
-  val AlpakkaKafkaVersion = "2.0.2"
+  val AlpakkaKafkaVersion = "2.0.4"
 
   val dependencies = List(
     "com.lightbend.akka" %% "akka-stream-alpakka-csv" % AlpakkaVersion,
