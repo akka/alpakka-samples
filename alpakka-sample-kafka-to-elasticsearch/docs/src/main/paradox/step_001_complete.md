@@ -9,7 +9,7 @@
 - Parse message from Kafka to `Movie` and create Elasticsearch write message (6)
 - Use `createWithContext` to use an Elasticsearch flow with context-support (so it passes through the Kafka commit offset) (7)
 - React on write errors (8)
-- Let the `Committer.sink` aggregate commits to batches and commit to Kafka (9)
+- Let the `Committer.flow` aggregate commits to batches and commit to Kafka (9)
 - Combine consumer control and stream completion into `DrainingControl` (10)
 
 ### Data class and JSON mapping
