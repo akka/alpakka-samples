@@ -69,7 +69,7 @@ object Main extends App with Helper {
         NotUsed
       }
       .toMat(Committer.sinkWithOffsetContext(CommitterSettings(actorSystem.toClassic)))(Keep.both) // (9)
-      .mapMaterializedValue(Consumer.DrainingControl.apply) // (10)
+      .mapMaterializedValue(Consumer.DrainingControl.apply[Done]) // (10)
       .run()
     // #flow
     control
