@@ -12,7 +12,7 @@ import akka.kafka._
 import akka.kafka.scaladsl.{Committer, Consumer}
 import akka.stream.alpakka.elasticsearch.WriteMessage
 import akka.stream.alpakka.elasticsearch.scaladsl.ElasticsearchFlow
-import akka.stream.scaladsl.Keep
+import akka.stream.scaladsl.Sink
 import akka.{Done, NotUsed}
 import org.apache.http.HttpHost
 import org.apache.kafka.clients.consumer.ConsumerConfig
@@ -68,8 +68,8 @@ object Main extends App with Helper {
         }
         NotUsed
       }
-      .toMat(Committer.sinkWithOffsetContext(CommitterSettings(actorSystem.toClassic)))(Keep.both) // (9)
-      .mapMaterializedValue(Consumer.DrainingControl.apply) // (10)
+      .via(Committer.flowWithOffsetContext(CommitterSettings(actorSystem.toClassic))) // (9)
+      .toMat(Sink.ignore)(Consumer.DrainingControl.apply) // (10)
       .run()
     // #flow
     control

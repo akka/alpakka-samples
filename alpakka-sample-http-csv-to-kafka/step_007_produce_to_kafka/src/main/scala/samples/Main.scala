@@ -91,7 +91,7 @@ object Main
     .atMostOnceSource(kafkaConsumerSettings, Subscriptions.topics("topic1"))
     .map(_.value)
     .toMat(Sink.foreach(println))(Keep.both)
-    .mapMaterializedValue(Consumer.DrainingControl.apply)
+    .mapMaterializedValue(Consumer.DrainingControl.apply[Done])
     .run()
 
   for {
