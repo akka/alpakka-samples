@@ -24,6 +24,7 @@ import akka.kafka.javadsl.Consumer;
 import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
 import akka.stream.OverflowStrategy;
+import akka.stream.SystemMaterializer;
 import akka.stream.javadsl.BroadcastHub;
 import akka.stream.javadsl.Flow;
 import akka.stream.javadsl.Sink;
@@ -67,7 +68,7 @@ public class Main extends AllDirectives {
 
     private void run() throws Exception {
         actorSystem = ActorSystem.create("KafkaToWebSocket");
-        materializer = ActorMaterializer.create(actorSystem);
+        materializer = SystemMaterializer.get(actorSystem).materializer();
         Http http = Http.get(actorSystem);
 
         // #websocket-handler
@@ -108,7 +109,7 @@ public class Main extends AllDirectives {
         return concat(
                 path("events", () -> handleWebSocketMessages(webSocketHandler)),
                 path("push", () -> parameter("value", v -> {
-                    CompletionStage<Done> written = helper.writeToKafka(topic, v, actorSystem, materializer);
+                    CompletionStage<Done> written = helper.writeToKafka(topic, v, actorSystem);
                     return onSuccess(written, done -> complete("Ok"));
                 }))
         );

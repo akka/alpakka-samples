@@ -1,10 +1,10 @@
 import sbt._
 
 object Dependencies {
-  val scalaVer = "2.13.2"
+  val scalaVer = "2.13.3"
   // #deps
-  val AkkaVersion = "2.6.4"
-  val AlpakkaVersion = "2.0.0"
+  val AkkaVersion = "2.6.8"
+  val AlpakkaVersion = "2.0.1"
 
   // #deps
 
@@ -21,7 +21,7 @@ object Dependencies {
     "ch.qos.logback" % "logback-classic" % "1.2.3",
   // #deps
     "com.h2database" % "h2" % "1.4.200",
-    "org.testcontainers" % "elasticsearch" % "1.13.0",
-    "org.testcontainers" % "postgresql" % "1.13.0"
+    "org.testcontainers" % "elasticsearch" % "1.14.3",
+    "org.testcontainers" % "postgresql" % "1.14.3"
   )
 }

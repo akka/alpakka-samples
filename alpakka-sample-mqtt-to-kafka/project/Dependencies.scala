@@ -5,7 +5,7 @@ object Dependencies {
   // #deps
   val AkkaVersion = "2.6.4"
   val AlpakkaVersion = "2.0.0"
-  val AlpakkaKafkaVersion = "2.0.4"
+  val AlpakkaKafkaVersion = "2.0.5"
   val JacksonDatabindVersion = "2.10.3"
 
   // #deps

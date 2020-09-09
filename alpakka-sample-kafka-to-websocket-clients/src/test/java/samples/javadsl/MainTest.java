@@ -3,7 +3,6 @@ package samples.javadsl;
 import akka.NotUsed;
 import akka.actor.ActorSystem;
 import akka.japi.Pair;
-import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
 import akka.stream.javadsl.Flow;
 import akka.stream.javadsl.Sink;
@@ -25,19 +24,16 @@ import static org.junit.Assert.assertTrue;
 
 public class MainTest {
     static ActorSystem system;
-    static Materializer materializer;
 
     @BeforeClass
     public static void setup() {
         system = ActorSystem.create("WebsocketExampleMainTest");
-        materializer = ActorMaterializer.create(system);
     }
 
     @AfterClass
     public static void tearDown() {
         TestKit.shutdownActorSystem(system);
         system = null;
-        materializer = null;
     }
 
     @Test
@@ -55,7 +51,7 @@ public class MainTest {
 
         final CompletionStage<List<String>> future = Source.from(messages)
                 .via(addIndexFlow)
-                .runWith(Sink.seq(), materializer);
+                .runWith(Sink.seq(), system);
         final List<String> result = future.toCompletableFuture().get(3, TimeUnit.SECONDS);
 
         assert(result.size() == messages.size());
