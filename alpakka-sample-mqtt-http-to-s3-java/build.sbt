@@ -3,7 +3,7 @@ name := "alpakka-samples-mqtt-http-to-s3-java"
 
 ThisBuild / scalaVersion := "2.13.3"
 
-val AkkaVersion = "2.6.8"
+val AkkaVersion = "2.6.9"
 val AkkaHttpVersion = "10.1.12"
 
 libraryDependencies ++= Seq(
