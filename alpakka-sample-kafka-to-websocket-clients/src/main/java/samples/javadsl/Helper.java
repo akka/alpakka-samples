@@ -4,8 +4,6 @@ import akka.Done;
 import akka.actor.ActorSystem;
 import akka.kafka.ProducerSettings;
 import akka.kafka.javadsl.Producer;
-import akka.stream.ActorMaterializer;
-import akka.stream.Materializer;
 import akka.stream.javadsl.Source;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.IntegerSerializer;
@@ -36,14 +34,14 @@ public class Helper {
         kafka.stop();
     }
 
-    CompletionStage<Done> writeToKafka(String topic, String item, ActorSystem actorSystem, Materializer materializer) {
+    CompletionStage<Done> writeToKafka(String topic, String item, ActorSystem actorSystem) {
         ProducerSettings<Integer, String> kafkaProducerSettings =
                 ProducerSettings.create(actorSystem, new IntegerSerializer(), new StringSerializer())
                         .withBootstrapServers(kafkaBootstrapServers);
 
         CompletionStage<Done> producing =
                 Source.single(new ProducerRecord<Integer, String>(topic, item))
-                        .runWith(Producer.plainSink(kafkaProducerSettings), materializer);
+                        .runWith(Producer.plainSink(kafkaProducerSettings), actorSystem);
         producing.thenAccept(s -> log.info("Producing finished"));
         return producing;
     }

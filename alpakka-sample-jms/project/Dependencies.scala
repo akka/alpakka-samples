@@ -1,11 +1,11 @@
 import sbt._
 
 object Dependencies {
-  val scalaVer = "2.13.2"
+  val scalaVer = "2.13.3"
   // #deps
-  val AkkaVersion = "2.6.4"
-  val AkkaHttpVersion = "10.1.11"
-  val AlpakkaVersion = "2.0.0"
+  val AkkaVersion = "2.6.9"
+  val AkkaHttpVersion = "10.1.12"
+  val AlpakkaVersion = "2.0.1"
 
   // #deps
 
@@ -23,6 +23,6 @@ object Dependencies {
     "ch.qos.logback" % "logback-classic" % "1.2.3",
     // #deps
     // http://activemq.apache.org/download.html
-    "org.apache.activemq" % "activemq-all" % "5.15.9" exclude("log4j", "log4j") exclude("org.slf4j", "slf4j-log4j12") // ApacheV2
+    "org.apache.activemq" % "activemq-all" % "5.16.0" exclude("log4j", "log4j") exclude("org.slf4j", "slf4j-log4j12") // ApacheV2
   )
 }

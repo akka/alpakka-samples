@@ -122,7 +122,7 @@ object Main extends App {
       // track statistics per log file (13)
       .scan(Map[(String, String), LogFileSummary]()) { (summaries, logLine) =>
         val key = (logLine.directory, logLine.filename)
-        val timestamp = now
+        val timestamp = now()
         val summary = summaries
           .get(key)
           .map(_.copy(lastUpdated = timestamp, numberOfLines = logLine.lineNo))
