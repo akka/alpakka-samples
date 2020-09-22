@@ -25,8 +25,13 @@ FtpToFile / paradoxProperties ++= Map(
   "canonical.base_url" -> s"${homepage.value.get}/${FtpToFile.name}",
   "snip.build.base_dir" -> s"${baseDirectory.value}/../alpakka-sample-${FtpToFile.name}",
   "github.root.base_dir" -> s"${baseDirectory.value}/..",
-  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.FtpToFile.AkkaVersion}",
+  // Alpakka
+  "scaladoc.akka.stream.alpakka.base_url" -> s"https://doc.akka.io/api/alpakka/${Dependencies.Jms.AlpakkaVersion}",
+  "javadoc.akka.base_url" -> "",
   "extref.alpakka.base_url" -> s"https://doc.akka.io/docs/alpakka/${Dependencies.FtpToFile.AlpakkaVersion}/%s",
+  // Akka
+  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.FtpToFile.AkkaVersion}",
+  "javadoc.akka.base_url" -> s"https://doc.akka.io/japi/akka/${Dependencies.FtpToFile.AkkaVersion}",
   "extref.akka.base_url" -> s"https://doc.akka.io/docs/akka/${Dependencies.FtpToFile.AkkaVersion}/%s",
 )
 FtpToFile / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
@@ -42,12 +47,22 @@ HttpCsvToKafka / paradoxProperties ++= Map(
   "canonical.base_url" -> s"${homepage.value.get}/${HttpCsvToKafka.name}",
   "snip.build.base_dir" -> s"${baseDirectory.value}/../alpakka-sample-${HttpCsvToKafka.name}",
   "github.root.base_dir" -> s"${baseDirectory.value}/..",
-  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.HttpCsvToKafka.AkkaVersion}",
-  "extref.alpakka-kafka.base_url" -> s"https://doc.akka.io/docs/alpakka-kafka/${Dependencies.HttpCsvToKafka.AlpakkaKafkaVersion}/%s",
-  "scaladoc.akka.kafka.base_url" -> s"https://doc.akka.io/api/alpakka-kafka/${Dependencies.HttpCsvToKafka.AlpakkaKafkaVersion}",
-  "extref.akka-http.base_url" -> s"https://doc.akka.io/docs/akka-http/${Dependencies.HttpCsvToKafka.AkkaHttpVersion}/%s",
+  // Alpakka
+  "scaladoc.akka.stream.alpakka.base_url" -> s"https://doc.akka.io/api/alpakka/${Dependencies.HttpCsvToKafka.AlpakkaVersion}",
+  "javadoc.akka.base_url" -> "",
   "extref.alpakka.base_url" -> s"https://doc.akka.io/docs/alpakka/${Dependencies.HttpCsvToKafka.AlpakkaVersion}/%s",
+  // Alpakka Kafka
+  "scaladoc.akka.kafka.base_url" -> s"https://doc.akka.io/api/alpakka-kafka/${Dependencies.HttpCsvToKafka.AlpakkaKafkaVersion}",
+  "javadoc.akka.kafka.base_url" -> "",
+  "extref.alpakka-kafka.base_url" -> s"https://doc.akka.io/docs/alpakka-kafka/${Dependencies.HttpCsvToKafka.AlpakkaKafkaVersion}/%s",
+  // Akka
+  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.HttpCsvToKafka.AkkaVersion}",
+  "javadoc.akka.base_url" -> s"https://doc.akka.io/japi/akka/${Dependencies.HttpCsvToKafka.AkkaVersion}",
   "extref.akka.base_url" -> s"https://doc.akka.io/docs/akka/${Dependencies.HttpCsvToKafka.AkkaVersion}/%s",
+  // Akka HTTP
+  "scaladoc.akka.http.base_url" -> s"https://doc.akka.io/api/akka-http/${Dependencies.HttpCsvToKafka.AkkaHttpVersion}",
+  "javadoc.akka.http.base_url" -> s"https://doc.akka.io/japi/akka-http/${Dependencies.HttpCsvToKafka.AkkaHttpVersion}",
+  "extref.akka-http.base_url" -> s"https://doc.akka.io/docs/akka-http/${Dependencies.HttpCsvToKafka.AkkaHttpVersion}/%s",
 )
 HttpCsvToKafka / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
 
@@ -62,8 +77,13 @@ JdbcToElasticsearch / paradoxProperties ++= Map(
   "canonical.base_url" -> s"${homepage.value.get}/${JdbcToElasticsearch.name}",
   "snip.build.base_dir" -> s"${baseDirectory.value}/../alpakka-sample-${JdbcToElasticsearch.name}",
   "github.root.base_dir" -> s"${baseDirectory.value}/..",
-  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.JdbcToElasticsearch.AkkaVersion}",
+  // Alpakka
+  "scaladoc.akka.stream.alpakka.base_url" -> s"https://doc.akka.io/api/alpakka/${Dependencies.JdbcToElasticsearch.AlpakkaVersion}",
+  "javadoc.akka.base_url" -> "",
   "extref.alpakka.base_url" -> s"https://doc.akka.io/docs/alpakka/${Dependencies.JdbcToElasticsearch.AlpakkaVersion}/%s",
+  // Akka
+  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.JdbcToElasticsearch.AkkaVersion}",
+  "javadoc.akka.base_url" -> s"https://doc.akka.io/japi/akka/${Dependencies.JdbcToElasticsearch.AkkaVersion}",
   "extref.akka.base_url" -> s"https://doc.akka.io/docs/akka/${Dependencies.JdbcToElasticsearch.AkkaVersion}/%s",
 )
 JdbcToElasticsearch / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
@@ -79,9 +99,17 @@ Jms / paradoxProperties ++= Map(
   "canonical.base_url" -> s"${homepage.value.get}/${Jms.name}",
   "snip.build.base_dir" -> s"${baseDirectory.value}/../alpakka-sample-${Jms.name}",
   "github.root.base_dir" -> s"${baseDirectory.value}/..",
-  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.Jms.AkkaVersion}",
+  // Alpakka
+  "scaladoc.akka.stream.alpakka.base_url" -> s"https://doc.akka.io/api/alpakka/${Dependencies.Jms.AlpakkaVersion}",
+  "javadoc.akka.base_url" -> "",
   "extref.alpakka.base_url" -> s"https://doc.akka.io/docs/alpakka/${Dependencies.Jms.AlpakkaVersion}/%s",
+  // Akka
+  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.Jms.AkkaVersion}",
+  "javadoc.akka.base_url" -> s"https://doc.akka.io/japi/akka/${Dependencies.Jms.AkkaVersion}",
   "extref.akka.base_url" -> s"https://doc.akka.io/docs/akka/${Dependencies.Jms.AkkaVersion}/%s",
+  // Akka HTTP
+  "scaladoc.akka.http.base_url" -> s"https://doc.akka.io/api/akka-http/${Dependencies.Jms.AkkaHttpVersion}",
+  "javadoc.akka.http.base_url" -> s"https://doc.akka.io/japi/akka-http/${Dependencies.Jms.AkkaHttpVersion}",
   "extref.akka-http.base_url" -> s"https://doc.akka.io/docs/akka-http/${Dependencies.Jms.AkkaHttpVersion}/%s",
 )
 Jms / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
@@ -98,9 +126,17 @@ KafkaToElasticsearch / paradoxProperties ++= Map(
   "canonical.base_url" -> s"${homepage.value.get}/${KafkaToElasticsearch.name}",
   "snip.build.base_dir" -> s"${baseDirectory.value}/../alpakka-sample-${KafkaToElasticsearch.name}",
   "github.root.base_dir" -> s"${baseDirectory.value}/..",
-  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.KafkaToElasticsearch.AkkaVersion}",
-  "extref.alpakka-kafka.base_url" -> s"https://doc.akka.io/docs/alpakka-kafka/${Dependencies.KafkaToElasticsearch.AlpakkaKafkaVersion}/%s",
+  // Alpakka
+  "scaladoc.akka.stream.alpakka.base_url" -> s"https://doc.akka.io/api/alpakka/${Dependencies.KafkaToElasticsearch.AlpakkaVersion}",
+  "javadoc.akka.base_url" -> "",
   "extref.alpakka.base_url" -> s"https://doc.akka.io/docs/alpakka/${Dependencies.KafkaToElasticsearch.AlpakkaVersion}/%s",
+  // Alpakka Kafka
+  "scaladoc.akka.kafka.base_url" -> s"https://doc.akka.io/api/alpakka-kafka/${Dependencies.KafkaToElasticsearch.AlpakkaKafkaVersion}",
+  "javadoc.akka.kafka.base_url" -> "",
+  "extref.alpakka-kafka.base_url" -> s"https://doc.akka.io/docs/alpakka-kafka/${Dependencies.KafkaToElasticsearch.AlpakkaKafkaVersion}/%s",
+  // Akka
+  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.KafkaToElasticsearch.AkkaVersion}",
+  "javadoc.akka.base_url" -> s"https://doc.akka.io/japi/akka/${Dependencies.KafkaToElasticsearch.AkkaVersion}",
   "extref.akka.base_url" -> s"https://doc.akka.io/docs/akka/${Dependencies.KafkaToElasticsearch.AkkaVersion}/%s",
 )
 KafkaToElasticsearch / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
@@ -116,10 +152,22 @@ KafkaToWebsocketClients / paradoxProperties ++= Map(
   "canonical.base_url" -> s"${homepage.value.get}/${KafkaToWebsocketClients.name}",
   "snip.build.base_dir" -> s"${baseDirectory.value}/../alpakka-sample-${KafkaToWebsocketClients.name}",
   "github.root.base_dir" -> s"${baseDirectory.value}/..",
-  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.KafkaToWebsocketClients.AkkaVersion}",
-  "extref.akka-http.base_url" -> s"https://doc.akka.io/docs/akka-http/${Dependencies.HttpCsvToKafka.AkkaHttpVersion}/%s",
+  // Alpakka
+//  "scaladoc.akka.stream.alpakka.base_url" -> s"https://doc.akka.io/api/alpakka/${Dependencies.KafkaToWebsocketClients.AlpakkaVersion}",
+//  "javadoc.akka.base_url" -> "",
+//  "extref.alpakka.base_url" -> s"https://doc.akka.io/docs/alpakka/${Dependencies.KafkaToWebsocketClients.AlpakkaVersion}/%s",
+  // Alpakka Kafka
+  "scaladoc.akka.kafka.base_url" -> s"https://doc.akka.io/api/alpakka-kafka/${Dependencies.KafkaToWebsocketClients.AlpakkaKafkaVersion}",
+  "javadoc.akka.kafka.base_url" -> "",
   "extref.alpakka-kafka.base_url" -> s"https://doc.akka.io/docs/alpakka-kafka/${Dependencies.KafkaToWebsocketClients.AlpakkaKafkaVersion}/%s",
+  // Akka
+  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.KafkaToWebsocketClients.AkkaVersion}",
+  "javadoc.akka.base_url" -> s"https://doc.akka.io/japi/akka/${Dependencies.KafkaToWebsocketClients.AkkaVersion}",
   "extref.akka.base_url" -> s"https://doc.akka.io/docs/akka/${Dependencies.KafkaToWebsocketClients.AkkaVersion}/%s",
+  // Akka HTTP
+  "scaladoc.akka.http.base_url" -> s"https://doc.akka.io/api/akka-http/${Dependencies.KafkaToWebsocketClients.AkkaHttpVersion}",
+  "javadoc.akka.http.base_url" -> s"https://doc.akka.io/japi/akka-http/${Dependencies.KafkaToWebsocketClients.AkkaHttpVersion}",
+  "extref.akka-http.base_url" -> s"https://doc.akka.io/docs/akka-http/${Dependencies.KafkaToWebsocketClients.AkkaHttpVersion}/%s",
 )
 KafkaToWebsocketClients / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
 
@@ -134,9 +182,17 @@ MqttToKafka / paradoxProperties ++= Map(
   "canonical.base_url" -> s"${homepage.value.get}/${MqttToKafka.name}",
   "snip.build.base_dir" -> s"${baseDirectory.value}/../alpakka-sample-${MqttToKafka.name}",
   "github.root.base_dir" -> s"${baseDirectory.value}/..",
-  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.MqttToKafka.AkkaVersion}",
-  "extref.alpakka-kafka.base_url" -> s"https://doc.akka.io/docs/alpakka-kafka/${Dependencies.MqttToKafka.AlpakkaKafkaVersion}/%s",
+  // Alpakka
+  "scaladoc.akka.stream.alpakka.base_url" -> s"https://doc.akka.io/api/alpakka/${Dependencies.MqttToKafka.AlpakkaVersion}",
+  "javadoc.akka.base_url" -> "",
   "extref.alpakka.base_url" -> s"https://doc.akka.io/docs/alpakka/${Dependencies.MqttToKafka.AlpakkaVersion}/%s",
+  // Alpakka Kafka
+  "scaladoc.akka.kafka.base_url" -> s"https://doc.akka.io/api/alpakka-kafka/${Dependencies.MqttToKafka.AlpakkaKafkaVersion}",
+  "javadoc.akka.kafka.base_url" -> "",
+  "extref.alpakka-kafka.base_url" -> s"https://doc.akka.io/docs/alpakka-kafka/${Dependencies.MqttToKafka.AlpakkaKafkaVersion}/%s",
+  // Akka
+  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.MqttToKafka.AkkaVersion}",
+  "javadoc.akka.base_url" -> s"https://doc.akka.io/japi/akka/${Dependencies.MqttToKafka.AkkaVersion}",
   "extref.akka.base_url" -> s"https://doc.akka.io/docs/akka/${Dependencies.MqttToKafka.AkkaVersion}/%s",
 )
 MqttToKafka / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
@@ -153,8 +209,13 @@ FileToElasticsearch / paradoxProperties ++= Map(
   "canonical.base_url" -> s"${homepage.value.get}/${FileToElasticsearch.name}",
   "snip.build.base_dir" -> s"${baseDirectory.value}/../alpakka-sample-${FileToElasticsearch.name}",
   "github.root.base_dir" -> s"${baseDirectory.value}/..",
-  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.FileToElasticsearch.AkkaVersion}",
+  // Alpakka
+  "scaladoc.akka.stream.alpakka.base_url" -> s"https://doc.akka.io/api/alpakka/${Dependencies.FileToElasticsearch.AlpakkaVersion}",
+  "javadoc.akka.base_url" -> "",
   "extref.alpakka.base_url" -> s"https://doc.akka.io/docs/alpakka/${Dependencies.FileToElasticsearch.AlpakkaVersion}/%s",
+  // Akka
+  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.FileToElasticsearch.AkkaVersion}",
+  "javadoc.akka.base_url" -> s"https://doc.akka.io/japi/akka/${Dependencies.FileToElasticsearch.AkkaVersion}",
   "extref.akka.base_url" -> s"https://doc.akka.io/docs/akka/${Dependencies.FileToElasticsearch.AkkaVersion}/%s",
 )
 FileToElasticsearch / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))
@@ -170,8 +231,13 @@ RotateLogsToFtp / paradoxProperties ++= Map(
   "canonical.base_url" -> s"${homepage.value.get}/${RotateLogsToFtp.name}",
   "snip.build.base_dir" -> s"${baseDirectory.value}/../alpakka-sample-${RotateLogsToFtp.name}",
   "github.root.base_dir" -> s"${baseDirectory.value}/..",
-  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.RotateLogsToFtp.AkkaVersion}",
+  // Alpakka
+  "scaladoc.akka.stream.alpakka.base_url" -> s"https://doc.akka.io/api/alpakka/${Dependencies.RotateLogsToFtp.AlpakkaVersion}",
+  "javadoc.akka.base_url" -> "",
   "extref.alpakka.base_url" -> s"https://doc.akka.io/docs/alpakka/${Dependencies.RotateLogsToFtp.AlpakkaVersion}/%s",
+  // Akka
+  "scaladoc.akka.base_url" -> s"https://doc.akka.io/api/akka/${Dependencies.RotateLogsToFtp.AkkaVersion}",
+  "javadoc.akka.base_url" -> s"https://doc.akka.io/japi/akka/${Dependencies.RotateLogsToFtp.AkkaVersion}",
   "extref.akka.base_url" -> s"https://doc.akka.io/docs/akka/${Dependencies.RotateLogsToFtp.AkkaVersion}/%s",
 )
 RotateLogsToFtp / paradoxGroups := Map("Language" -> Seq("Java", "Scala"))

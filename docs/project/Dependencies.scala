@@ -89,6 +89,7 @@ object Dependencies {
 
     val ScalaVersion = versions("scalaVer")
     val AkkaVersion = versions("AkkaVersion")
+    val AkkaHttpVersion = versions("AkkaHttpVersion")
     val AlpakkaKafkaVersion = versions("AlpakkaKafkaVersion")
   }
 
