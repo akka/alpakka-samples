@@ -3,8 +3,8 @@ name := "alpakka-samples-sqs-java"
 
 ThisBuild / scalaVersion := "2.13.3"
 
-val akkaVersion = "2.6.9"
-val alpakkaVersion = "2.0.1"
+val AkkaVersion = "2.6.14"
+val AlpakkaVersion = "3.0.1"
 val jacksonVersion = "2.10.5"
 
 libraryDependencies ++= Seq(
