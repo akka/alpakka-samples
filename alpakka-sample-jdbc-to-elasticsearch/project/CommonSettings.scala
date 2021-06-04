@@ -7,14 +7,14 @@ object CommonSettings {
     version := "1.3.0",
     scalaVersion := Dependencies.scalaVer,
     scalacOptions ++= CompileOptions.compileOptions,
-    unmanagedSourceDirectories in Compile := List((scalaSource in Compile).value, (javaSource in Compile).value),
-    unmanagedSourceDirectories in Test := List((scalaSource in Compile).value, (javaSource in Compile).value),
+    Compile / unmanagedSourceDirectories := List((Compile / scalaSource).value, (Compile / javaSource).value),
+    Test / unmanagedSourceDirectories := List((Compile / scalaSource).value, (Compile / javaSource).value),
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
-    parallelExecution in Test := false,
-    logBuffered in Test := false,
-    parallelExecution in ThisBuild := false,
-    parallelExecution in GlobalScope := false,
-    fork in Test := true,
+    Test / parallelExecution := false,
+    Test / logBuffered := false,
+    ThisBuild / parallelExecution := false,
+    GlobalScope / parallelExecution := false,
+    Test / fork := true,
     libraryDependencies ++= Dependencies.dependencies
   )
 }

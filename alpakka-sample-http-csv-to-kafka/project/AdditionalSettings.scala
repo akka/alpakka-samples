@@ -18,7 +18,7 @@ object AdditionalSettings {
 
   val initialCmdsTestConsole: Seq[Def.Setting[String]]  =
     if (loadInitialCmds) {
-      Seq(initialCommands in(Test, console) := (initialCommands in console).value + ", TestData._")
+      Seq(Test /console / initialCommands := (console / initialCommands).value + ", TestData._")
     } else {
       Seq()
     }
