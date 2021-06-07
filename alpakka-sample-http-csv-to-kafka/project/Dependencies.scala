@@ -18,8 +18,8 @@ object Dependencies {
     // Used from Scala
     "com.typesafe.akka" %% "akka-http-spray-json" % AkkaHttpVersion,
     // Used from Java
-    "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.10.5",
-    "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.10.5",
+    "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.11.4",
+    "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.11.4",
 
     "org.testcontainers" % "kafka" % "1.14.3",
     
