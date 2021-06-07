@@ -1,5 +1,6 @@
 
-lazy val alpakka_sample_master = (project in file("."))
+lazy val alpakka_sample_master = project
+  .in(file("."))
   .aggregate(
     common,
     step_001_http_request,

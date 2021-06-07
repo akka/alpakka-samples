@@ -1,5 +1,6 @@
 
-lazy val base = (project in file("."))
+lazy val base = project
+  .in(file("."))
   .aggregate(
     common,
     step_001_complete
