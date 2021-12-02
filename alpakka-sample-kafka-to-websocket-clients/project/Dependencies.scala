@@ -1,7 +1,7 @@
 import sbt._
 
 object Dependencies {
-  val scalaVer = "2.13.3"
+  val scalaVer = "2.13.7"
   // #deps
   val AkkaVersion = "2.6.14"
   val AkkaHttpVersion = "10.1.12"
