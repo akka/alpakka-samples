@@ -1,0 +1,35 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  publish:
+    name: Publish site to Gustav
+    runs-on: ubuntu-latest
+    env:
+      JAVA_OPTS: -Xms2G -Xmx2G -Xss2M -XX:ReservedCodeCacheSize=256M -Dfile.encoding=UTF-8
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 11
+        uses: coursier/setup-action@v1
+        with:
+          jvm: adopt:11
+
+      - name: Cache Coursier cache
+        uses: coursier/cache-action@v6
+
+      - name: "Create site with Paradox"
+        run: |
+          eval "$(ssh-agent -s)"
+          echo $RSYNC_SECRET | base64 -d > /tmp/id_rsa
+          chmod 600 /tmp/id_rsa
+          ssh-add /tmp/id_rsa
+          cd docs
+          sbt publishRsync
