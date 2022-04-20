@@ -3,30 +3,30 @@ jdk: openjdk8
 
 jobs:
   include:
-    - script: cd alpakka-sample-ftp-to-file && sbt compile
-      name: Compile Alpakka FTP to file sample
-    - script: cd alpakka-sample-http-csv-to-kafka && sbt compile
-      name: Compile Alpakka Http Csv Kafka sample
-    - script: cd alpakka-sample-jdbc-to-elasticsearch && sbt compile
-      name: Compile Alpakka JDBC to Elasticsearch sample
-    - script: cd alpakka-sample-jms && sbt compile
-      name: Compile Alpakka JMS samples
-    - script: cd alpakka-sample-kafka-to-websocket-clients && sbt compile
-      name: Compile Alpakka Kafka to Websocket Clients sample
-    - script: cd alpakka-sample-kafka-to-elasticsearch && sbt compile
-      name: Compile Alpakka Kafka to Elasticsearch sample
-    - script: cd alpakka-sample-mqtt-to-kafka && sbt compile
-      name: Compile MQTT to Kafka sample
-    - script: cd alpakka-sample-file-to-elasticsearch && sbt compile
-      name: Compile Alpakka File to Elasticsearch sample
-    - script: cd alpakka-sample-mqtt-http-to-s3-java && sbt compile
-      name: Compile Alpakka Mqtt Http S3 sample
-    - script: cd alpakka-sample-sqs-java && sbt compile
-      name: Compile Alpakka Sqs Java sample
-    - script: cd alpakka-sample-rotate-logs-to-ftp && sbt compile
-      name: Compile Rotate logs to FTP sample
-    - script: cd docs && sbt makeSite
-      name: Build documentation website
+#    - script: cd alpakka-sample-ftp-to-file && sbt compile
+#      name: Compile Alpakka FTP to file sample
+#    - script: cd alpakka-sample-http-csv-to-kafka && sbt compile
+#      name: Compile Alpakka Http Csv Kafka sample
+#    - script: cd alpakka-sample-jdbc-to-elasticsearch && sbt compile
+#      name: Compile Alpakka JDBC to Elasticsearch sample
+#    - script: cd alpakka-sample-jms && sbt compile
+#      name: Compile Alpakka JMS samples
+#    - script: cd alpakka-sample-kafka-to-websocket-clients && sbt compile
+#      name: Compile Alpakka Kafka to Websocket Clients sample
+#    - script: cd alpakka-sample-kafka-to-elasticsearch && sbt compile
+#      name: Compile Alpakka Kafka to Elasticsearch sample
+#    - script: cd alpakka-sample-mqtt-to-kafka && sbt compile
+#      name: Compile MQTT to Kafka sample
+#    - script: cd alpakka-sample-file-to-elasticsearch && sbt compile
+#      name: Compile Alpakka File to Elasticsearch sample
+#    - script: cd alpakka-sample-mqtt-http-to-s3-java && sbt compile
+#      name: Compile Alpakka Mqtt Http S3 sample
+#    - script: cd alpakka-sample-sqs-java && sbt compile
+#      name: Compile Alpakka Sqs Java sample
+#    - script: cd alpakka-sample-rotate-logs-to-ftp && sbt compile
+#      name: Compile Rotate logs to FTP sample
+#    - script: cd docs && sbt makeSite
+#      name: Build documentation website
 
     - stage: publish
       script: eval "$(ssh-agent -s)" && echo $RSYNC_SECRET | base64 -d > /tmp/id_rsa && chmod 600 /tmp/id_rsa && ssh-add /tmp/id_rsa && cd docs && sbt publishRsync
