@@ -9,7 +9,7 @@ import samples.scaladsl
 import scala.compat.java8.FutureConverters._
 
 object RunOps {
-  val elasticsearchAddress: String = scaladsl.RunOps.elasticsearchContainer.getHttpHostAddress
+  val elasticsearchAddress: String = scaladsl.RunOps.elasticsearchAddress
 
   def stopContainers(): Unit = scaladsl.RunOps.stopContainers()
 

@@ -1,7 +1,7 @@
 package samples.scaladsl
+
 import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 import java.time.ZonedDateTime
-
 import akka.Done
 import akka.actor.typed.ActorSystem
 import akka.stream.alpakka.file.scaladsl.Directory
@@ -15,9 +15,9 @@ object RunOps {
   final val log = LoggerFactory.getLogger(getClass)
 
   // Testcontainers: start Elasticsearch in Docker
-  private[samples] val elasticsearchContainer = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.3")
+  private val elasticsearchContainer = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2")
   elasticsearchContainer.start()
-  val elasticsearchAddress: String = elasticsearchContainer.getHttpHostAddress
+  private[samples] val elasticsearchAddress: String = "http://" + elasticsearchContainer.getHttpHostAddress
 
   def stopContainers(): Unit = {
     elasticsearchContainer.stop()
@@ -43,7 +43,7 @@ object RunOps {
     implicit val ec = system.executionContext
     for {
       files <- listFiles(path)
-    } yield files filterNot(_.getFileName.toString == ".gitignore") foreach { file =>
+    } yield files filterNot (_.getFileName.toString == ".gitignore") foreach { file =>
       log.info(s"Deleting file: $file")
       Files.delete(file)
     }
