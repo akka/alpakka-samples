@@ -5,44 +5,45 @@
 package samples.scaladsl
 
 import akka.actor.typed.ActorSystem
+import akka.stream.alpakka.elasticsearch.ElasticsearchConnectionSettings
+import akka.stream.alpakka.elasticsearch.ElasticsearchParams
+import akka.stream.alpakka.elasticsearch.ElasticsearchSourceSettings
 import akka.stream.alpakka.elasticsearch.WriteMessage
 import akka.stream.alpakka.elasticsearch.scaladsl.{ElasticsearchFlow, ElasticsearchSource}
 import akka.stream.alpakka.slick.javadsl.SlickSession
 import akka.stream.alpakka.slick.scaladsl.Slick
 import akka.stream.scaladsl.{Keep, Sink, Source}
 import akka.{Done, NotUsed}
-import org.apache.http.HttpHost
-import org.elasticsearch.client.RestClient
 import org.slf4j.LoggerFactory
 import org.testcontainers.elasticsearch.ElasticsearchContainer
+import samples.scaladsl.Main.Movie
 import spray.json.DefaultJsonProtocol._
 import spray.json._
 
 import scala.collection.immutable
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
-import samples.scaladsl.Main.elasticSearchClient
 
 trait Helper {
 
   final val log = LoggerFactory.getLogger(getClass)
 
   // Testcontainers: start Elasticsearch in Docker
-  val elasticsearchContainer = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.3")
+  val elasticsearchContainer = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2")
   elasticsearchContainer.start()
-  val elasticsearchAddress = elasticsearchContainer.getHttpHostAddress
+  val elasticsearchAddress: String = "http://" + elasticsearchContainer.getHttpHostAddress
 
-//  def readFromElasticsearch(indexName: String)(implicit actorSystem: ActorSystem, materializer: Materializer): Future[immutable.Seq[Movie]] = {
-//    val reading = ElasticsearchSource
-//      .typed[Movie](indexName, "_doc", """{"match_all": {}}""")
-//      .map(_.source)
-//      .runWith(Sink.seq)
-//    reading.foreach(_ => log.info("Reading finished"))(actorSystem.dispatcher)
-//    reading
-//  }
+  def readFromElasticsearch(indexName: String)(implicit actorSystem: ActorSystem[_]): Future[immutable.Seq[Movie]] = {
+    val reading = ElasticsearchSource
+      .typed[Movie](ElasticsearchParams.V7(indexName), """{"match_all": {}}""",
+        ElasticsearchSourceSettings(ElasticsearchConnectionSettings(elasticsearchAddress)))
+      .map(_.source)
+      .runWith(Sink.seq)
+    reading.foreach(_ => log.info("Reading finished"))(actorSystem.executionContext)
+    reading
+  }
 
   def stopContainers() = {
-    elasticSearchClient.close()
     elasticsearchContainer.stop()
   }
 }
