@@ -24,9 +24,3 @@ public class Movie {
     }
 }
 
-class JsonMappers {
-    // Jackson conversion setup (3)
-    public final static ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
-    public final static ObjectWriter movieWriter = mapper.writerFor(Movie.class);
-    public final static ObjectReader movieReader = mapper.readerFor(Movie.class);
-}

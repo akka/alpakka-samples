@@ -23,17 +23,19 @@ import scala.collection.immutable
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import JsonFormats._
-import akka.stream.Materializer
-import samples.scaladsl.Main.{elasticsearchClient, elasticsearchContainer, kafka}
+import akka.stream.alpakka.elasticsearch.ElasticsearchConnectionSettings
+import akka.stream.alpakka.elasticsearch.ElasticsearchParams
+import akka.stream.alpakka.elasticsearch.ElasticsearchSourceSettings
+import samples.scaladsl.Main.{elasticsearchContainer, kafka}
 
 trait Helper {
 
   final val log = LoggerFactory.getLogger(getClass)
 
   // Testcontainers: start Elasticsearch in Docker
-  val elasticsearchContainer = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.3")
+  val elasticsearchContainer = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2")
   elasticsearchContainer.start()
-  val elasticsearchAddress = elasticsearchContainer.getHttpHostAddress
+  val connectionSettings = ElasticsearchConnectionSettings("http://" + elasticsearchContainer.getHttpHostAddress)
 
   // Testcontainers: start Kafka in Docker
   // [[https://hub.docker.com/r/confluentinc/cp-kafka/tags Available Docker images]]
@@ -42,7 +44,7 @@ trait Helper {
   kafka.start()
   val kafkaBootstrapServers = kafka.getBootstrapServers
 
-  def writeToKafka(topic: String, movies: immutable.Iterable[Movie])(implicit actorSystem: ActorSystem[_], materializer: Materializer) = {
+  def writeToKafka(topic: String, movies: immutable.Iterable[Movie])(implicit actorSystem: ActorSystem[_]) = {
     val kafkaProducerSettings = ProducerSettings(actorSystem.toClassic, new IntegerSerializer, new StringSerializer)
       .withBootstrapServers(kafkaBootstrapServers)
 
@@ -56,9 +58,9 @@ trait Helper {
     producing
   }
 
-  def readFromElasticsearch(indexName: String)(implicit actorSystem: ActorSystem[_], materializer: Materializer): Future[immutable.Seq[Movie]] = {
+  def readFromElasticsearch(indexName: String)(implicit actorSystem: ActorSystem[_]): Future[immutable.Seq[Movie]] = {
     val reading = ElasticsearchSource
-      .typed[Movie](indexName, "_doc", """{"match_all": {}}""")
+      .typed[Movie](ElasticsearchParams.V7(indexName), """{"match_all": {}}""", ElasticsearchSourceSettings(connectionSettings))
       .map(_.source)
       .runWith(Sink.seq)
     reading.foreach(_ => log.info("Reading finished"))(actorSystem.executionContext)
@@ -67,7 +69,6 @@ trait Helper {
 
   def stopContainers() = {
     kafka.stop()
-    elasticsearchClient.close()
     elasticsearchContainer.stop()
   }
 }

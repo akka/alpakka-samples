@@ -4,7 +4,7 @@
 - Configure Kafka consumer (1)
 - Data class mapped to Elasticsearch (2)
 - @scala[Spray JSON]@java[Jackson] conversion for the data class (3)
-- Elasticsearch client setup (4)
+- Elasticsearch setup (4)
 - Kafka consumer with committing support (5)
 - Parse message from Kafka to `Movie` and create Elasticsearch write message (6)
 - Use `createWithContext` to use an Elasticsearch flow with context-support (so it passes through the Kafka commit offset) (7)
