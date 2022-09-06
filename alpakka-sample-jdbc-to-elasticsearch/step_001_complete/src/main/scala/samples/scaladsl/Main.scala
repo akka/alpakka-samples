@@ -8,18 +8,19 @@ package samples.scaladsl
 import akka.Done
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.scaladsl.adapter._
-import akka.stream.alpakka.elasticsearch.WriteMessage.createIndexMessage
+import akka.stream.alpakka.elasticsearch.ElasticsearchConnectionSettings
+import akka.stream.alpakka.elasticsearch.ElasticsearchParams
+import akka.stream.alpakka.elasticsearch.ElasticsearchWriteSettings
+import akka.stream.alpakka.elasticsearch.WriteMessage
 import akka.stream.alpakka.elasticsearch.scaladsl.ElasticsearchSink
 import akka.stream.alpakka.slick.javadsl.SlickSession
 import akka.stream.alpakka.slick.scaladsl.Slick
-import org.apache.http.HttpHost
-import org.elasticsearch.client.RestClient
 import spray.json.DefaultJsonProtocol.{jsonFormat4, _}
 import spray.json.JsonFormat
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
+
 // #imports
 
 object Main extends App with Helper {
@@ -58,8 +59,7 @@ object Main extends App with Helper {
   // #data-class
 
   // #es-setup
-  implicit val elasticSearchClient: RestClient =
-    RestClient.builder(HttpHost.create(elasticsearchAddress)).build()
+  val connection = ElasticsearchConnectionSettings(elasticsearchAddress)
   // #es-setup
 
   // #sample
@@ -69,18 +69,13 @@ object Main extends App with Helper {
       .map {
         case (id, genre, title, gross) => Movie(id, genre, title, gross)
       }
-      .map(movie => createIndexMessage(movie.id.toString, movie))
-      .runWith(ElasticsearchSink.create[Movie]("movie", "_doc"))
+      .map(movie => WriteMessage.createIndexMessage(movie.id.toString, movie))
+      .runWith(ElasticsearchSink.create[Movie](ElasticsearchParams.V7("movie"),
+        ElasticsearchWriteSettings(connection)))
 
-  done.onComplete {
-    case _ =>
-      elasticSearchClient.close()
-  }
   // #sample
-  done.onComplete {
-    case _ =>
-      stopContainers()
-  }
+  done.failed.foreach(exception => log.error("failure", exception))
+  done.onComplete(_ => stopContainers())
   wait(10.seconds)
   terminateActorSystem()
 

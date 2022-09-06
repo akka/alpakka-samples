@@ -8,6 +8,8 @@ package samples.javadsl;
 import akka.Done;
 import akka.actor.typed.ActorSystem;
 import akka.actor.typed.javadsl.Behaviors;
+import akka.stream.alpakka.elasticsearch.ElasticsearchConnectionSettings;
+import akka.stream.alpakka.elasticsearch.ElasticsearchParams;
 import akka.stream.alpakka.elasticsearch.ElasticsearchWriteSettings;
 import akka.stream.alpakka.elasticsearch.WriteMessage;
 import akka.stream.alpakka.elasticsearch.javadsl.ElasticsearchSink;
@@ -17,15 +19,12 @@ import akka.stream.alpakka.slick.javadsl.SlickSession;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpHost;
-import org.elasticsearch.client.RestClient;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import samples.scaladsl.Helper;
+import scala.concurrent.Await;
+import scala.concurrent.duration.Duration;
 
-import java.io.IOException;
 import java.util.concurrent.CompletionStage;
-
-import static akka.actor.typed.javadsl.Adapter.toClassic;
 
 // #imports
 
@@ -60,9 +59,9 @@ public class Main {
 
     void run() {
         // Testcontainers: start Elasticsearch in Docker
-        ElasticsearchContainer elasticsearchContainer = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.3");
+        ElasticsearchContainer elasticsearchContainer = new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2");
         elasticsearchContainer.start();
-        String elasticsearchAddress = elasticsearchContainer.getHttpHostAddress();
+        String elasticsearchAddress = "http://" + elasticsearchContainer.getHttpHostAddress();
 
         // #sample
         ActorSystem<Void> system = ActorSystem.create(Behaviors.empty(), "alpakka-sample");
@@ -76,7 +75,7 @@ public class Main {
         Helper.populateDataForTable(session, system);
 
         // #es-setup
-        RestClient elasticSearchClient = RestClient.builder(HttpHost.create(elasticsearchAddress)).build();
+        ElasticsearchConnectionSettings connectionSettings = ElasticsearchConnectionSettings.create(elasticsearchAddress);
         // #es-setup
 
         // #data-class
@@ -93,27 +92,26 @@ public class Main {
                         .map(movie -> WriteMessage.createIndexMessage(String.valueOf(movie.id), movie))
                         .runWith(
                                 ElasticsearchSink.create(
-                                        "movie",
-                                        "boxoffice",
-                                        ElasticsearchWriteSettings.Default(),
-                                        elasticSearchClient,
+                                        ElasticsearchParams.V7("movie"),
+                                        ElasticsearchWriteSettings.create(connectionSettings),
                                         objectToJsonMapper),
-                                toClassic(system));
+                                system);
+        // #sample
 
         done.thenRunAsync(
-                () -> {
-                    try {
-                        elasticSearchClient.close();
-                    } catch (IOException ignored) {
-                        ignored.printStackTrace();
-                    }
-                },
-                system.executionContext())
-                // #sample
-                .thenRunAsync(
                         () -> {
                             elasticsearchContainer.stop();
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                // ignored
+                            }
                             system.terminate();
+                            try {
+                                Await.result(system.whenTerminated(), Duration.create("10s"));
+                            } catch (Exception e) {
+                                // ignored
+                            }
                         });
     }
 }
