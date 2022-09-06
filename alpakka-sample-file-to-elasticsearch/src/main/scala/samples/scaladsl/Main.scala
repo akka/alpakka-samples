@@ -5,18 +5,15 @@
 package samples.scaladsl
 
 import java.nio.file._
-
 import akka.NotUsed
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
-import akka.stream.alpakka.elasticsearch.WriteMessage
+import akka.stream.alpakka.elasticsearch._
 import akka.stream.alpakka.elasticsearch.scaladsl.{ElasticsearchFlow, ElasticsearchSource}
 import akka.stream.alpakka.file.DirectoryChange
 import akka.stream.alpakka.file.scaladsl.{DirectoryChangesSource, FileTailSource}
 import akka.stream.scaladsl.{Flow, Keep, RunnableGraph, Sink, Source}
 import akka.stream.{KillSwitches, Materializer, UniqueKillSwitch}
-import org.apache.http.HttpHost
-import org.elasticsearch.client.RestClient
 import samples.common.DateTimeExtractor
 import samples.scaladsl.LogFileSummary.LogFileSummaries
 
@@ -35,11 +32,7 @@ object Main extends App {
   val streamRuntime = 10.seconds
   val streamParallelism = 47
 
-  // Elasticsearch client setup
-  implicit val elasticsearchClient: RestClient =
-    RestClient
-      .builder(HttpHost.create(elasticsearchAddress))
-      .build()
+  val connectionSettings = ElasticsearchConnectionSettings.create(RunOps.elasticsearchAddress)
 
   val indexName = "logs"
   val typeName = "_doc"
@@ -105,7 +98,8 @@ object Main extends App {
       .map(WriteMessage.createIndexMessage[LogLine])
       // use Alpakka Elasticsearch to create a new `LogLine` record. (12)
       // implicitly takes `JsonFormat` for `LogLine` for serialization
-      .via(ElasticsearchFlow.create(indexName, typeName))
+      .via(ElasticsearchFlow.create(ElasticsearchParams.V5(indexName, typeName),
+        ElasticsearchWriteSettings.create(connectionSettings).withApiVersion(ApiVersion.V5)))
       .mapConcat { writeResult =>
         writeResult.error.foreach { errorJson =>
           throw new RuntimeException(s"Elasticsearch index failed ${writeResult.errorReason.getOrElse(errorJson)}")
@@ -137,7 +131,8 @@ object Main extends App {
   def queryAllRecordsFromElasticsearch(indexName: String): Future[immutable.Seq[LogLine]] = {
     val reading = ElasticsearchSource
       // use Alpakka Elasticsearch to return all entries from the provided index (14)
-      .typed[LogLine](indexName, "_doc", """{"match_all": {}}""")
+      .typed[LogLine](ElasticsearchParams.V5(indexName, typeName), """{"match_all": {}}""",
+        ElasticsearchSourceSettings.create(connectionSettings).withApiVersion(ApiVersion.V5))
       .map(_.source)
       .runWith(Sink.seq)
     reading.foreach(_ => log.info("Reading finished"))

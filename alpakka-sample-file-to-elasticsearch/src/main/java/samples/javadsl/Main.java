@@ -7,18 +7,13 @@ import akka.actor.typed.javadsl.Behaviors;
 import akka.japi.Pair;
 import akka.stream.KillSwitches;
 import akka.stream.UniqueKillSwitch;
-import akka.stream.alpakka.elasticsearch.ElasticsearchSourceSettings;
-import akka.stream.alpakka.elasticsearch.ElasticsearchWriteSettings;
-import akka.stream.alpakka.elasticsearch.ReadResult;
-import akka.stream.alpakka.elasticsearch.WriteMessage;
+import akka.stream.alpakka.elasticsearch.*;
 import akka.stream.alpakka.elasticsearch.javadsl.ElasticsearchFlow;
 import akka.stream.alpakka.elasticsearch.javadsl.ElasticsearchSource;
 import akka.stream.alpakka.file.DirectoryChange;
 import akka.stream.alpakka.file.javadsl.DirectoryChangesSource;
 import akka.stream.alpakka.file.javadsl.FileTailSource;
 import akka.stream.javadsl.*;
-import org.apache.http.HttpHost;
-import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import samples.common.DateTimeExtractor;
@@ -37,12 +32,11 @@ public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     private ActorSystem<?> system;
-    private RestClient elasticsearchClient;
 
-    private final String elasticsearchAddress;
+    private final ElasticsearchConnectionSettings connectionSettings;
 
     public Main() {
-        this.elasticsearchAddress = RunOps.elasticsearchAddress();
+        connectionSettings = ElasticsearchConnectionSettings.create(RunOps.elasticsearchAddress());
     }
 
     private final static Duration streamRuntime = Duration.ofSeconds(10L);
@@ -101,9 +95,10 @@ public class Main {
                 })
                 .mapConcat(logAcc -> {
                     if (logAcc.logLine.isPresent()) {
-                        Collections.singletonList(logAcc.logLine.get());
+                        return Collections.singletonList(logAcc.logLine.get());
+                    } else {
+                        return Collections.emptyList();
                     }
-                    return Collections.emptyList();
                 });
     }
 
@@ -118,10 +113,8 @@ public class Main {
                 // use Alpakka Elasticsearch to create a new `LogLine` record. (12)
                 // takes `ObjectMapper` for `LogLine` for serialization
                 .via(ElasticsearchFlow.create(
-                        indexName,
-                        typeName,
-                        ElasticsearchWriteSettings.create(),
-                        elasticsearchClient,
+                        ElasticsearchParams.V5(indexName, typeName),
+                        ElasticsearchWriteSettings.create(connectionSettings).withApiVersion(ApiVersion.V5),
                         JsonMappers.mapper))
                 .map(writeResult -> {
                     writeResult
@@ -160,17 +153,15 @@ public class Main {
 
     // #query-elasticsearch
 
-    private CompletionStage<List<LogLine>> queryAllRecordsFromElasticsearch(RestClient elasticsearchClient, String indexName, ActorSystem system) {
+    private CompletionStage<List<LogLine>> queryAllRecordsFromElasticsearch(String indexName) {
         CompletionStage<List<LogLine>> reading =
                 // use Alpakka Elasticsearch to return all entries from the provided index (14)
                 ElasticsearchSource
                         .typed(
-                            indexName,
-                            "_doc",
-                            "{\"match_all\": {}}",
-                            ElasticsearchSourceSettings.create(),
-                            elasticsearchClient,
-                            LogLine.class)
+                                ElasticsearchParams.V5(indexName, typeName),
+                                "{\"match_all\": {}}",
+                                ElasticsearchSourceSettings.create(connectionSettings).withApiVersion(ApiVersion.V5),
+                                LogLine.class)
                         .map(ReadResult::source)
                         .runWith(Sink.seq(), system);
         reading.thenAccept(non -> log.info("Reading finished"));
@@ -195,8 +186,6 @@ public class Main {
 
     private CompletionStage<Done> run() throws Exception {
         this.system = ActorSystem.create(Behaviors.empty(), "FileToElasticSearch");
-        this.elasticsearchClient = RestClient.builder(HttpHost.create(this.elasticsearchAddress)).build();
-
         // #stream-composing
 
         // compose stream together starting with the `DirectoryChangesSource` (15)
@@ -236,13 +225,13 @@ public class Main {
         Map<Pair<String, String>, LogFileSummary> summaries = stream.toCompletableFuture().get(10, TimeUnit.SECONDS);
 
         // run a new graph to query all records from Elasticsearch and get the results (17)
-        List<LogLine> results = queryAllRecordsFromElasticsearch(elasticsearchClient, indexName, system).toCompletableFuture().get(10, TimeUnit.SECONDS);
+        List<LogLine> results = queryAllRecordsFromElasticsearch(indexName).toCompletableFuture().get(10, TimeUnit.SECONDS);
 
         printResults(results, summaries);
 
         RunOps.deleteAllFilesFrom(inputLogsPath, system).toCompletableFuture().get(10, TimeUnit.SECONDS);
 
-        return RunOps.shutdown(system, elasticsearchClient);
+        return RunOps.shutdown(system);
 
         // #running-the-app
     }
