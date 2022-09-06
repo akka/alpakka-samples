@@ -10,14 +10,14 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.scaladsl.adapter._
 import akka.kafka._
 import akka.kafka.scaladsl.{Committer, Consumer}
+import akka.stream.alpakka.elasticsearch.ElasticsearchParams
+import akka.stream.alpakka.elasticsearch.ElasticsearchWriteSettings
 import akka.stream.alpakka.elasticsearch.WriteMessage
 import akka.stream.alpakka.elasticsearch.scaladsl.ElasticsearchFlow
 import akka.stream.scaladsl.Sink
 import akka.{Done, NotUsed}
-import org.apache.http.HttpHost
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization._
-import org.elasticsearch.client.RestClient
 import spray.json._
 
 import scala.concurrent.duration._
@@ -35,12 +35,6 @@ object Main extends App with Helper {
   private val groupId = "docs-group"
 
   // #es-setup
-  // Elasticsearch client setup (4)
-  implicit val elasticsearchClient: RestClient =
-    RestClient
-      .builder(HttpHost.create(elasticsearchAddress))
-      .build()
-
   val indexName = "movies"
   // #es-setup
 
@@ -61,7 +55,8 @@ object Main extends App with Helper {
         val movie = consumerRecord.value().parseJson.convertTo[Movie]
         WriteMessage.createUpsertMessage(movie.id.toString, movie)
       }
-      .via(ElasticsearchFlow.createWithContext(indexName, "_doc")) // (7)
+      .via(ElasticsearchFlow.createWithContext(
+        ElasticsearchParams.V7(indexName), ElasticsearchWriteSettings(connectionSettings))) // (7)
       .map { writeResult => // (8)
         writeResult.error.foreach { errorJson =>
           throw new RuntimeException(s"Elasticsearch update failed ${writeResult.errorReason.getOrElse(errorJson)}")
@@ -91,5 +86,6 @@ object Main extends App with Helper {
     read.foreach(m => println(s"read $m"))
     stopContainers()
     actorSystem.terminate()
+    Await.result(actorSystem.whenTerminated, 10.seconds)
   }
 }

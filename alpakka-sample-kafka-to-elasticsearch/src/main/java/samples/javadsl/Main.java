@@ -16,19 +16,15 @@ import akka.kafka.ConsumerSettings;
 import akka.kafka.Subscriptions;
 import akka.kafka.javadsl.Committer;
 import akka.kafka.javadsl.Consumer;
-import akka.stream.alpakka.elasticsearch.ElasticsearchWriteSettings;
-import akka.stream.alpakka.elasticsearch.WriteMessage;
+import akka.stream.alpakka.elasticsearch.*;
 import akka.stream.alpakka.elasticsearch.javadsl.ElasticsearchFlow;
 import akka.stream.javadsl.Keep;
-import org.apache.http.HttpHost;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.IntegerDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +37,7 @@ public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     private final Helper helper;
-    private final String elasticsearchAddress;
+    private final ElasticsearchConnectionSettings elasticsearchAddress;
     private final String kafkaBootstrapServers;
 
     private final String topic = "movies-to-elasticsearch";
@@ -53,19 +49,18 @@ public class Main {
     // #es-setup
 
     public Main(Helper helper) {
-        this.elasticsearchAddress = helper.elasticsearchAddress;
+        this.elasticsearchAddress = helper.connectionSettings;
         this.kafkaBootstrapServers = helper.kafkaBootstrapServers;
         this.helper = helper;
     }
 
     private ActorSystem<Void> actorSystem;
-    private RestClient elasticsearchClient;
 
     private Consumer.DrainingControl<Done> readFromKafkaToEleasticsearch() {
         // #kafka-setup
         // configure Kafka consumer (1)
         ConsumerSettings<Integer, String> kafkaConsumerSettings =
-                ConsumerSettings.create(toClassic(actorSystem), new IntegerDeserializer(), new StringDeserializer())
+                ConsumerSettings.create(actorSystem, new IntegerDeserializer(), new StringDeserializer())
                         .withBootstrapServers(kafkaBootstrapServers)
                         .withGroupId(groupId)
                         .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
@@ -82,10 +77,8 @@ public class Main {
                                 })
                         .via(
                                 ElasticsearchFlow.createWithContext(
-                                        indexName,
-                                        "_doc",
-                                        ElasticsearchWriteSettings.create(),
-                                        elasticsearchClient,
+                                        ElasticsearchParams.V7(indexName),
+                                        ElasticsearchWriteSettings.create(elasticsearchAddress),
                                         JsonMappers.mapper)) // (7)
                         .map(
                                 writeResult -> { // (8)
@@ -108,10 +101,6 @@ public class Main {
 
     private CompletionStage<Done> run() throws Exception {
         actorSystem = ActorSystem.create(Behaviors.empty(), "KafkaToElasticSearch");
-        // #es-setup
-        // Elasticsearch client setup (4)
-        elasticsearchClient = RestClient.builder(HttpHost.create(elasticsearchAddress)).build();
-        // #es-setup
 
         List<Movie> movies = Arrays.asList(new Movie(23, "Psycho"), new Movie(423, "Citizen Kane"));
         CompletionStage<Done> writing = helper.writeToKafka(topic, movies, actorSystem);
@@ -121,16 +110,11 @@ public class Main {
         TimeUnit.SECONDS.sleep(5);
         CompletionStage<Done> copyingFinished = control.drainAndShutdown(actorSystem.executionContext());
         copyingFinished.toCompletableFuture().get(10, TimeUnit.SECONDS);
-        CompletionStage<List<Movie>> reading = helper.readFromElasticsearch(elasticsearchClient, indexName, actorSystem);
+        CompletionStage<List<Movie>> reading = helper.readFromElasticsearch(indexName, actorSystem);
 
         return reading.thenCompose(
                 ms -> {
                     ms.forEach(m -> System.out.println("read " + m));
-                    try {
-                        elasticsearchClient.close();
-                    } catch (IOException e) {
-                        log.error(e.toString(), e);
-                    }
                     actorSystem.terminate();
                     return actorSystem.getWhenTerminated();
                 });
