@@ -11,6 +11,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import java.util.concurrent.CompletionStage;
 
@@ -25,7 +26,7 @@ public class Helper {
     }
 
     public void startContainers() {
-        kafka = new KafkaContainer("5.1.2"); // contains Kafka 2.1.x
+        kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.3.0"));
         kafka.start();
         kafkaBootstrapServers = kafka.getBootstrapServers();
     }
