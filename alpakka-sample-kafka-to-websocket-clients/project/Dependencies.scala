@@ -3,9 +3,9 @@ import sbt._
 object Dependencies {
   val scalaVer = "2.13.7"
   // #deps
-  val AkkaVersion = "2.6.19"
-  val AkkaHttpVersion = "10.1.12"
-  val AlpakkaKafkaVersion = "3.0.1"
+  val AkkaVersion = "2.7.0"
+  val AkkaHttpVersion = "10.4.0"
+  val AlpakkaKafkaVersion = "4.0.0"
   // #deps
   val dependencies = List(
     // #deps
@@ -18,7 +18,7 @@ object Dependencies {
     "ch.qos.logback" % "logback-classic" % "1.2.3",
     // #deps
 
-    "org.testcontainers" % "kafka" % "1.14.3",
+    "org.testcontainers" % "kafka" % "1.17.5",
 
     "com.typesafe.akka" %% "akka-stream-testkit" % AkkaVersion % Test,
     "com.google.guava" % "guava" % "28.2-jre" % Test,
