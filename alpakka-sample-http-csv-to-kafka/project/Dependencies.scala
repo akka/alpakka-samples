@@ -8,6 +8,7 @@ object Dependencies {
   val AkkaHttpVersion = "10.1.12"
   val AlpakkaVersion = "4.0.0"
   val AlpakkaKafkaVersion = "3.0.1"
+  val AkkaDiagnosticsVersion = "2.0.0-M3"
 
   val dependencies = List(
     "com.lightbend.akka" %% "akka-stream-alpakka-csv" % AlpakkaVersion,
@@ -15,6 +16,7 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
     "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
     "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion,
+    "com.lightbend.akka" %% "akka-diagnostics" % AkkaDiagnosticsVersion,
     // Used from Scala
     "com.typesafe.akka" %% "akka-http-spray-json" % AkkaHttpVersion,
     // Used from Java

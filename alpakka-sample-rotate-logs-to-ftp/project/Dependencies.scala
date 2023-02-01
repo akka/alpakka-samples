@@ -5,6 +5,7 @@ object Dependencies {
   // #deps
   val AkkaVersion = "2.6.19"
   val AlpakkaVersion = "4.0.0"
+  val AkkaDiagnosticsVersion = "2.0.0-M3"
 
   // #deps
 
@@ -15,6 +16,7 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
     "com.lightbend.akka" %% "akka-stream-alpakka-file" % AlpakkaVersion,
     "com.lightbend.akka" %% "akka-stream-alpakka-ftp" % AlpakkaVersion,
+    "com.lightbend.akka" %% "akka-diagnostics" % AkkaDiagnosticsVersion,
     // #deps
     // Playground file system and FTP server
     // https://mina.apache.org/ftpserver-project/downloads.html

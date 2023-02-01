@@ -6,6 +6,7 @@ object Dependencies {
   val AkkaVersion = "2.6.19"
   val AlpakkaVersion = "4.0.0"
   val AlpakkaKafkaVersion = "3.0.1"
+  val AkkaDiagnosticsVersion = "2.0.0-M3"
 
   // #deps
 
@@ -16,6 +17,7 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
     "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
     "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
+    "com.lightbend.akka" %% "akka-diagnostics" % AkkaDiagnosticsVersion,
     // for JSON in Scala
     "io.spray" %% "spray-json" % "1.3.6",
     // for JSON in Java
