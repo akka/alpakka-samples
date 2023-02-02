@@ -3,9 +3,10 @@ import sbt._
 object Dependencies {
   val scalaVer = "2.13.7"
   // #deps
-  val AkkaVersion = "2.6.19"
-  val AkkaHttpVersion = "10.1.12"
-  val AlpakkaVersion = "4.0.0"
+  val AkkaVersion = "2.7.0"
+  val AkkaHttpVersion = "10.4.0"
+  val AlpakkaVersion = "5.0.0"
+  val AkkaDiagnosticsVersion = "2.0.0-M3"
 
   // #deps
 
@@ -16,6 +17,7 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-stream" % AkkaVersion,
     "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion,
     "com.typesafe.akka" %% "akka-actor" % AkkaVersion,
+    "com.lightbend.akka" %% "akka-diagnostics" % AkkaDiagnosticsVersion,
     // https://github.com/javaee/javax.jms
     "javax.jms" % "jms" % "1.1", // CDDL Version 1.1
     // Logging
