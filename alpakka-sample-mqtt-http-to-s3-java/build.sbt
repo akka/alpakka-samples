@@ -5,7 +5,7 @@ ThisBuild / scalaVersion := "2.13.7"
 
 val AkkaVersion = "2.7.0"
 val AkkaHttpVersion = "10.4.0"
-val AkkaDiagnosticsVersion = "2.0.0-M3"
+val AkkaDiagnosticsVersion = "2.0.0-M4"
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,
