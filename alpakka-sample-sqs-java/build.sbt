@@ -4,7 +4,7 @@ name := "alpakka-samples-sqs-java"
 ThisBuild / scalaVersion := "2.13.7"
 
 val AkkaVersion = "2.7.0"
-val AlpakkaVersion = "5.0.0"
+val AlpakkaVersion = "6.0.0"
 val AkkaDiagnosticsVersion = "2.0.0-M4"
 val JacksonCoreVersion = "2.14.2"
 
