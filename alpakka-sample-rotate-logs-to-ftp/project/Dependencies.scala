@@ -4,7 +4,7 @@ object Dependencies {
   val scalaVer = "2.13.7"
   // #deps
   val AkkaVersion = "2.7.0"
-  val AlpakkaVersion = "6.0.0"
+  val AlpakkaVersion = "6.0.1"
   val AkkaDiagnosticsVersion = "2.0.0-M4"
 
   // #deps
