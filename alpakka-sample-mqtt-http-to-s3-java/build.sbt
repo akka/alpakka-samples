@@ -7,6 +7,8 @@ val AkkaVersion = "2.7.0"
 val AkkaHttpVersion = "10.4.0"
 val AkkaDiagnosticsVersion = "2.0.0-M4"
 
+resolvers += "Akka library repository".at("https://repo.akka.io/maven")
+
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,
   "com.typesafe.akka" %% "akka-stream" % AkkaVersion,

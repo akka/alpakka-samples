@@ -8,6 +8,8 @@ val AlpakkaVersion = "6.0.1"
 val AkkaDiagnosticsVersion = "2.0.0-M4"
 val JacksonCoreVersion = "2.14.2"
 
+resolvers += "Akka library repository".at("https://repo.akka.io/maven")
+
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,
   "com.typesafe.akka" %% "akka-stream" % AkkaVersion,

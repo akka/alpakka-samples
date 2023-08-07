@@ -15,6 +15,7 @@ object CommonSettings {
     ThisBuild / parallelExecution := false,
     GlobalScope / parallelExecution := false,
     Test / fork := true,
+    resolvers += "Akka library repository".at("https://repo.akka.io/maven"),
     libraryDependencies ++= Dependencies.dependencies
   )
 }
