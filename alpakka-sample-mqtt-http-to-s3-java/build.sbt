@@ -1,11 +1,11 @@
 organization := "com.lightbend.akka.samples"
 name := "alpakka-samples-mqtt-http-to-s3-java"
 
-ThisBuild / scalaVersion := "2.13.7"
+ThisBuild / scalaVersion := "2.13.12"
 
-val AkkaVersion = "2.7.0"
-val AkkaHttpVersion = "10.4.0"
-val AkkaDiagnosticsVersion = "2.0.0-M4"
+val AkkaVersion = "2.9.0"
+val AkkaHttpVersion = "10.6.0"
+val AkkaDiagnosticsVersion = "2.1.0"
 
 resolvers += "Akka library repository".at("https://repo.akka.io/maven")
 

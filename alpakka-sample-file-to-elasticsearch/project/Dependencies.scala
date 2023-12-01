@@ -1,11 +1,11 @@
 import sbt._
 
 object Dependencies {
-  val scalaVer = "2.13.8"
+  val scalaVer = "2.13.12"
   // #deps
-  val AkkaVersion = "2.7.0"
-  val AlpakkaVersion = "6.0.1"
-  val AkkaDiagnosticsVersion = "2.0.0-M4"
+  val AkkaVersion = "2.9.0"
+  val AlpakkaVersion = "7.0.1"
+  val AkkaDiagnosticsVersion = "2.1.0"
   // #deps
   val dependencies = List(
     // #deps
@@ -18,8 +18,8 @@ object Dependencies {
     // for JSON in Scala
     "io.spray" %% "spray-json" % "1.3.6",
     // for JSON in Java
-    "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.13.4",
-    "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.13.4",
+    "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.15.2",
+    "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.15.2",
     // Logging
     "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,
     "ch.qos.logback" % "logback-classic" % "1.2.11",
