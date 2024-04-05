@@ -1,14 +1,14 @@
 import sbt._
 
 object Dependencies {
-  val scalaVer = "2.13.7"
+  val scalaVer = "2.13.12"
   // #dependencies
   val ScalaTestVersion = "3.1.4"
-  val AkkaVersion = "2.7.0"
-  val AkkaHttpVersion = "10.4.0"
-  val AlpakkaVersion = "6.0.1"
-  val AlpakkaKafkaVersion = "4.0.0"
-  val AkkaDiagnosticsVersion = "2.0.0-M4"
+  val AkkaVersion = "2.9.0"
+  val AkkaHttpVersion = "10.6.0"
+  val AlpakkaVersion = "7.0.2"
+  val AlpakkaKafkaVersion = "5.0.0"
+  val AkkaDiagnosticsVersion = "2.1.0"
 
   val dependencies = List(
     "com.lightbend.akka" %% "akka-stream-alpakka-csv" % AlpakkaVersion,
