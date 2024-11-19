@@ -3,9 +3,9 @@ name := "alpakka-samples-mqtt-http-to-s3-java"
 
 ThisBuild / scalaVersion := "2.13.12"
 
-val AkkaVersion = "2.9.0"
+val AkkaVersion = "2.10.0"
 val AkkaHttpVersion = "10.6.0"
-val AkkaDiagnosticsVersion = "2.1.0"
+val AkkaDiagnosticsVersion = "2.2.0"
 
 resolvers += "Akka library repository".at("https://repo.akka.io/maven")
 

@@ -4,11 +4,11 @@ object Dependencies {
   val scalaVer = "2.13.12"
   // #dependencies
   val ScalaTestVersion = "3.1.4"
-  val AkkaVersion = "2.9.0"
+  val AkkaVersion = "2.10.0"
   val AkkaHttpVersion = "10.6.0"
-  val AlpakkaVersion = "7.0.2"
+  val AlpakkaVersion = "9.0.0"
   val AlpakkaKafkaVersion = "5.0.0"
-  val AkkaDiagnosticsVersion = "2.1.0"
+  val AkkaDiagnosticsVersion = "2.2.0"
 
   val dependencies = List(
     "com.lightbend.akka" %% "akka-stream-alpakka-csv" % AlpakkaVersion,
