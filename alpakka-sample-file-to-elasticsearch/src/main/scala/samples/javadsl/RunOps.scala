@@ -6,7 +6,7 @@ import akka.Done
 import akka.actor.typed.ActorSystem
 import samples.scaladsl
 
-import scala.compat.java8.FutureConverters._
+import scala.jdk.FutureConverters._
 
 object RunOps {
   val elasticsearchAddress: String = scaladsl.RunOps.elasticsearchAddress
@@ -16,18 +16,18 @@ object RunOps {
   def now(): Long = scaladsl.RunOps.now()
 
   def listFiles(path: String)(implicit system: ActorSystem[_]): CompletionStage[Seq[Path]] = {
-    scaladsl.RunOps.listFiles(path).toJava
+    scaladsl.RunOps.listFiles(path).asJava
   }
 
   def copyTestDataTo(source: String, destination: String)(implicit system: ActorSystem[_]): CompletionStage[Unit] = {
-    scaladsl.RunOps.copyTestDataTo(source, destination).toJava
+    scaladsl.RunOps.copyTestDataTo(source, destination).asJava
   }
 
   def deleteAllFilesFrom(path: String)(implicit system: ActorSystem[_]): CompletionStage[Unit] = {
-    scaladsl.RunOps.deleteAllFilesFrom(path).toJava
+    scaladsl.RunOps.deleteAllFilesFrom(path).asJava
   }
 
   def shutdown(actorSystem: ActorSystem[_]): CompletionStage[Done] = {
-    scaladsl.RunOps.shutdown(actorSystem).toJava
+    scaladsl.RunOps.shutdown(actorSystem).asJava
   }
 }

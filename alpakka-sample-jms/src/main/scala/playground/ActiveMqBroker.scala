@@ -12,7 +12,7 @@ import org.apache.activemq.ActiveMQConnectionFactory
 import org.apache.activemq.broker.BrokerService
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.compat.java8.FutureConverters._
+import scala.jdk.FutureConverters._
 
 /**
   * To start an ActiveMQ broker be sure to include these dependencies:
@@ -33,7 +33,7 @@ class ActiveMqBroker {
     broker
   }
 
-  def stopCs(ec: ExecutionContext): CompletionStage[Done] = stop()(ec).toJava
+  def stopCs(ec: ExecutionContext): CompletionStage[Done] = stop()(ec).asJava
 
   def stop()(implicit ec: ExecutionContext): Future[Done] =
     brokerService.fold(Future.successful(Done)) { broker =>
