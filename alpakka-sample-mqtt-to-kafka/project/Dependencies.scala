@@ -1,12 +1,12 @@
 import sbt._
 
 object Dependencies {
-  val scalaVer = "2.13.12"
+  val scalaVer = "2.13.15"
   // #deps
-  val AkkaVersion = "2.10.0"
-  val AlpakkaVersion = "9.0.0"
-  val AlpakkaKafkaVersion = "5.0.0"
-  val JacksonDatabindVersion = "2.15.2"
+  val AkkaVersion = "2.10.5"
+  val AlpakkaVersion = "9.0.2"
+  val AlpakkaKafkaVersion = "7.0.2"
+  val JacksonDatabindVersion = "2.18.3"
 
   // #deps
 
@@ -24,7 +24,7 @@ object Dependencies {
     "com.fasterxml.jackson.module" %% "jackson-module-scala" % JacksonDatabindVersion,
     // Logging
     "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,
-    "ch.qos.logback" % "logback-classic" % "1.2.3",
+    "ch.qos.logback" % "logback-classic" % "1.5.18",
   // #deps
     "org.testcontainers" % "kafka" % "1.16.0"
   )
