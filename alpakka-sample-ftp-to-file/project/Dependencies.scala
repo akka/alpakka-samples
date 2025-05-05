@@ -1,11 +1,11 @@
 import sbt._
 
 object Dependencies {
-  val scalaVer = "2.13.12"
+  val scalaVer = "2.13.15"
   // #deps
-  val AkkaVersion = "2.10.0"
-  val AlpakkaVersion = "9.0.0"
-  val AkkaDiagnosticsVersion = "2.2.0"
+  val AkkaVersion = "2.10.5"
+  val AlpakkaVersion = "9.0.2"
+  val AkkaDiagnosticsVersion = "2.2.1"
 
   // #deps
 
@@ -24,6 +24,6 @@ object Dependencies {
     "com.google.jimfs" % "jimfs" % "1.1", // ApacheV2
     // Logging
     "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,
-    "ch.qos.logback" % "logback-classic" % "1.2.3"
+    "ch.qos.logback" % "logback-classic" % "1.5.18"
   )
 }
