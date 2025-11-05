@@ -31,7 +31,7 @@ To use Java 8 time types (`Instant`) with Jackson, extra dependencies are requir
   version1=2.10.0
   group2=com.fasterxml.jackson.datatype
   artifact2=jackson-datatype-jsr310
-  version2=2.10.0
+  version2.2.20.0
   group3=com.fasterxml.jackson.module
   artifact3=jackson-module-scala_$scala.binary.version$
   version3=2.10.0
