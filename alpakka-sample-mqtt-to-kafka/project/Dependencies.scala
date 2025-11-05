@@ -1,12 +1,12 @@
 import sbt._
 
 object Dependencies {
-  val scalaVer = "2.13.15"
+  val scalaVer = "2.13.17"
   // #deps
-  val AkkaVersion = "2.10.5"
-  val AlpakkaVersion = "9.0.2"
-  val AlpakkaKafkaVersion = "7.0.2"
-  val JacksonDatabindVersion = "2.18.3"
+  val AkkaVersion = "2.10.11"
+  val AlpakkaVersion = "10.0.0"
+  val AlpakkaKafkaVersion = "8.0.0"
+  val JacksonDatabindVersion = "2.18.4"
 
   // #deps
 

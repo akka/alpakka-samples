@@ -3,10 +3,10 @@ import sbt._
 object Dependencies {
   val scalaVer = "2.13.12"
   // #deps
-  val AkkaVersion = "2.10.5"
-  val AkkaHttpVersion = "10.7.1"
-  val AlpakkaKafkaVersion = "7.0.2"
-  val AkkaDiagnosticsVersion = "2.2.1"
+  val AkkaVersion = "2.10.11"
+  val AkkaHttpVersion = "10.7.3"
+  val AlpakkaKafkaVersion = "8.0.0"
+  val AkkaDiagnosticsVersion = "2.2.2"
   // #deps
   val dependencies = List(
     // #deps

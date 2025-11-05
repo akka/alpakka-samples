@@ -1,11 +1,11 @@
 organization := "com.lightbend.akka.samples"
 name := "alpakka-samples-mqtt-http-to-s3-java"
 
-ThisBuild / scalaVersion := "2.13.15"
+ThisBuild / scalaVersion := "2.13.17"
 
-val AkkaVersion = "2.10.5"
-val AkkaHttpVersion = "10.7.1"
-val AkkaDiagnosticsVersion = "2.2.1"
+val AkkaVersion = "2.10.11"
+val AkkaHttpVersion = "10.7.3"
+val AkkaDiagnosticsVersion = "2.2.2"
 
 resolvers += "Akka library repository".at("https://repo.akka.io/maven")
 
@@ -18,8 +18,8 @@ libraryDependencies ++= Seq(
     "com.lightbend.akka" %% "akka-diagnostics" % AkkaDiagnosticsVersion,
   "com.lightbend.akka" %% "akka-stream-alpakka-mqtt" % "3.0.4",
   "com.lightbend.akka" %% "akka-stream-alpakka-s3" % "3.0.4",
-  "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.18.3",
-  "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.18.3",
+  "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.18.4",
+  "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.18.4",
   "ch.qos.logback" % "logback-classic" % "1.5.18"
 )
 
