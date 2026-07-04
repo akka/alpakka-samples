@@ -8,7 +8,7 @@ val AlpakkaVersion = "10.0.3"
 val AkkaDiagnosticsVersion = "2.2.2"
 val JacksonCoreVersion = "2.18.4"
 
-resolvers += "Akka library repository".at("https://repo.akka.io/maven")
+resolvers += "Akka library repository".at("REPLACE_WITH_REPO_URL_FROM_https://account.akka.io/token")
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,

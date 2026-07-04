@@ -7,7 +7,7 @@ val AkkaVersion = "2.10.11"
 val AkkaHttpVersion = "10.7.3"
 val AkkaDiagnosticsVersion = "2.2.2"
 
-resolvers += "Akka library repository".at("https://repo.akka.io/maven")
+resolvers += "Akka library repository".at("REPLACE_WITH_REPO_URL_FROM_https://account.akka.io/token")
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-slf4j" % AkkaVersion,
