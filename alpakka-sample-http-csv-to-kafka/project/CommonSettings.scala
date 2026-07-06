@@ -16,7 +16,7 @@ object CommonSettings {
     ThisBuild / parallelExecution := false,
     GlobalScope / parallelExecution := false,
     Test / fork := true,
-    resolvers += "Akka library repository".at("https://repo.akka.io/maven"),
+    resolvers += "Akka library repository".at("REPLACE_WITH_REPO_URL_FROM_https://account.akka.io/token"),
     libraryDependencies ++= Dependencies.dependencies
   ) ++
     AdditionalSettings.initialCmdsConsole ++
