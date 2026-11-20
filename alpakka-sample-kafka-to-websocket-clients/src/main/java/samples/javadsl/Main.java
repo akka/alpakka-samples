@@ -21,7 +21,6 @@ import akka.japi.Pair;
 import akka.kafka.ConsumerSettings;
 import akka.kafka.Subscriptions;
 import akka.kafka.javadsl.Consumer;
-import akka.stream.ActorMaterializer;
 import akka.stream.Materializer;
 import akka.stream.OverflowStrategy;
 import akka.stream.SystemMaterializer;
