@@ -16,7 +16,7 @@ import akka.kafka.scaladsl.{Consumer, Producer}
 import akka.stream.alpakka.mqtt.{MqttConnectionSettings, MqttMessage, MqttQoS, MqttSubscriptions}
 import akka.stream.alpakka.mqtt.scaladsl.{MqttSink, MqttSource}
 import akka.stream.scaladsl.{Keep, RestartSource, Sink, Source}
-import akka.stream.{KillSwitches, UniqueKillSwitch}
+import akka.stream.{KillSwitches, RestartSettings, UniqueKillSwitch}
 import akka.util.ByteString
 import com.fasterxml.jackson.annotation.{JsonCreator, JsonProperty}
 import com.fasterxml.jackson.core.JsonFactory
@@ -80,7 +80,8 @@ class Main {
    */
   private def wrapWithAsRestartSource[M](source: => Source[M, Future[Done]]): Source[M, Future[Done]] = {
     val fut = Promise[Done]
-    RestartSource.withBackoff(100.millis, 3.seconds, randomFactor = 0.2d, maxRestarts = 5) {
+    val restartSettings = RestartSettings(100.millis, 3.seconds, randomFactor = 0.2d).withMaxRestarts(5, 100.millis)
+    RestartSource.withBackoff(restartSettings) {
       () => source.mapMaterializedValue(mat => fut.completeWith(mat))
     }.mapMaterializedValue(_ => fut.future)
   }

@@ -1,11 +1,11 @@
 organization := "com.lightbend.alpakka.samples"
 name := "alpakka-samples-sqs-java"
 
-ThisBuild / scalaVersion := "2.13.17"
+ThisBuild / scalaVersion := "2.13.18"
 
-val AkkaVersion = "2.10.11"
-val AlpakkaVersion = "10.0.3"
-val AkkaDiagnosticsVersion = "2.2.2"
+val AkkaVersion = "2.11.0"
+val AlpakkaVersion = "11.0.2"
+val AkkaDiagnosticsVersion = "2.3.0"
 val JacksonCoreVersion = "2.18.4"
 
 resolvers += "Akka library repository".at("REPLACE_WITH_REPO_URL_FROM_https://account.akka.io/token")

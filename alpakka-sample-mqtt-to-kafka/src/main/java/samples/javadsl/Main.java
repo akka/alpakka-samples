@@ -18,6 +18,7 @@ import akka.kafka.javadsl.Consumer;
 import akka.kafka.javadsl.Producer;
 import akka.stream.KillSwitch;
 import akka.stream.KillSwitches;
+import akka.stream.RestartSettings;
 import akka.stream.UniqueKillSwitch;
 import akka.stream.alpakka.mqtt.MqttConnectionSettings;
 import akka.stream.alpakka.mqtt.MqttMessage;
@@ -117,11 +118,11 @@ public class Main {
             Creator<Source<M, CompletionStage<Done>>> source) {
         // makes use of the fact that these sources materialize a CompletionStage<Done>
         CompletableFuture<Done> fut = new CompletableFuture<>();
+        RestartSettings restartSettings =
+                RestartSettings.create(Duration.ofMillis(100), Duration.ofSeconds(3), 0.2d)
+                        .withMaxRestarts(5, Duration.ofMillis(100));
         return RestartSource.withBackoff(
-                Duration.ofMillis(100),
-                Duration.ofSeconds(3),
-                0.2d, // randomFactor
-                5, // maxRestarts,
+                restartSettings,
                 () ->
                         source
                                 .create()
